@@ -13,4 +13,5 @@ Rails.application.routes.draw do
   # root "posts#index"
   root "dashboard#show"
   get "/dashboard", to: "dashboard#show"
+  get "/ui", to: "ui#show"
 end

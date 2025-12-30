@@ -1,11 +1,5 @@
 <div class="min-h-screen">
-  <%= render Studs::TopBarComponent.new(title: "UI Check", subtitle: "Studs components playground") do |t| %>
-    <% t.with_left do %>
-      <div class="flex items-center gap-2">
-        <span class="text-sm font-semibold text-zinc-100">Clear</span>
-      </div>
-    <% end %>
-
+  <%= render Studs::TopBarComponent.new(title: "UI", subtitle: "Studs testing page") do |t| %>
     <% t.with_actions do %>
       <%= render Studs::SearchBarComponent.new(class_name: "w-80", placeholder: "Search…" ) %>
     <% end %>
@@ -15,15 +9,52 @@
     <%= render Studs::LeftNavComponent.new(
           brand: nil,
           items: [
-            { label: "UI", path: "/ui" },
-            { label: "Dashboard", path: "/" }
+            { label: "Dashboard", path: "/dashboard", icon_name: "search-01-stroke-rounded" },
+            { label: "UI", path: "/ui", icon_name: "search-01-stroke-rounded" }
           ],
           class_name: "h-[calc(100vh-4rem)]"
         ) %>
 
-    <main class="min-w-0 flex-1 px-4 py-6">
-      <div class="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6">
-        <div class="text-sm text-zinc-300">Page content goes here…</div>
+    <main class="min-w-0 flex-1 px-6 py-6">
+      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div class="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5">
+          <div class="text-xs text-zinc-400">Primary button</div>
+          <div class="mt-3 flex flex-wrap gap-2">
+            <%= render Studs::PrimaryButtonComponent.new(label: "Orange (default)", color: :orange) %>
+            <%= render Studs::PrimaryButtonComponent.new(label: "Zinc", color: :zinc) %>
+            <%= render Studs::PrimaryButtonComponent.new(label: "Blue", color: :blue) %>
+            <%= render Studs::PrimaryButtonComponent.new(label: "Emerald", color: :emerald) %>
+          </div>
+        </div>
+
+        <div class="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5">
+          <div class="text-xs text-zinc-400">Secondary colors</div>
+          <div class="mt-3 flex flex-wrap gap-2">
+            <%= render Studs::SecondaryButtonComponent.new(label: "Zinc", color: :zinc, size: :sm) %>
+            <%= render Studs::SecondaryButtonComponent.new(label: "Orange", color: :orange, size: :sm) %>
+            <%= render Studs::SecondaryButtonComponent.new(label: "Blue", color: :blue, size: :sm) %>
+            <%= render Studs::SecondaryButtonComponent.new(label: "Emerald", color: :emerald, size: :sm) %>
+            <%= render Studs::SecondaryButtonComponent.new(label: "Red", color: :red, size: :sm) %>
+          </div>
+        </div>
+
+        <div class="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5">
+          <div class="text-xs text-zinc-400">Secondary sizes</div>
+          <div class="mt-3 flex flex-wrap items-center gap-2">
+            <%= render Studs::SecondaryButtonComponent.new(label: "XS", size: :xs, color: :zinc) %>
+            <%= render Studs::SecondaryButtonComponent.new(label: "SM", size: :sm, color: :zinc) %>
+            <%= render Studs::SecondaryButtonComponent.new(label: "MD", size: :md, color: :zinc) %>
+            <%= render Studs::SecondaryButtonComponent.new(label: "LG", size: :lg, color: :zinc) %>
+          </div>
+        </div>
+
+        <div class="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5 lg:col-span-3">
+          <div class="text-xs text-zinc-400">Nav link component</div>
+          <div class="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            <%= render Studs::LeftNavLinkComponent.new(label: "Active", path: "#", icon_name: "search-01-stroke-rounded", active: true) %>
+            <%= render Studs::LeftNavLinkComponent.new(label: "Inactive", path: "#", icon_name: "search-01-stroke-rounded", active: false) %>
+          </div>
+        </div>
       </div>
     </main>
   </div>

@@ -1,19 +1,15 @@
-<aside class="<%= wrapper_classes %>">
-  <nav class="px-3 py-3">
-    <ul class="space-y-1">
-      <% @items.each do |item| %>
-        <% active = active_item?(item) %>
-        <li>
-          <%= link_to item[:path], class: item_classes(active) do %>
-            <% if item[:icon_name].present? %>
-              <span class="shrink-0 opacity-90">
-                <%= helpers.icon item[:icon_name], library: "huge_icons", class: "h-5 w-5" %>
-              </span>
-            <% end %>
-            <span class="truncate"><%= item[:label] %></span>
-          <% end %>
-        </li>
-      <% end %>
-    </ul>
-  </nav>
-</aside>
+<nav class="px-3 py-3">
+  <ul class="space-y-1">
+    <% @items.each do |item| %>
+      <% active = active_item?(item) %>
+      <li>
+        <%= render Studs::LeftNavLinkComponent.new(
+              label: item[:label],
+              path: item[:path],
+              icon_name: item[:icon_name],
+              active: active
+            ) %>
+      </li>
+    <% end %>
+  </ul>
+</nav>
