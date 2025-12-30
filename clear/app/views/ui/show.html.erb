@@ -1,0 +1,30 @@
+<div class="min-h-screen">
+  <%= render Studs::TopBarComponent.new(title: "UI Check", subtitle: "Studs components playground") do |t| %>
+    <% t.with_left do %>
+      <div class="flex items-center gap-2">
+        <span class="text-sm font-semibold text-zinc-100">Clear</span>
+      </div>
+    <% end %>
+
+    <% t.with_actions do %>
+      <%= render Studs::SearchBarComponent.new(class_name: "w-80", placeholder: "Search…" ) %>
+    <% end %>
+  <% end %>
+
+  <div class="flex h-[calc(100vh-4rem)]">
+    <%= render Studs::LeftNavComponent.new(
+          brand: nil,
+          items: [
+            { label: "UI", path: "/ui" },
+            { label: "Dashboard", path: "/" }
+          ],
+          class_name: "h-[calc(100vh-4rem)]"
+        ) %>
+
+    <main class="min-w-0 flex-1 px-4 py-6">
+      <div class="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6">
+        <div class="text-sm text-zinc-300">Page content goes here…</div>
+      </div>
+    </main>
+  </div>
+</div>
