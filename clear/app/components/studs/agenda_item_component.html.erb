@@ -1,0 +1,27 @@
+<%= content_tag(wrapper_tag, **wrapper_attrs) do %>
+  <div class="w-16 shrink-0 text-xs font-medium text-zinc-400">
+    <%= @time %>
+  </div>
+
+  <div class="min-w-0 flex-1">
+    <div class="flex items-center gap-2">
+      <% if @icon_name.present? %>
+        <%= helpers.icon @icon_name, library: "huge_icons", class: "h-4 w-4 text-zinc-400" %>
+      <% end %>
+
+      <div class="truncate text-sm font-semibold text-zinc-100">
+        <%= @title %>
+      </div>
+
+      <% if @tag.present? %>
+        <span class="<%= tag_classes %>"><%= @tag %></span>
+      <% end %>
+    </div>
+
+    <% if @meta.present? %>
+      <div class="mt-1 truncate text-xs text-zinc-400">
+        <%= @meta %>
+      </div>
+    <% end %>
+  </div>
+<% end %>

@@ -1,0 +1,15 @@
+<nav class="px-3 py-3">
+  <ul class="space-y-1">
+    <% @items.each do |item| %>
+      <% active = active_item?(item) %>
+      <li>
+        <%= render Studs::LeftNavLinkComponent.new(
+              label: item[:label],
+              path: item[:path],
+              icon_name: item[:icon_name],
+              active: active
+            ) %>
+      </li>
+    <% end %>
+  </ul>
+</nav>

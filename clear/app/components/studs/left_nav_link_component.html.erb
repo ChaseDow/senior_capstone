@@ -1,0 +1,8 @@
+<%= link_to @path, class: classes do %>
+  <% if @icon_name.present? %>
+    <span class="shrink-0 opacity-90">
+      <%= helpers.icon @icon_name, library: "huge_icons", class: "h-5 w-5" %>
+    </span>
+  <% end %>
+  <span class="truncate"><%= @label %></span>
+<% end %>

@@ -1,0 +1,14 @@
+<div class="<%= wrapper_classes %>">
+  <div class="pointer-events-none absolute inset-y-0 left-3 flex items-center">
+    <%= helpers.icon "search-01-stroke-rounded", library: "huge_icons", class: "h-4 w-4 text-zinc-400" %>
+  </div>
+
+  <%= tag.input(
+        type: "search",
+        name: @name,
+        value: @value,
+        placeholder: @placeholder,
+        class: input_classes,
+        **@attrs
+      ) %>
+</div>
