@@ -26,14 +26,20 @@
     <div class="flex shrink-0 items-center gap-2">
       <%= render Studs::SecondaryButtonComponent.new(
             label: "Edit",
-            href: edit_event_path(@event)
+            path: edit_event_path(@event),
+            size: :sm
           ) %>
 
-      <%= button_to "Delete",
-                    event_path(@event),
+      <%= button_to event_path(@event),
                     method: :delete,
                     form: { data: { turbo_confirm: "Delete this event?" } },
-                    class: "inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-500 transition" %>
+                    class: "inline-block" do %>
+        <%= render Studs::SecondaryButtonComponent.new(
+              label: "Delete",
+              color: :red,
+              type: "submit"
+            ) %>
+      <% end %>
     </div>
   </div>
 
