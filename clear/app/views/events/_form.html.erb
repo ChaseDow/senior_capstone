@@ -1,8 +1,8 @@
-<%= form_with model: event, class: "space-y-4" do |f| %>
+<%= form_with model: event, class: "space-y-5" do |f| %>
   <% if event.errors.any? %>
-    <div class="rounded-xl bg-red-50 p-4 text-red-800">
+    <div class="rounded-2xl border border-red-900 bg-red-950/40 p-4 text-red-200">
       <p class="font-medium">Please fix the following:</p>
-      <ul class="mt-2 list-disc pl-6">
+      <ul class="mt-2 list-disc pl-6 text-sm">
         <% event.errors.full_messages.each do |msg| %>
           <li><%= msg %></li>
         <% end %>
@@ -10,35 +10,43 @@
     </div>
   <% end %>
 
+  <% input_classes = "mt-1 w-full rounded-xl border border-zinc-800 bg-zinc-950/40 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-orange-300/50" %>
+  <% label_classes = "block text-sm font-medium text-zinc-200" %>
+
   <div>
-    <%= f.label :title, class: "block text-sm font-medium text-gray-800" %>
-    <%= f.text_field :title, class: "mt-1 w-full rounded-lg border-gray-300" %>
+    <%= f.label :title, class: label_classes %>
+    <%= f.text_field :title, class: input_classes, placeholder: "e.g. Gym session, Study group..." %>
   </div>
 
   <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
     <div>
-      <%= f.label :starts_at, "Start time", class: "block text-sm font-medium text-gray-800" %>
-      <%= f.datetime_local_field :starts_at, class: "mt-1 w-full rounded-lg border-gray-300" %>
+      <%= f.label :starts_at, "Start time", class: label_classes %>
+      <%= f.datetime_local_field :starts_at, class: input_classes %>
     </div>
 
     <div>
-      <%= f.label :ends_at, "End time (optional)", class: "block text-sm font-medium text-gray-800" %>
-      <%= f.datetime_local_field :ends_at, class: "mt-1 w-full rounded-lg border-gray-300" %>
+      <%= f.label :ends_at, "End time (optional)", class: label_classes %>
+      <%= f.datetime_local_field :ends_at, class: input_classes %>
     </div>
   </div>
 
   <div>
-    <%= f.label :location, class: "block text-sm font-medium text-gray-800" %>
-    <%= f.text_field :location, class: "mt-1 w-full rounded-lg border-gray-300" %>
+    <%= f.label :location, class: label_classes %>
+    <%= f.text_field :location, class: input_classes, placeholder: "e.g. Library, Room 210" %>
   </div>
 
   <div>
-    <%= f.label :description, class: "block text-sm font-medium text-gray-800" %>
-    <%= f.text_area :description, rows: 4, class: "mt-1 w-full rounded-lg border-gray-300" %>
+    <%= f.label :description, class: label_classes %>
+    <%= f.text_area :description, rows: 5, class: input_classes, placeholder: "Optional notes..." %>
   </div>
 
-  <div class="flex items-center gap-2">
-    <%= f.submit class: "rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800" %>
-    <%= link_to "Cancel", events_path, class: "rounded-lg bg-gray-100 px-4 py-2 text-sm hover:bg-gray-200" %>
+  <div class="flex items-center gap-2 pt-2">
+    <%= render Studs::PrimaryButtonComponent.new(
+          label: (event.persisted? ? "Update event" : "Create event"),
+          type: "submit",
+          color: :orange
+        ) %>
+
+    <%= render Studs::SecondaryButtonComponent.new(label: "Cancel", href: events_path) %>
   </div>
 <% end %>

@@ -1,13 +1,57 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Testing</title>
-        <%= csrf_meta_tags %>
-        <%= csp_meta_tag %>
+  <head>
+    <title><%= content_for(:title) || "Clear" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Clear">
+    <meta name="mobile-web-app-capable" content="yes">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
 
-        <%= stylesheet_link_tag "app", "data-trubo-track": "reload"%>
-        <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module"%>
-    </head>
+    <%= yield :head %>
 
-    <>
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+
+    <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+  </head>
+
+  <body data-theme="green" class="min-h-screen bg-zinc-950 text-zinc-100">
+    <div class="min-h-screen">
+      <%= render Studs::TopBarComponent.new(title: "Events", subtitle: "Separate from classes and work.") do |t| %>
+        <% t.with_actions do %>
+          <%= render Studs::SearchBarComponent.new(class_name: "w-80", placeholder: "Search…") %>
+        <% end %>
+      <% end %>
+
+      <div class="flex h-[calc(100vh-4rem)]">
+        <%= render Studs::LeftNavComponent.new(
+              brand: nil,
+              items: [
+                { label: "Dashboard", path: "/dashboard", icon_name: "dashboard-circle-stroke-rounded" },
+                { label: "UI",        path: "/ui",        icon_name: "search-01-stroke-rounded" },
+                { label: "Events",    path: "/events",    icon_name: "timeline-event-stroke-rounded" }
+              ],
+              class_name: "h-[calc(100vh-4rem)]"
+            ) %>
+
+        <div class="min-w-0 flex-1">
+          <div class="flex h-full gap-6 px-6 py-6">
+            <main class="min-w-0 flex-1">
+              <% if notice.present? %>
+                <div class="mb-4 rounded-2xl border border-emerald-900 bg-emerald-950/40 px-4 py-3 text-sm text-emerald-200">
+                  <%= notice %>
+                </div>
+              <% end %>
+
+              <%= yield %>
+            </main>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
 </html>

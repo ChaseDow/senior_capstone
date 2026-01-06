@@ -1,1 +1,27 @@
 @import "tailwindcss";
+/* =========================
+   Studs Theme (default: green)
+   ========================= */
+
+:root,
+body[data-theme="green"] {
+  /* Colors pulled from your palette image */
+  --studs-panel-bg: rgba(3, 98, 76, 0.18);        /* Bangladesh Green (#03624C) tinted */
+  --studs-panel-bg-2: rgba(3, 98, 76, 0.10);      /* lighter surface */
+  --studs-panel-hover: rgba(3, 98, 76, 0.22);     /* hover lift */
+
+  --studs-border: rgba(47, 169, 140, 0.22);       /* Mint (#2FA98C) border */
+  --studs-divider: rgba(47, 169, 140, 0.16);      /* subtle divider */
+}
+
+/* Override common "gray panel" utilities app-wide */
+.bg-zinc-900\/40 { background-color: var(--studs-panel-bg) !important; }
+.border-zinc-800  { border-color: var(--studs-border) !important; }
+
+/* Tailwind divide utilities apply border-color to children */
+.divide-zinc-800 > :not([hidden]) ~ :not([hidden]) {
+  border-color: var(--studs-divider) !important;
+}
+
+.bg-zinc-900\/50 { background-color: var(--studs-panel-hover) !important; }
+.bg-zinc-950\/40 { background-color: var(--studs-panel-bg-2) !important; }
