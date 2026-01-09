@@ -25,6 +25,15 @@
         (controller.respond_to?(:devise_controller?) && controller.devise_controller?) %>
 
     <% if show_public_header %>
+      <!-- Public aurora background -->
+      <div class="aurora pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+        <div class="aurora__gradient"></div>
+        <div class="aurora__orb aurora__orb--1"></div>
+        <div class="aurora__orb aurora__orb--2"></div>
+        <div class="aurora__orb aurora__orb--3"></div>
+        <div class="aurora__vignette"></div>
+      </div>
+
       <header class="border-b border-zinc-800/80 bg-zinc-950/60 backdrop-blur">
         <div class="flex w-full items-center justify-between px-4 py-3">
           <%= link_to "Clear", root_path, class: "text-sm font-semibold tracking-wide text-zinc-100" %>
