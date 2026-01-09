@@ -1,15 +1,37 @@
-<nav class="px-3 py-3">
-  <ul class="space-y-1">
-    <% @items.each do |item| %>
-      <% active = active_item?(item) %>
-      <li>
+<aside class="<%= wrapper_classes %>">
+  <div class="flex h-full flex-col px-3 py-4">
+    <% if @brand.present? %>
+      <div class="mb-4 px-3 text-sm font-semibold text-zinc-100">
+        <%= @brand %>
+      </div>
+    <% end %>
+
+    <nav class="space-y-1">
+      <% @items.each do |item| %>
         <%= render Studs::LeftNavLinkComponent.new(
               label: item[:label],
               path: item[:path],
               icon_name: item[:icon_name],
-              active: active
+              active: active_item?(item)
             ) %>
-      </li>
+      <% end %>
+    </nav>
+
+    <% if helpers.user_signed_in? %>
+      <div class="mt-auto pt-4">
+        <div class="border-t border-zinc-800 pt-4">
+          <div class="px-3 pb-2 text-xs text-zinc-400 truncate">
+            <%= helpers.current_user.email %>
+          </div>
+
+          <%= button_to helpers.destroy_user_session_path,
+                method: :delete,
+                data: { turbo: false },
+                class: "w-full rounded-xl border border-zinc-800 bg-zinc-900/40 px-3 py-2 text-sm text-zinc-100 hover:bg-zinc-900" do %>
+            Sign out
+          <% end %>
+        </div>
+      </div>
     <% end %>
-  </ul>
-</nav>
+  </div>
+</aside>

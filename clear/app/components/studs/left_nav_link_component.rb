@@ -24,13 +24,21 @@ module Studs
     end
 
     def icon_classes
-      base = "h-5 w-5 shrink-0 opacity-90 fill-none stroke-current"
+      svg_base = [
+        "shrink-0",
+        "[&>svg]:h-5 [&>svg]:w-5",
+        "[&>svg]:opacity-90",
+        "[&>svg]:fill-none [&>svg]:stroke-current"
+      ].join(" ")
 
-      if @active
-        "#{base} text-emerald-200"
-      else
-        "#{base} text-emerald-300 group-hover:text-zinc-50"
-      end
+      color =
+        if @active
+          "text-emerald-200"
+        else
+          "text-emerald-300 group-hover:text-zinc-50"
+        end
+
+      "#{svg_base} #{color}"
     end
   end
 end
