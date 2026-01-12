@@ -1,0 +1,166 @@
+<% hour_height_px = 56 %> 
+<% px_per_minute  = hour_height_px / 60.0 %>
+
+<% week_start_date = start_date.to_date.beginning_of_week %>
+<% days            = (0..6).map { |i| week_start_date + i } %>
+
+<% prev_start  = week_start_date - 7.days %>
+<% next_start  = week_start_date + 7.days %>
+<% today_start = Date.current.beginning_of_week %>
+
+<% nav_btn =
+  "inline-flex items-center rounded-xl border border-zinc-800 bg-zinc-950/40 px-3 py-1.5 text-sm text-zinc-200 " \
+  "hover:bg-zinc-800/40 hover:text-zinc-50 transition"
+%>
+
+<% event_classes =
+  "absolute rounded-xl border border-zinc-700 bg-zinc-800/70 px-2 py-1 text-[11px] text-zinc-100 " \
+  "hover:bg-zinc-800/90 hover:border-zinc-600 transition shadow-sm"
+%>
+
+<% events_by_day = events.group_by { |e| e.starts_at.in_time_zone.to_date } %>
+
+<div class="flex h-full min-h-0 flex-col">
+  <div class="mb-4 flex items-center justify-between gap-3">
+    <div class="text-base font-semibold text-zinc-100">
+      <%= week_start_date.strftime("%b %-d") %>
+      <span class="text-zinc-500">–</span>
+      <%= (week_start_date + 6.days).strftime("%b %-d, %Y") %>
+    </div>
+
+    <nav class="flex items-center gap-2">
+      <%= link_to "Previous", url_for(start_date: prev_start), class: nav_btn %>
+      <%= link_to "Today",    url_for(start_date: today_start), class: nav_btn %>
+      <%= link_to "Next",     url_for(start_date: next_start), class: nav_btn %>
+    </nav>
+  </div>
+
+  <div class="min-h-0 flex-1 overflow-auto rounded-2xl border border-zinc-800 bg-zinc-950/10">
+    <div class="sticky top-0 z-20 grid grid-cols-[4rem_repeat(7,minmax(0,1fr))] border-b border-zinc-800 bg-zinc-950/70 backdrop-blur">
+      <div class="h-12 border-r border-zinc-800"></div>
+
+      <% days.each do |day| %>
+        <% is_today = (day == Date.current) %>
+        <div class="h-12 border-r border-zinc-800 px-3 py-2">
+          <div class="flex items-center justify-between">
+            <div class="text-sm font-medium text-zinc-100">
+              <%= day.strftime("%a") %>
+              <span class="text-zinc-400"><%= day.strftime("%-m/%-d") %></span>
+            </div>
+
+            <% if is_today %>
+              <span class="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[11px] text-emerald-300">Today</span>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="grid grid-cols-[4rem_repeat(7,minmax(0,1fr))]">
+      <%# Time labels %>
+      <div class="border-r border-zinc-800">
+        <% 24.times do |h| %>
+          <div class="h-14 border-b border-zinc-900/60 px-2 pt-1 text-right text-[11px] text-zinc-500">
+            <% label =
+              if h == 0
+                "12 AM"
+              elsif h < 12
+                "#{h} AM"
+              elsif h == 12
+                "12 PM"
+              else
+                "#{h - 12} PM"
+              end
+            %>
+            <%= label %>
+          </div>
+        <% end %>
+      </div>
+
+      <%# Day columns %>
+      <% days.each do |day| %>
+        <% day_start = Time.zone.local(day.year, day.month, day.day, 0, 0, 0) %>
+        <% day_end   = day_start.end_of_day %>
+
+        <div class="relative border-r border-zinc-800">
+          <%# Hour grid lines %>
+          <div class="absolute inset-0 pointer-events-none">
+            <% 24.times do %>
+              <div class="h-14 border-b border-zinc-900/60"></div>
+            <% end %>
+          </div>
+
+          <%# Events overlay %>
+          <div class="relative h-[1344px]">
+            <% day_events = events_by_day.fetch(day, []) %>
+
+            <% segments =
+              day_events.map do |e|
+                start_at = e.starts_at.in_time_zone
+                finish_at =
+                  if e.respond_to?(:ends_at) && e.ends_at.present?
+                    e.ends_at.in_time_zone
+                  else
+                    start_at + 1.hour
+                  end
+
+                seg_start = [start_at, day_start].max
+                seg_end   = [finish_at, day_end].min
+                next if seg_end <= seg_start
+
+                minutes_from_midnight = ((seg_start - day_start) / 60.0)
+                duration_minutes      = ((seg_end - seg_start) / 60.0)
+
+                {
+                  event: e,
+                  seg_start: seg_start,
+                  seg_end: seg_end,
+                  top: (minutes_from_midnight * px_per_minute),
+                  height: ([duration_minutes, 15].max * px_per_minute),
+                  col: 0
+                }
+              end.compact.sort_by { |s| s[:seg_start] }
+            %>
+
+            <% active = [] %>
+            <% max_cols = 1 %>
+
+            <% segments.each do |seg| %>
+              <% active.reject! { |a| a[:seg_end] <= seg[:seg_start] } %>
+
+              <% used = active.map { |a| a[:col] } %>
+              <% col = 0 %>
+              <% col += 1 while used.include?(col) %>
+
+              <% seg[:col] = col %>
+              <% active << seg %>
+
+              <% max_cols = [max_cols, (active.map { |a| a[:col] }.max.to_i + 1)].max %>
+            <% end %>
+
+            <% width_pct = (100.0 / max_cols) %>
+
+            <% segments.each do |seg| %>
+              <% e = seg[:event] %>
+              <% left_pct = seg[:col] * width_pct %>
+              <% start_label = seg[:seg_start].strftime("%-I:%M %p") %>
+              <% end_label   = seg[:seg_end].strftime("%-I:%M %p") %>
+
+              <% style_str =
+                "top: #{seg[:top]}px; " \
+                "height: #{seg[:height]}px; " \
+                "left: calc(#{left_pct}% + 4px); " \
+                "width: calc(#{width_pct}% - 8px);"
+              %>
+
+              <%= link_to(e, class: event_classes, style: style_str) do %>
+                <div class="font-medium truncate"><%= e.title.presence || "(Untitled)" %></div>
+                <div class="text-zinc-300"><%= start_label %> – <%= end_label %></div>
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
