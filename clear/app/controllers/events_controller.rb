@@ -1,21 +1,22 @@
 class EventsController < ApplicationController
   layout "app_shell"
 
+  before_action :authenticate_user!
   before_action :set_page_title
   before_action :set_event, only: %i[show edit update destroy]
 
   def index
-    @events = Event.order(starts_at: :asc)
+    @events = current_user.events.order(starts_at: :asc)
   end
 
   def show; end
 
   def new
-    @event = Event.new
+    @event = current_user.events.new
   end
 
   def create
-    @event = Event.new(event_params)
+    @event = current_user.events.new(event_params)
 
     if @event.save
       redirect_to event_path(@event), notice: "Event created."
@@ -52,7 +53,7 @@ class EventsController < ApplicationController
   end
 
   def set_event
-    @event = Event.find(params[:id])
+    @event = current_user.events.find(params[:id])
   end
 
   def event_params
