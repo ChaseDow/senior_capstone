@@ -19,7 +19,7 @@ module Studs
       [
         "w-full rounded-xl border border-zinc-800 bg-zinc-900/50",
         "pl-10 pr-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-500",
-        "focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400/40",
+        "focus:outline-none focus-visible:ring-2 focus-visible:ring-green-400/40",
         @input_class_name
       ].compact.join(" ")
     end
