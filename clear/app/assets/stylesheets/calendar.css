@@ -1,0 +1,29 @@
+.calendar {
+  display: flex;
+  flex-direction: column;
+}
+
+.week {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.day {
+  border: 1px solid #ddd;
+  min-height: 100px;
+  padding: 4px;
+}
+
+.other-month {
+  background: #f7f7f7;
+  color: #aaa;
+}
+
+.event {
+  background: #3174ad;
+  color: white;
+  padding: 2px 4px;
+  margin-top: 4px;
+  border-radius: 3px;
+  font-size: 0.85em;
+}
