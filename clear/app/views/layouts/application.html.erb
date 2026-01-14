@@ -1,5 +1,7 @@
 <!DOCTYPE html>
 <html>
+
+ 
   <head>
     <title><%= content_for(:title) || "Clear" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -10,14 +12,14 @@
     <%= csp_meta_tag %>
 
     <%= yield :head %>
-
-    <link rel="icon" href="/icon.png" type="image/png">
-    <link rel="icon" href="/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icon.png">
+    
+    <%= favicon_link_tag asset_path("logo-favicon.png"), type: "image/png" %>
 
     <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
   </head>
+
+
 
   <body class="min-h-screen bg-zinc-950 text-zinc-100">
     <% show_public_header =
@@ -35,10 +37,36 @@
       </div>
 
       <header class="border-b border-zinc-800/80 bg-zinc-950/60 backdrop-blur">
-        <div class="flex w-full items-center justify-between px-4 py-5">
-          <%= link_to "Clear", root_path, class: "text-md font-semibold tracking-wide text-zinc-100" %>
+        
+        <div class="flex w-full items-center justify-between px-4 py-3">
+          <%= link_to root_path, class: "flex items-center gap-2" do %>
+            <%= image_tag "Logo.png",
+                          alt: "Clear",
+                          class: "h-6 w-auto" %>
+            <span class="text-sm font-semibold tracking-wide text-zinc-100">Clear</span>
+          <% end %>
 
-          <nav class="flex items-center gap-3 text-sm">
+            <% if user_signed_in? %>
+              <span class="hidden sm:inline text-zinc-400">
+                <%= current_user.email %>
+              </span>
+
+              <%= button_to "Sign out",
+                    destroy_user_session_path,
+                    method: :delete,
+                    data: { turbo: false },
+                    class: "rounded-xl border border-zinc-800 bg-zinc-900/40 px-3 py-1.5 text-zinc-100 hover:bg-zinc-900" %>
+            <% else %>
+              <%= link_to "Sign in",
+                    new_user_session_path,
+                    data: { turbo: false },
+                    class: "rounded-xl border border-zinc-800 bg-zinc-900/40 px-3 py-1.5 hover:bg-zinc-900" %>
+
+              <%= link_to "Sign up",
+                    new_user_registration_path,
+                    data: { turbo: false },
+                    class: "rounded-xl bg-zinc-100 px-3 py-1.5 font-medium text-zinc-950 hover:bg-white" %>
+            <% end %>
           </nav>
         </div>
       </header>
