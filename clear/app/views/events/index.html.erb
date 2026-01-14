@@ -12,24 +12,44 @@
   </div>
 
   <div class="mt-4 overflow-hidden rounded-2xl border border-emerald-900/30 bg-emerald-950/10">
-    <% if @events.any? %>
+    <% occurrences = (@occurrences || @events || []) %>
+
+    <% if occurrences.any? %>
       <div class="divide-y divide-emerald-900/25">
-        <% @events.each do |event| %>
-          <div class="flex items-start justify-between gap-4 p-4 bg-emerald-950/10 hover:bg-emerald-900/10 transition">
+        <% occurrences.each do |occ| %>
+          <% event = occ.respond_to?(:event) ? occ.event : occ %>
+
+          <div class="flex items-start justify-between gap-4 p-4 bg-emerald-950/10 hover:bg-emerald-900/10 transition border-l-4"
+               style="border-left-color: <%= event.color.presence || "#34D399" %>;">
             <div class="min-w-0">
-              <p class="truncate font-medium text-zinc-100">
+              <p class="truncate font-medium text-zinc-100 flex items-center gap-2">
                 <%= link_to(event.title.presence || "(Untitled)", event_path(event), class: "hover:underline") %>
+
+                <% if event.recurring? %>
+                  <span class="rounded-full border border-emerald-900/40 bg-emerald-950/30 px-2 py-0.5 text-[11px] text-emerald-200">
+                    Repeats
+                  </span>
+                <% end %>
               </p>
 
+              <% starts_at = occ.respond_to?(:starts_at) ? occ.starts_at : event.starts_at %>
+              <% ends_at   = occ.respond_to?(:ends_at)   ? occ.ends_at   : event.ends_at   %>
+
               <p class="mt-1 text-sm text-zinc-400">
-                <%= event.starts_at&.strftime("%b %d, %Y • %I:%M %p") %>
-                <% if event.ends_at.present? %>
-                  – <%= event.ends_at.strftime("%I:%M %p") %>
+                <%= starts_at&.strftime("%b %d, %Y • %I:%M %p") %>
+                <% if ends_at.present? %>
+                  – <%= ends_at.strftime("%I:%M %p") %>
                 <% end %>
               </p>
 
               <% if event.location.present? %>
                 <p class="text-sm text-zinc-400"><%= event.location %></p>
+              <% end %>
+
+              <% if event.recurring? && event.repeat_until.present? %>
+                <p class="mt-1 text-xs text-zinc-500">
+                  Until <%= event.repeat_until.strftime("%b %d, %Y") %>
+                </p>
               <% end %>
             </div>
 

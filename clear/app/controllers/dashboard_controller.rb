@@ -1,19 +1,27 @@
-# frozen_string_literal: true
-
 class DashboardController < ApplicationController
   before_action :authenticate_user!
 
   def show
-    @start_date = params.fetch(:start_date, Date.current).to_date
+    @start_date =
+      if params[:start_date].present?
+        Date.parse(params[:start_date])
+      else
+        Date.current
+      end
 
     week_start  = @start_date.beginning_of_week
-    range_start = Time.zone.local(week_start.year, week_start.month, week_start.day, 0, 0, 0)
-    range_end   = (range_start + 6.days).end_of_day
+    range_start = week_start.beginning_of_day
+    range_end   = (week_start + 6.days).end_of_day
 
-    @events =
-      current_user
-        .events
-        .where(starts_at: range_start..range_end)
-        .order(:starts_at)
+    base_events = current_user.events
+      .where("starts_at <= ?", range_end)
+      .where("recurring = FALSE OR repeat_until >= ?", range_start.to_date)
+      .order(starts_at: :asc)
+
+    @events = base_events
+
+    @occurrences =
+      base_events.flat_map { |e| e.occurrences_between(range_start, range_end) }
+                .sort_by(&:starts_at)
   end
 end

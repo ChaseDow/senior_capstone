@@ -1,4 +1,4 @@
-<% hour_height_px = 56 %> 
+<% hour_height_px = 56 %>
 <% px_per_minute  = hour_height_px / 60.0 %>
 
 <% week_start_date = start_date.to_date.beginning_of_week %>
@@ -14,8 +14,8 @@
 %>
 
 <% event_classes =
-  "absolute rounded-xl border border-zinc-700 bg-zinc-800/70 px-2 py-1 text-[11px] text-zinc-100 " \
-  "hover:bg-zinc-800/90 hover:border-zinc-600 transition shadow-sm"
+  "absolute rounded-xl border px-2 py-1 text-[11px] shadow-sm transition " \
+  "hover:brightness-110 hover:saturate-110"
 %>
 
 <% events_by_day = events.group_by { |e| e.starts_at.in_time_zone.to_date } %>
@@ -96,6 +96,8 @@
 
             <% segments =
               day_events.map do |e|
+                event_record = e.respond_to?(:event) ? e.event : e
+
                 start_at = e.starts_at.in_time_zone
                 finish_at =
                   if e.respond_to?(:ends_at) && e.ends_at.present?
@@ -112,7 +114,7 @@
                 duration_minutes      = ((seg_end - seg_start) / 60.0)
 
                 {
-                  event: e,
+                  event: event_record,
                   seg_start: seg_start,
                   seg_end: seg_end,
                   top: (minutes_from_midnight * px_per_minute),
@@ -141,7 +143,7 @@
             <% width_pct = (100.0 / max_cols) %>
 
             <% segments.each do |seg| %>
-              <% e = seg[:event] %>
+              <% event = seg[:event] %>
               <% left_pct = seg[:col] * width_pct %>
               <% start_label = seg[:seg_start].strftime("%-I:%M %p") %>
               <% end_label   = seg[:seg_end].strftime("%-I:%M %p") %>
@@ -150,12 +152,15 @@
                 "top: #{seg[:top]}px; " \
                 "height: #{seg[:height]}px; " \
                 "left: calc(#{left_pct}% + 4px); " \
-                "width: calc(#{width_pct}% - 8px);"
+                "width: calc(#{width_pct}% - 8px); " \
+                "background-color: #{event.color.presence || "#34D399"}; " \
+                "color: #{event.contrast_text_color}; " \
+                "border-color: rgba(0,0,0,0.25);"
               %>
 
-              <%= link_to(e, class: event_classes, style: style_str) do %>
-                <div class="font-medium truncate"><%= e.title.presence || "(Untitled)" %></div>
-                <div class="text-zinc-300"><%= start_label %> – <%= end_label %></div>
+              <%= link_to(event, class: event_classes, style: style_str) do %>
+                <div class="font-semibold truncate"><%= event.title.presence || "(Untitled)" %></div>
+                <div class="opacity-85"><%= start_label %> – <%= end_label %></div>
               <% end %>
             <% end %>
           </div>
