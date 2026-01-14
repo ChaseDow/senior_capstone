@@ -10,9 +10,25 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_14_071111) do
+<<<<<<< HEAD
+ActiveRecord::Schema[8.1].define(version: 2026_01_12_205621) do
+=======
+ActiveRecord::Schema[8.1].define(version: 2026_01_13_010722) do
+>>>>>>> d1ef2c5 (WIP: Courses page created, creating one is bugged)
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "courses", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.datetime "ends_at"
+    t.string "location"
+    t.string "meeting_days"
+    t.string "professor"
+    t.datetime "starts_at"
+    t.string "title"
+    t.datetime "updated_at", null: false
+  end
 
   create_table "events", force: :cascade do |t|
     t.string "color", default: "#34D399", null: false

@@ -1,0 +1,66 @@
+<div class="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6 space-y-6">
+  <% if notice.present? %>
+    <div class="rounded-2xl border border-emerald-900 bg-emerald-950/40 px-4 py-3 text-sm text-emerald-200">
+      <%= notice %>
+    </div>
+  <% end %>
+
+  <div class="flex items-start justify-between gap-4">
+    <div class="min-w-0">
+      <h1 class="text-2xl font-semibold text-zinc-100 truncate">
+        <%= @course.title.presence || "(Untitled)" %>
+      </h1>
+
+      <p class="mt-2 text-sm text-zinc-400">
+        <%= @course.starts_at&.strftime("%b %d, %Y • %I:%M %p") %>
+        <% if @course.ends_at.present? %>
+          – <%= @course.ends_at.strftime("%I:%M %p") %>
+        <% end %>
+      </p>
+
+      <% if @course.location.present? %>
+        <p class="mt-1 text-sm text-zinc-400"><%= @course.location %></p>
+      <% end %>
+    </div>
+
+    <div class="flex shrink-0 items-center gap-2">
+      <%= render Studs::SecondaryButtonComponent.new(
+            label: "Edit",
+            path: edit_course_path(@course),
+            size: :sm
+          ) %>
+
+      <%= button_to course_path(@course),
+                    method: :delete,
+                    form: { data: { turbo_confirm: "Delete this course?" } },
+                    class: "inline-block" do %>
+        <%= render Studs::SecondaryButtonComponent.new(
+              label: "Delete",
+              color: :red,
+              type: "submit"
+            ) %>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="rounded-2xl border border-zinc-800 bg-zinc-950/40 p-5">
+    <% if @course.description.present? %>
+      <p class="whitespace-pre-wrap text-zinc-200"><%= @course.description %></p>
+    <% else %>
+      <p class="text-sm text-zinc-400">No description.</p>
+    <% end %>
+  </div>
+
+  <div class="flex items-center gap-2">
+    <%= render Studs::SecondaryButtonComponent.new(
+          label: "Back to courses",
+          href: course_path
+        ) %>
+
+    <%= render Studs::PrimaryButtonComponent.new(
+          label: "New course",
+          href: new_course_path,
+          color: :orange
+        ) %>
+  </div>
+</div>

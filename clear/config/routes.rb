@@ -1,6 +1,7 @@
 Rails.application.routes.draw do
   devise_for :users
   resources :events
+  resources :courses
 
 
   if Rails.env.development?
