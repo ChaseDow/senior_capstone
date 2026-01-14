@@ -1,0 +1,59 @@
+<div class="relative inline-block dropdown-wrapper">
+  <button 
+    type="button"
+    class="dropdown-toggle <%= button_classes %>"
+    onclick="
+      const menu = this.nextElementSibling;
+      const arrow = this.querySelector('.dropdown-arrow');
+      menu.classList.toggle('hidden');
+      arrow.classList.toggle('rotate-180');
+    ">
+    <span class="dropdown-label"><%= @label %></span>
+    <%= helpers.icon "arrow-down-01-stroke-rounded", library: "huge_icons", class: "dropdown-arrow h-4 w-4 transition-transform" %>
+  </button>
+  
+  <div class="dropdown-menu absolute left-0 z-50 mt-2 <%= SIZES.fetch(@size)[:width] %> rounded-xl border border-zinc-800 bg-zinc-900 shadow-lg hidden">
+    <div class="py-1">
+      <% @items.each do |item| %>
+        <% if item[:divider] %>
+          <div class="my-1 h-px bg-zinc-800"></div>
+        <% else %>
+          <button
+            type="button"
+            class="dropdown-item block w-full text-left px-4 py-2 text-sm text-zinc-200 transition hover:bg-zinc-800/60"
+            onclick="
+              const wrapper = this.closest('.dropdown-wrapper');
+              wrapper.querySelector('.dropdown-label').textContent = '<%= item[:label] %>';
+              wrapper.querySelector('.dropdown-input').value = '<%= item[:value] || item[:label] %>';
+              wrapper.querySelector('.dropdown-menu').classList.add('hidden');
+              wrapper.querySelector('.dropdown-arrow').classList.remove('rotate-180');
+              wrapper.querySelectorAll('.dropdown-item').forEach(i => i.classList.remove('bg-zinc-800'));
+              this.classList.add('bg-zinc-800');
+            ">
+            <%= item[:label] %>
+          </button>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+  
+  <input type="hidden" class="dropdown-input" name="<%= @name || 'dropdown' %>" value="<%= @selected_value %>">
+</div>
+
+<script>
+  document.addEventListener('click', function(e) {
+    const clickedInsideDropdown = e.target.closest('.dropdown-wrapper');
+    
+    if (!clickedInsideDropdown) {
+      const dropMenu = document.querySelectorAll(".dropdown-menu");
+      const dropArrow = document.querySelectorAll(".dropdown-arrow");
+      
+      dropMenu.forEach(function(menu) {
+        menu.classList.add("hidden");
+      });
+      dropArrow.forEach(function(arrow) {
+        arrow.classList.remove("rotate-180");
+      });
+    }
+  });
+</script>

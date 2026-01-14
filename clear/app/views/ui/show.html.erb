@@ -4,7 +4,6 @@
       <%= render Studs::SearchBarComponent.new(class_name: "w-80", placeholder: "Search…" ) %>
     <% end %>
   <% end %>
-
   <div class="flex h-[calc(100vh-4rem)]">
     <%= render Studs::LeftNavComponent.new(
           brand: nil,
@@ -27,7 +26,6 @@
             <%= render Studs::PrimaryButtonComponent.new(label: "Emerald", color: :emerald) %>
           </div>
         </div>
-
         <div class="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5">
           <div class="text-xs text-zinc-400">Secondary colors</div>
           <div class="mt-3 flex flex-wrap gap-2">
@@ -38,7 +36,6 @@
             <%= render Studs::SecondaryButtonComponent.new(label: "Red", color: :red, size: :sm) %>
           </div>
         </div>
-
         <div class="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5">
           <div class="text-xs text-zinc-400">Secondary sizes</div>
           <div class="mt-3 flex flex-wrap items-center gap-2">
@@ -48,12 +45,29 @@
             <%= render Studs::SecondaryButtonComponent.new(label: "LG", size: :lg, color: :zinc) %>
           </div>
         </div>
-
         <div class="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5 lg:col-span-3">
           <div class="text-xs text-zinc-400">Nav link component</div>
           <div class="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
             <%= render Studs::LeftNavLinkComponent.new(label: "Active", path: "#", icon_name: "search-01-stroke-rounded", active: true) %>
             <%= render Studs::LeftNavLinkComponent.new(label: "Inactive", path: "#", icon_name: "search-01-stroke-rounded", active: false) %>
+          </div>
+        </div>
+        <div class="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5">
+          <div class="text-xs text-zinc-400">Input & Dropdown</div>
+          <div class="mt-3 flex flex-col gap-3">
+            <%= render Studs::DropdownComponent.new(
+              label: "Dropdown",
+              color: :orange,
+              size: :md,
+              items: [
+                { label: "1", href: "#" },
+                { label: "2", href: "#" },
+                { label: "3", href: "#" }
+              ]
+            ) %>
+          </div>
+          <div class="mt-3">
+           <%= render Studs::InputBoxComponent.new(name: "email", placeholder: "Input Box", color: :zinc, size: :xs) %>
           </div>
         </div>
       </div>
