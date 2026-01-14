@@ -1,3 +1,4 @@
+
 <div class="min-h-screen">
   <%= render Studs::TopBarComponent.new(title: "Dashboard", subtitle: "Overview") do |t| %>
     <% t.with_actions do %>
@@ -5,7 +6,7 @@
     <% end %>
   <% end %>
 
-  <div class="flex h-[calc(100vh-4rem)]">
+  <div class="flex h-[calc(100vh-4rem)] overflow-hidden">
     <%= render Studs::LeftNavComponent.new(
           brand: nil,
           items: [
@@ -24,7 +25,8 @@
           </div>
         </main>
 
-        <aside class="w-wd shrink-0">
+        <!-- Optional: right panel scrolls independently -->
+        <aside class="w-wd shrink-0 h-full overflow-y-auto">
           <%= render Studs::AgendaComponent.new(title: "Agenda", subtitle: "Today", mode: :panel) do |a| %>
             <% a.with_item(time: "9:00 AM", title: "CSC 405", meta: "Room 120", tag: "Class", tag_color: :blue) %>
             <% a.with_item(time: "2:00 PM", title: "CSC 499", meta: "Room 108", tag: "Class", tag_color: :emerald) %>
