@@ -11,16 +11,35 @@
         <%= @course.title.presence || "(Untitled)" %>
       </h1>
 
-      <p class="mt-2 text-sm text-zinc-400">
-        <%= @course.starts_at&.strftime("%b %d, %Y • %I:%M %p") %>
-        <% if @course.ends_at.present? %>
-          – <%= @course.ends_at.strftime("%I:%M %p") %>
+      <div class="mt-1 text-sm text-zinc-300">
+        <% details = [] %>
+        <% details << @course.term if @course.term.present? %>
+        <% details << @course.professor if @course.professor.present? %>
+        <% details << @course.location if @course.location.present? %>
+        <%= details.join(" • ") %>
+      </div>
+      
+      <div class="mt-2 text-sm text-zinc-400">
+        <% if @course.meeting_days.present? %>
+          <span class="mr-2"><%= @course.meeting_days %></span>
         <% end %>
-      </p>
 
-      <% if @course.location.present? %>
-        <p class="mt-1 text-sm text-zinc-400"><%= @course.location %></p>
-      <% end %>
+        <% if @course.start_time.present? && @course.end_time.present? %>
+          <span><%= @course.start_time.strftime("%-I:%M%P") %>–<%= @course.end_time.strftime("%-I:%M%P") %></span>
+        <% elsif @course.start_time.present? %>
+          <span><%= @course.start_time.strftime("%-I:%M%P") %></span>
+        <% end %>
+      </div>
+
+      <div class="mt-2 text-sm text-zinc-400">
+        <% if @course.start_date.present? && @course.end_date.present? %>
+          <%= @course.start_date.strftime("%b %-d, %Y") %> – <%= @course.end_date.strftime("%b %-d, %Y") %>
+        <% elsif @course.start_date.present? %>
+          Starts <%= @course.start_date.strftime("%b %-d, %Y") %>
+        <% elsif @course.end_date.present? %>
+          Ends <%= @course.end_date.strftime("%b %-d, %Y") %>
+        <% end %>
+      </div>
     </div>
 
     <div class="flex shrink-0 items-center gap-2">

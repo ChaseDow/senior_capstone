@@ -21,12 +21,15 @@
                 <%= link_to(course.title.presence || "(Untitled)", course_path(course), class: "hover:underline") %>
               </p>
 
-              <p class="mt-1 text-sm text-zinc-400">
-                <%= course.starts_at&.strftime("%b %d, %Y • %I:%M %p") %>
-                <% if course.ends_at.present? %>
-                  – <%= course.ends_at.strftime("%I:%M %p") %>
-                <% end %>
-              </p>
+
+              <% if course.meeting_days.present? %>
+                <p class="mt-1 text-sm text-zinc-400">
+                  <%= course.meeting_days %>
+                  <% if course.start_time.present? && course.end_time.present? %>
+                    · <%= course.start_time.strftime("%-I:%M%P") %>–<%= course.end_time.strftime("%-I:%M%P") %>
+                  <% end %>
+                </p>
+              <% end %>
 
               <% if course.location.present? %>
                 <p class="text-sm text-zinc-400"><%= course.location %></p>
