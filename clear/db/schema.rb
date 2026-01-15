@@ -47,6 +47,72 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_14_071111) do
     t.index ["user_id"], name: "index_events_on_user_id"
   end
 
+  create_table "schedule_blocks", force: :cascade do |t|
+    t.string "category", default: "other", null: false
+    t.string "color"
+    t.datetime "created_at", null: false
+    t.integer "day_of_week", null: false
+    t.time "end_time", null: false
+    t.string "location"
+    t.boolean "locked", default: false, null: false
+    t.text "notes"
+    t.integer "position", default: 0, null: false
+    t.bigint "schedule_id", null: false
+    t.time "start_time", null: false
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.index ["schedule_id", "day_of_week", "start_time"], name: "index_block_on_schedule_day_start"
+    t.index ["schedule_id", "day_of_week"], name: "index_schedule_blocks_on_schedule_id_and_day_of_week"
+    t.index ["schedule_id"], name: "index_schedule_blocks_on_schedule_id"
+    t.check_constraint "day_of_week >= 0 AND day_of_week <= 6", name: "check_blocks_day_of_week"
+    t.check_constraint "start_time < end_time", name: "check_blocks_start_before_end"
+  end
+
+  create_table "schedules", force: :cascade do |t|
+    t.boolean "active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.string "name", default: "default", null: false
+    t.string "timezone", default: "american/chicago", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.integer "week_starts_on", default: 1, null: false
+    t.index ["user_id", "name"], name: "index_schedules_on_user_id_and_name", unique: true
+    t.index ["user_id"], name: "index_schedules_on_user_id"
+  end
+
+  create_table "schedule_blocks", force: :cascade do |t|
+    t.string "category", default: "other", null: false
+    t.string "color"
+    t.datetime "created_at", null: false
+    t.integer "day_of_week", null: false
+    t.time "end_time", null: false
+    t.string "location"
+    t.boolean "locked", default: false, null: false
+    t.text "notes"
+    t.integer "position", default: 0, null: false
+    t.bigint "schedule_id", null: false
+    t.time "start_time", null: false
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.index ["schedule_id", "day_of_week", "start_time"], name: "index_block_on_schedule_day_start"
+    t.index ["schedule_id", "day_of_week"], name: "index_schedule_blocks_on_schedule_id_and_day_of_week"
+    t.index ["schedule_id"], name: "index_schedule_blocks_on_schedule_id"
+    t.check_constraint "day_of_week >= 0 AND day_of_week <= 6", name: "check_blocks_day_of_week"
+    t.check_constraint "start_time < end_time", name: "check_blocks_start_before_end"
+  end
+
+  create_table "schedules", force: :cascade do |t|
+    t.boolean "active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.string "name", default: "default", null: false
+    t.string "timezone", default: "american/chicago", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.integer "week_starts_on", default: 1, null: false
+    t.index ["user_id", "name"], name: "index_schedules_on_user_id_and_name", unique: true
+    t.index ["user_id"], name: "index_schedules_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email", default: "", null: false
@@ -58,6 +124,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_14_071111) do
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
+
+  add_foreign_key "schedules", "users"
 
   add_foreign_key "events", "users"
 end

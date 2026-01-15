@@ -24,4 +24,6 @@ Rails.application.routes.draw do
   get "/ui", to: "ui#show"
 
   get "up" => "rails/health#show", as: :rails_health_check
+  get "/schedule", to: "schedule#week"
+  get "/schedule/week", to: "schedule#week"
 end
