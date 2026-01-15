@@ -1,0 +1,37 @@
+<div class="rounded-2xl border border-emerald-900/35 bg-emerald-950/15 backdrop-blur-sm p-6">
+  <div class="flex items-center justify-between">
+    <div class="text-sm text-zinc-300">
+      Today's agenda is shown here.
+    </div>
+  </div>
+
+  <div class="mt-4 overflow-hidden rounded-2xl border border-emerald-900/30 bg-emerald-950/10">
+    <% if @events.any? %>
+      <div class="divide-y divide-emerald-900/25">
+        <% @events.each do |event| %>
+          <div class="flex items-start justify-between gap-4 p-4 bg-emerald-950/10 hover:bg-emerald-900/10 transition">
+            <div class="min-w-0">
+              <p class="truncate font-medium text-zinc-100">
+                <%= link_to(event.title.presence || "(Untitled)", event_path(event), class: "hover:underline") %>
+              </p>
+
+              <p class="mt-1 text-sm text-zinc-400">
+                <%= event.starts_at&.strftime("%b %d, %Y • %I:%M %p") %>
+                <% if event.ends_at.present? %>
+                  – <%= event.ends_at.strftime("%I:%M %p") %>
+                <% end %>
+              </p>
+
+              <% if event.location.present? %>
+                <p class="text-sm text-zinc-400"><%= event.location %></p>
+              <% end %>
+            </div>
+
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="p-6 text-sm text-zinc-400">No events yet.</div>
+    <% end %>
+  </div>
+</div>
