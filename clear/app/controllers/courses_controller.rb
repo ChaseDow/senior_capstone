@@ -17,7 +17,7 @@ class CoursesController < ApplicationController
     @course = Course.new(course_params)
 
     if @course.save
-      redirect_to @course, notice: "Course created."
+      redirect_to courses_path, notice: "Course created."
     else
       render :new, status: :unprocessable_entity
     end
