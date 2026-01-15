@@ -57,6 +57,10 @@ class EventsController < ApplicationController
   end
 
   def event_params
-    params.require(:event).permit(:title, :starts_at, :ends_at, :location, :description)
+    params.require(:event).permit(
+      :title, :starts_at, :ends_at, :location, :description,
+      :color, :recurring, :repeat_until,
+      repeat_days: []
+    )
   end
 end

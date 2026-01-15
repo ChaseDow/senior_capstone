@@ -10,19 +10,25 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_12_205621) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_14_071111) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
   create_table "events", force: :cascade do |t|
+    t.string "color", default: "#34D399", null: false
     t.datetime "created_at", null: false
     t.text "description"
     t.datetime "ends_at"
     t.string "location"
+    t.boolean "recurring", default: false, null: false
+    t.integer "repeat_days", default: [], null: false, array: true
+    t.date "repeat_until"
     t.datetime "starts_at"
     t.string "title"
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
+    t.index ["user_id", "repeat_until"], name: "index_events_on_user_id_and_repeat_until"
+    t.index ["user_id", "starts_at"], name: "index_events_on_user_id_and_starts_at"
     t.index ["user_id"], name: "index_events_on_user_id"
   end
 
