@@ -21,7 +21,8 @@
 
   <body data-theme="green" class="min-h-screen bg-zinc-950 text-zinc-100">
     <div class="min-h-screen">
-      <%= render Studs::TopBarComponent.new(title: "Events", subtitle: "Separate from classes and work.") do |t| %>
+      <%= render Studs::TopBarComponent.new(title: (content_for?(:page_title) ? yield(:page_title) : "Dashboard" ), 
+                                        subtitle: (content_for?(:page_subtitle) ? yield(:page_subtitle) : nil) ) do |t| %>
         <% t.with_actions do %>
           <%= render Studs::SearchBarComponent.new(class_name: "w-80", placeholder: "Search…") %>
         <% end %>
