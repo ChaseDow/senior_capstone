@@ -19,14 +19,14 @@
 
     <div class="min-w-0 flex-1">
       <div class="flex h-full gap-6 px-6 py-6">
-        <main class="min-w-0 flex-1 min-h-0 overflow-y-auto">
+        <main class="scrollbars min-w-0 flex-1 min-h-0 overflow-y-auto">
           <div class="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6">
             <%= render "dashboard/calendar", events: @occurrences, start_date: @start_date %>
           </div>
         </main>
 
         <!-- Optional: right panel scrolls independently -->
-        <aside class="w-wd shrink-0 h-full overflow-y-auto">
+        <aside class="scrollbars w-wd shrink-0 h-full overflow-y-auto">
           <%= render Studs::AgendaComponent.new(title: "Agenda", subtitle: "Today", mode: :panel) do |a| %>
             <% a.with_item(time: "9:00 AM", title: "CSC 405", meta: "Room 120", tag: "Class", tag_color: :blue) %>
             <% a.with_item(time: "2:00 PM", title: "CSC 499", meta: "Room 108", tag: "Class", tag_color: :emerald) %>

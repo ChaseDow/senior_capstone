@@ -126,3 +126,50 @@ body[data-theme="green"] {
     animation: none;
   }
 }
+
+@layer base {
+  :root {
+    --sb-track: #f4f4f5;       /* light track */
+    --sb-thumb: #d4d4d8;       /* light thumb */
+    --sb-thumb-hover: #a1a1aa; /* light hover */
+  }
+
+  /* If you use Tailwind class-based dark mode (html.dark) */
+  html.dark {
+    --sb-track: #18181b;
+    --sb-thumb: #3f3f46;
+    --sb-thumb-hover: #52525b;
+  }
+
+  /* If you use system dark mode */
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --sb-track: #18181b;
+      --sb-thumb: #3f3f46;
+      --sb-thumb-hover: #52525b;
+    }
+  }
+
+  /* Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--sb-thumb) var(--sb-track);
+  }
+
+  /* Chrome/Edge/Safari */
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  *::-webkit-scrollbar-track {
+    background: var(--sb-track) !important;
+  }
+  *::-webkit-scrollbar-thumb {
+    background: var(--sb-thumb) !important;
+    border-radius: 9999px;
+    border: 2px solid var(--sb-track);
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background: var(--sb-thumb-hover) !important;
+  }
+}
