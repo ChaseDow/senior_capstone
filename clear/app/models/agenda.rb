@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Event < ApplicationRecord
+class Agenda < ApplicationRecord
   private
 
   def ends_at_after_starts_at
