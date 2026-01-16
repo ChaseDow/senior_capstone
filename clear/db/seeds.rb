@@ -19,11 +19,11 @@ users_data = [
         events: [
             {
                 color: "#FFA500",
-                title: "Capstone Standup",
+                title: "Capstone Sprint planning",
                 starts_at: now.change(hour: 9, min: 0)+1.day,
                 ends_at: now.change(hour: 10, min: 30)+1.day,
                 location: "Discord",
-                description: "Quick daily standup"
+                description: "Plan Sprint 2"
             },
             {
                 recurring: true,
@@ -34,7 +34,7 @@ users_data = [
                 ],
                 repeat_until: now+14.day,
                 title: "Gym",
-                starts_at: now.change(hour: 16, min:0)-5.day,
+                starts_at: now.change(hour: 16, min: 0)-5.day,
                 ends_at: now.change(hour: 17, min: 0)-5.day,
                 location: "Gym"
             }
@@ -46,24 +46,24 @@ users_data = [
         events: [
             {
                 color: "#FFFFFF",
-                title: "Capstone Standdown",
+                title: "Sprint planning for Capstone",
                 starts_at: now.change(hour: 9, min: 0)+1.day,
                 ends_at: now.change(hour: 10, min: 30)+1.day,
                 location: "Discord",
-                description: "Quick daily standup"
+                description: "Planning second sprint for capstone class."
             },
             {
-                color: "#000000",
+                color: "#FF0000",
                 recurring: true,
                 repeat_until: now+7.day,
                 repeat_days: [
                     2,
                     4
                 ],
-                title: "Gym",
-                starts_at: now.change(hour: 16, min:0)-4.day,
+                title: "Studying(Math)",
+                starts_at: now.change(hour: 16, min: 0)-4.day,
                 ends_at: now.change(hour: 17, min: 0)-4.day,
-                location: "Gym"
+                location: "I need to study for an exam in my math class."
             }
         ]
     }
