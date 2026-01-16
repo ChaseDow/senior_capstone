@@ -1,0 +1,78 @@
+<%= form_with model: course, class: "space-y-5" do |f| %>
+  <% if course.errors.any? %>
+    <div class="rounded-2xl border border-red-900 bg-red-950/40 p-4 text-red-200">
+      <p class="font-medium">Please fix the following:</p>
+      <ul class="mt-2 list-disc pl-6 text-sm">
+        <% course.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <% input_classes = "mt-1 w-full rounded-xl border border-zinc-800 bg-zinc-950/40 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-orange-300/50" %>
+  <% label_classes = "block text-sm font-medium text-zinc-200" %>
+
+  <div>
+    <%= f.label :title, class: label_classes %>
+    <%= f.text_field :title, class: input_classes, placeholder: "e.g. ENGL 1013 - Freshman Composition I, CSC 1303 - The Science of Computing I ..." %>
+  </div>
+
+
+  <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+    <div>
+      <%= f.label :term, "Term", class: label_classes%>
+      <%= f.text_field :term, class: input_classes, placeholder: "e.g. Fall 2025, Spring 2026 ..."%>
+    </div>
+
+    <div>
+      <%= f.label :meeting_days, "Meeting Days", class: label_classes%>
+      <%= f.text_field :meeting_days, class: input_classes, placeholder: "MWF or TR"%>
+    </div>
+
+    <div>
+      <%= f.label :professer, "Professor", class: label_classes%>
+      <%= f.text_field :professor, class: input_classes%>
+    </div>
+
+    <div>
+      <%= f.label :start_time, "Start time", class: label_classes %>
+      <%= f.time_field :start_time, class: input_classes %>
+    </div>
+
+    <div>
+      <%= f.label :end_time, "End time", class: label_classes %>
+      <%= f.time_field :end_time, class: input_classes %>
+    </div>
+
+    <div>
+      <%= f.label :start_date, "Start date", class: label_classes %>
+      <%= f.date_field :start_date, class: input_classes %>
+    </div>
+
+    <div>
+      <%= f.label :end_date, "End date", class: label_classes %>
+      <%= f.date_field :end_date, class: input_classes %>
+    </div>
+  </div>
+
+  <div>
+    <%= f.label :location, class: label_classes %>
+    <%= f.text_field :location, class: input_classes, placeholder: "e.g. IESB 220, NETH 153" %>
+  </div>
+
+  <div>
+    <%= f.label :description, class: label_classes %>
+    <%= f.text_area :description, rows: 3, class: input_classes, placeholder: "Course Details..." %>
+  </div>
+
+  <div class="flex items-center gap-2 pt-2">
+    <%= render Studs::PrimaryButtonComponent.new(
+          label: (course.persisted? ? "Update course" : "Create course"),
+          type: "submit",
+          color: :orange
+        ) %>
+
+    <%= render Studs::SecondaryButtonComponent.new(label: "Cancel", href: courses_path) %>
+  </div>
+<% end %>
