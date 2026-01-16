@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_14_071111) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_16_064104) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -47,6 +47,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_14_071111) do
     t.index ["user_id"], name: "index_events_on_user_id"
   end
 
+  create_table "schedules", force: :cascade do |t|
+    t.boolean "active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.string "name", default: "default", null: false
+    t.string "timezone", default: "american/chicago", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.integer "week_starts_on", default: 1, null: false
+    t.index ["user_id", "name"], name: "index_schedules_on_user_id_and_name", unique: true
+    t.index ["user_id"], name: "index_schedules_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email", default: "", null: false
@@ -60,4 +72,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_14_071111) do
   end
 
   add_foreign_key "events", "users"
+  add_foreign_key "schedules", "users"
 end

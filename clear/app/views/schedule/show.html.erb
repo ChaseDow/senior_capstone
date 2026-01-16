@@ -1,0 +1,7 @@
+<div class="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5 lg:col-span-3">
+          <div class="text-xs text-zinc-400">Day of the week</div>
+          <div class="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            <%= render Studs::LeftNavLinkComponent.new(label: "Active", path: "#", icon_name: "search-01-stroke-rounded", active: true) %>
+            <%= render Studs::LeftNavLinkComponent.new(label: "Inactive", path: "#", icon_name: "search-01-stroke-rounded", active: false) %>
+          </div>
+        </div>

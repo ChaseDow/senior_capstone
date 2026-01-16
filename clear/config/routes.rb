@@ -22,6 +22,8 @@ Rails.application.routes.draw do
 
   get "/dashboard", to: "dashboard#show"
   get "/ui", to: "ui#show"
+  get "/schedule", to: "schedule#week"
+  get "/schedule/week", to: "schedule#week"
 
   get "up" => "rails/health#show", as: :rails_health_check
 end
