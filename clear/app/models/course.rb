@@ -2,7 +2,8 @@
 
 class Course < ApplicationRecord
   # belongs_to :term (for right now let's ignore this)
-  # belongs_to :user
+  belongs_to :user
+
   before_validation :normalize_meeting_days
 
   validates :title, presence: true
