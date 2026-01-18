@@ -20,6 +20,7 @@ class DashboardController < ApplicationController
 
     @events = base_events
 
+
     @occurrences =
       base_events.flat_map { |e| e.occurrences_between(range_start, range_end) }
                 .sort_by(&:starts_at)

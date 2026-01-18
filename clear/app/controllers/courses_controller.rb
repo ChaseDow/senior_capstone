@@ -4,20 +4,20 @@ class CoursesController < ApplicationController
   before_action :set_course, only: %i[show edit update destroy]
 
   def index
-    @courses = Course.order(:title)
+    @courses = current_user.courses.order(:title)
   end
 
   def show; end
 
   def new
-    @course = Course.new
+    @course = current_user.courses.new
   end
 
   def create
-    @course = Course.new(course_params)
+    @course = current_user.courses.new(course_params)
 
     if @course.save
-      redirect_to courses_path, notice: "Course created."
+      redirect_to course_path(@course), notice: "Course created."
     else
       render :new, status: :unprocessable_entity
     end
@@ -27,7 +27,7 @@ class CoursesController < ApplicationController
 
   def update
     if @course.update(course_params)
-      redirect_to @course, notice: "Course updated."
+      redirect_to course_path(@course), notice: "Course updated."
     else
       render :edit, status: :unprocessable_entity
     end
@@ -41,7 +41,7 @@ class CoursesController < ApplicationController
   private
 
   def set_course
-    @course = Course.find(params[:id])
+    @course = current_user.courses.find(params[:id])
   end
 
   def course_params
