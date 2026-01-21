@@ -160,10 +160,10 @@
                 "border-color: rgba(0,0,0,0.25);"
               %>
 
-              <%= link_to edit_event_path(event, start_date: start_date.to_date),
+              <%= link_to event_path(event, start_date: start_date.to_date),
                 class: event_classes,
                 style: style_str,
-                data: { action: "click->drawer#openAndLoad", drawer_url: edit_event_path(event, start_date: start_date.to_date) } do %>
+                data: { turbo_frame: "event_drawer", action: "click->drawer#open" } do %>
 
                 <div class="font-semibold truncate"><%= event.title.presence || "(Untitled)" %></div>
                 <div class="opacity-85"><%= start_label %> – <%= end_label %></div>

@@ -5,12 +5,7 @@ export default class extends Controller {
   static values = { open: Boolean }
 
   connect() {
-    this.openValue = false
-
-    this.closedPanelClass = "translate-x-[110vw]"
-    this.openPanelClass = "translate-x-0"
-
-    if (this.hasFrameTarget) this.skeletonHtml = this.frameTarget.innerHTML
+    if (!this.hasOpenValue) this.openValue = false
 
     this._onKeydown = (e) => {
       if (e.key === "Escape") this.close()
@@ -29,21 +24,6 @@ export default class extends Controller {
     this.render()
   }
 
-  openAndLoad(event) {
-    event?.preventDefault()
-
-    const url = event?.currentTarget?.dataset?.drawerUrl
-    if (!this.hasFrameTarget || !url) {
-      this.open()
-      return
-    }
-
-    if (this.skeletonHtml != null) this.frameTarget.innerHTML = this.skeletonHtml
-
-    this.open()
-    this.frameTarget.setAttribute("src", url)
-  }
-
   close(event) {
     event?.preventDefault()
 
@@ -51,19 +31,22 @@ export default class extends Controller {
     this.render()
 
     window.setTimeout(() => {
-      if (this.openValue || !this.hasFrameTarget) return
-
-      this.frameTarget.removeAttribute("src")
-      if (this.skeletonHtml != null) this.frameTarget.innerHTML = this.skeletonHtml
+      if (!this.openValue && this.hasFrameTarget) this.frameTarget.innerHTML = ""
     }, 320)
   }
 
   frameLoaded() {
-    this.open()
+    this.openValue = true
+    this.render()
   }
 
   submitEnded(event) {
-    if (event.detail?.success) this.close()
+    if (event.detail?.success) {
+      window.setTimeout(() => this.close(), 0)
+    } else {
+      this.openValue = true
+      this.render()
+    }
   }
 
   render() {
@@ -71,16 +54,16 @@ export default class extends Controller {
 
     if (this.openValue) {
       this.overlayTarget.classList.remove("opacity-0", "pointer-events-none")
-      this.overlayTarget.classList.add("opacity-100")
+      this.overlayTarget.classList.add("opacity-100", "pointer-events-auto")
 
-      this.panelTarget.classList.remove(this.closedPanelClass)
-      this.panelTarget.classList.add(this.openPanelClass)
+      this.panelTarget.classList.remove("translate-x-[110vw]")
+      this.panelTarget.classList.add("translate-x-0")
     } else {
       this.overlayTarget.classList.add("opacity-0", "pointer-events-none")
-      this.overlayTarget.classList.remove("opacity-100")
+      this.overlayTarget.classList.remove("opacity-100", "pointer-events-auto")
 
-      this.panelTarget.classList.add(this.closedPanelClass)
-      this.panelTarget.classList.remove(this.openPanelClass)
+      this.panelTarget.classList.add("translate-x-[110vw]")
+      this.panelTarget.classList.remove("translate-x-0")
     }
   }
 }

@@ -1,0 +1,95 @@
+<%= turbo_frame_tag "event_drawer" do %>
+  <% start_at = event.starts_at&.in_time_zone %>
+  <% end_at   = event.ends_at&.in_time_zone %>
+
+  <% time_line =
+      if start_at && end_at
+        "#{start_at.strftime("%A, %b %-d")} · #{start_at.strftime("%-I:%M %p")} – #{end_at.strftime("%-I:%M %p")}"
+      elsif start_at
+        "#{start_at.strftime("%A, %b %-d")} · #{start_at.strftime("%-I:%M %p")}"
+      else
+        "Time not set"
+      end
+  %>
+
+  <div class="flex max-h-[85vh] flex-col">
+    <div class="flex items-start justify-between border-b border-zinc-800 px-6 py-4">
+      <div class="min-w-0">
+        <div class="flex items-center gap-2">
+          <span class="h-3 w-3 rounded-full"
+                style="background-color:<%= event.color.presence || "#34D399" %>"></span>
+          <div class="text-sm font-semibold text-zinc-100 truncate">
+            <%= event.title.presence || "(Untitled)" %>
+          </div>
+        </div>
+        <div class="mt-1 text-xs text-zinc-500">Event details</div>
+      </div>
+
+      <button
+        type="button"
+        data-action="drawer#close"
+        class="inline-flex items-center justify-center rounded-xl border border-zinc-800 bg-zinc-950/40 px-3 py-1.5 text-sm text-zinc-200 hover:bg-zinc-800/40 transition">
+        ✕
+      </button>
+    </div>
+
+    <div class="scrollbars min-h-0 flex-1 overflow-y-auto px-6 py-6 space-y-4">
+      <div class="rounded-2xl border border-zinc-800 bg-zinc-950/40 p-4">
+        <div class="text-xs text-zinc-400">When</div>
+        <div class="mt-1 text-sm text-zinc-100"><%= time_line %></div>
+      </div>
+
+      <div class="rounded-2xl border border-zinc-800 bg-zinc-950/40 p-4">
+        <div class="text-xs text-zinc-400">Location</div>
+        <div class="mt-1 text-sm text-zinc-100"><%= event.location.presence || "—" %></div>
+      </div>
+
+      <div class="rounded-2xl border border-zinc-800 bg-zinc-950/40 p-4">
+        <div class="text-xs text-zinc-400">Description</div>
+        <div class="mt-1 text-sm text-zinc-100 whitespace-pre-wrap"><%= event.description.presence || "—" %></div>
+      </div>
+
+      <div class="rounded-2xl border border-zinc-800 bg-zinc-950/40 p-4">
+        <div class="text-xs text-zinc-400">Repeat</div>
+
+        <% if event.recurring? %>
+          <% day_names = %w[Sun Mon Tue Wed Thu Fri Sat] %>
+          <% days = Array(event.repeat_days).map { |d| day_names[d.to_i] }.join(", ") %>
+
+          <div class="mt-1 text-sm text-zinc-100">
+            Weekly on <%= days.presence || "—" %>
+            <% if event.repeat_until.present? %>
+              until <%= event.repeat_until.strftime("%b %-d, %Y") %>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="mt-1 text-sm text-zinc-100">No</div>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="shrink-0 border-t border-zinc-800 bg-zinc-950/60 px-6 py-4">
+      <div class="flex items-center justify-between gap-3">
+        <div class="flex items-center gap-2">
+          <%= link_to "Edit",
+                edit_event_path(event, start_date: start_date),
+                data: { turbo_frame: "event_drawer" },
+                class: "inline-flex items-center rounded-xl border border-zinc-800 bg-zinc-950/40 px-3 py-1.5 text-sm text-zinc-200 hover:bg-zinc-800/40 transition" %>
+
+          <%= button_to "Delete",
+                event_path(event, start_date: start_date),
+                method: :delete,
+                class: "inline-flex items-center rounded-xl border border-rose-900/60 bg-rose-950/20 px-3 py-1.5 text-sm text-rose-200 hover:bg-rose-950/35 transition",
+                form: { data: { turbo_confirm: "Delete this event?", turbo_frame: "event_drawer" } } %>
+        </div>
+
+        <button
+          type="button"
+          data-action="drawer#close"
+          class="inline-flex items-center rounded-xl border border-zinc-800 bg-zinc-950/40 px-3 py-1.5 text-sm text-zinc-200 hover:bg-zinc-800/40 transition">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+<% end %>
