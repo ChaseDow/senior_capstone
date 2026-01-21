@@ -1,5 +1,4 @@
-
-<div class="min-h-screen">
+<div class="min-h-screen" data-controller="drawer">
   <%= render Studs::TopBarComponent.new(title: "Dashboard", subtitle: "Overview") do |t| %>
     <% t.with_actions do %>
       <%= render Studs::SearchBarComponent.new(class_name: "w-80", placeholder: "Search…") %>
@@ -10,11 +9,11 @@
     <%= render Studs::LeftNavComponent.new(
           brand: nil,
           items: [
-                { label: "Dashboard", path: "/dashboard", icon_name: "dashboard-circle-stroke-rounded" },
-                { label: "Events",    path: "/events",    icon_name: "timeline-event-stroke-rounded" },
-                { label: "Courses",    path: "/courses",    icon_name: "course-stroke-rounded" },
-                { label: "Schedule", path: "/schedule", icon_name: "timeline-event-stroke-rounded"},
-                { label: "UI",        path: "/ui",        icon_name: "search-01-stroke-rounded" }
+            { label: "Dashboard", path: "/dashboard", icon_name: "dashboard-circle-stroke-rounded" },
+            { label: "Events",    path: "/events",    icon_name: "timeline-event-stroke-rounded" },
+            { label: "Courses",   path: "/courses",   icon_name: "course-stroke-rounded" },
+            { label: "Schedule",  path: "/schedule",  icon_name: "timeline-event-stroke-rounded" },
+            { label: "UI",        path: "/ui",        icon_name: "search-01-stroke-rounded" }
           ],
           class_name: "h-[calc(100vh-4rem)]"
         ) %>
@@ -22,12 +21,9 @@
     <div class="min-w-0 flex-1">
       <div class="flex h-full gap-6 px-6 py-6">
         <main class="scrollbars min-w-0 flex-1 min-h-0 overflow-y-auto">
-          <div class="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6">
-            <%= render "dashboard/calendar", events: @occurrences, start_date: @start_date %>
-          </div>
+          <%= render "dashboard/calendar_frame", events: @occurrences, start_date: @start_date %>
         </main>
 
-        <!-- Optional: right panel scrolls independently -->
         <aside class="scrollbars w-wd shrink-0 h-full overflow-y-auto">
           <%= render Studs::AgendaComponent.new(title: "Agenda", subtitle: "Today", mode: :panel) do |a| %>
             <% a.with_item(time: "9:00 AM", title: "CSC 405", meta: "Room 120", tag: "Class", tag_color: :blue) %>
@@ -36,6 +32,33 @@
           <% end %>
         </aside>
       </div>
+    </div>
+  </div>
+
+  <div
+    data-drawer-target="overlay"
+    data-action="click->drawer#close"
+    class="fixed inset-0 z-40 bg-black/50 backdrop-blur-[2px] opacity-0 pointer-events-none transition-opacity duration-300">
+  </div>
+
+  <div class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none px-4">
+    <div
+      data-drawer-target="panel"
+      class="pointer-events-auto w-[min(92vw,40rem)] h-[min(85vh,44rem)]
+             overflow-hidden rounded-2xl border border-zinc-800
+             bg-zinc-950/90 backdrop-blur shadow-2xl
+             translate-x-[110vw] transition-transform duration-300 ease-in-out">
+
+      <%= turbo_frame_tag "event_drawer",
+            class: "block h-full",
+            data: {
+              drawer_target: "frame",
+              action: "turbo:frame-load->drawer#frameLoaded turbo:submit-end->drawer#submitEnded"
+            } do %>
+
+        <%= render "events/drawer_skeleton" %>
+
+      <% end %>
     </div>
   </div>
 </div>
