@@ -163,7 +163,7 @@
               <%= link_to event_path(event, start_date: start_date.to_date),
                 class: event_classes,
                 style: style_str,
-                data: { turbo_frame: "event_drawer", action: "click->drawer#open" } do %>
+                data: { turbo_frame: "event_drawer", turbo_prefetch: "false", action: "click->drawer#open" } do %>
 
                 <div class="font-semibold truncate"><%= event.title.presence || "(Untitled)" %></div>
                 <div class="opacity-85"><%= start_label %> – <%= end_label %></div>

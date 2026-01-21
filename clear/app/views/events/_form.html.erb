@@ -1,32 +1,29 @@
-<% mode ||= :page %>
-<% start_date ||= nil %>
-
 <% form_url =
-  if event.persisted?
-    event_path(event, start_date: start_date.presence)
-  else
-    events_path(start_date: start_date.presence)
-  end
+    event.persisted? ?
+      event_path(event, start_date: start_date) :
+      events_path(start_date: start_date)
 %>
 
-<% drawer_mode = (mode.to_sym == :drawer) %>
+<%= form_with model: event,
+              url: form_url,
+              class: "space-y-4",
+              data: { drawer_close_on_success: "false" } do |f| %>
 
-<%= form_with model: event, url: form_url, class: (drawer_mode ? "flex h-full flex-col" : "space-y-4") do |f| %>
+  <% if event.errors.any? %>
+    <div class="rounded-2xl border border-red-900 bg-red-950/40 p-4 text-red-200">
+      <p class="font-medium">Please fix the following:</p>
+      <ul class="mt-2 list-disc pl-6 text-sm">
+        <% event.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
   <% input_classes = "mt-1 w-full rounded-xl border border-zinc-800 bg-zinc-950/40 px-3 py-1.5 text-sm text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-emerald-300/40" %>
   <% label_classes = "block text-sm font-medium text-zinc-200" %>
 
-  <div class="<%= drawer_mode ? "scrollbars flex-1 min-h-0 overflow-y-auto px-6 py-6 space-y-4" : "space-y-4" %>">
-    <% if event.errors.any? %>
-      <div class="rounded-2xl border border-red-900 bg-red-950/40 p-4 text-red-200">
-        <p class="font-medium">Please fix the following:</p>
-        <ul class="mt-2 list-disc pl-6 text-sm">
-          <% event.errors.full_messages.each do |msg| %>
-            <li><%= msg %></li>
-          <% end %>
-        </ul>
-      </div>
-    <% end %>
-
+  <div class="space-y-4">
     <div>
       <%= f.label :title, class: label_classes %>
       <%= f.text_field :title, class: input_classes, placeholder: "e.g. Gym session, Study group..." %>
@@ -114,17 +111,15 @@
         </div>
       </div>
     </div>
-  </div>
 
-  <div class="<%= drawer_mode ? "shrink-0 border-t border-zinc-800 bg-zinc-950/60 px-6 py-4" : "pt-2" %>">
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-2 pt-2">
       <%= render Studs::PrimaryButtonComponent.new(
             label: (event.persisted? ? "Update event" : "Create event"),
             type: "submit",
             color: :emerald
           ) %>
 
-      <% if drawer_mode %>
+      <% if local_assigns[:cancel_drawer] %>
         <button
           type="button"
           data-action="drawer#close"

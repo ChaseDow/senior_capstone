@@ -2,6 +2,7 @@
 
 class EventsController < ApplicationController
   layout "app_shell"
+
   before_action :authenticate_user!
   before_action :set_event, only: %i[show edit update destroy]
 
@@ -13,7 +14,7 @@ class EventsController < ApplicationController
     return unless turbo_frame_request?
 
     render partial: "events/drawer_detail",
-           locals: { event: @event, start_date: params[:start_date] }
+           locals: { event: @event, start_date: parse_start_date(params[:start_date]) }
   end
 
   def new
@@ -35,6 +36,11 @@ class EventsController < ApplicationController
               "dashboard_calendar",
               partial: "dashboard/calendar_frame",
               locals: { events: occurrences, start_date: start_date }
+            ),
+            turbo_stream.replace(
+              "event_drawer",
+              partial: "events/drawer_detail",
+              locals: { event: @event, start_date: start_date }
             )
           ]
         end
@@ -43,10 +49,12 @@ class EventsController < ApplicationController
       respond_to do |format|
         format.html { render :new, status: :unprocessable_entity }
         format.turbo_stream do
+          start_date = parse_start_date(params[:start_date])
+
           render turbo_stream: turbo_stream.replace(
             "event_drawer",
             partial: "events/drawer_edit",
-            locals: { event: @event, start_date: params[:start_date] }
+            locals: { event: @event, start_date: start_date }
           ), status: :unprocessable_entity
         end
       end
@@ -54,10 +62,10 @@ class EventsController < ApplicationController
   end
 
   def edit
-    return unless turbo_frame_request?
-
-    render partial: "events/drawer_edit",
-           locals: { event: @event, start_date: params[:start_date] }
+    if turbo_frame_request?
+      render partial: "events/drawer_edit",
+             locals: { event: @event, start_date: parse_start_date(params[:start_date]) }
+    end
   end
 
   def update
@@ -86,10 +94,12 @@ class EventsController < ApplicationController
       respond_to do |format|
         format.html { render :edit, status: :unprocessable_entity }
         format.turbo_stream do
+          start_date = parse_start_date(params[:start_date])
+
           render turbo_stream: turbo_stream.replace(
             "event_drawer",
             partial: "events/drawer_edit",
-            locals: { event: @event, start_date: params[:start_date] }
+            locals: { event: @event, start_date: start_date }
           ), status: :unprocessable_entity
         end
       end

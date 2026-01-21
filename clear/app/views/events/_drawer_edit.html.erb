@@ -1,51 +1,21 @@
 <%= turbo_frame_tag "event_drawer" do %>
-  <div class="flex max-h-[85vh] flex-col">
+  <div class="flex h-full flex-col">
     <div class="flex items-start justify-between border-b border-zinc-800 px-6 py-4">
       <div>
         <div class="text-sm font-semibold text-zinc-100">Edit event</div>
-        <div class="text-xs text-zinc-500">Changes save without leaving the dashboard</div>
+        <div class="text-xs text-zinc-500">Update details without leaving the dashboard</div>
       </div>
 
       <button
         type="button"
         data-action="drawer#close"
-        class="inline-flex items-center justify-center rounded-xl border border-zinc-800 bg-zinc-950/40 px-3 py-1.5 text-sm text-zinc-200 hover:bg-zinc-800/40 transition">
+        class="inline-flex items-center rounded-xl border border-zinc-800 bg-zinc-950/40 px-3 py-1.5 text-sm text-zinc-200 hover:bg-zinc-800/40 transition">
         ✕
       </button>
     </div>
 
-    <%= form_with model: event, class: "min-h-0 flex-1 flex flex-col" do |f| %>
-      <%= hidden_field_tag :start_date, start_date %>
-
-      <div class="scrollbars min-h-0 flex-1 overflow-y-auto px-6 py-6">
-        <% if event.errors.any? %>
-          <div class="mb-4 rounded-2xl border border-red-900 bg-red-950/40 p-4 text-red-200">
-            <p class="font-medium">Please fix the following:</p>
-            <ul class="mt-2 list-disc pl-6 text-sm">
-              <% event.errors.full_messages.each do |msg| %>
-                <li><%= msg %></li>
-              <% end %>
-            </ul>
-          </div>
-        <% end %>
-
-        <%= render "events/form_fields", f: f, event: event %>
-      </div>
-
-      <div class="shrink-0 border-t border-zinc-800 bg-zinc-950/60 px-6 py-4">
-        <div class="flex items-center gap-2">
-          <%= render Studs::PrimaryButtonComponent.new(
-                label: "Save changes",
-                type: "submit",
-                color: :emerald
-              ) %>
-
-          <%= link_to "Cancel",
-                event_path(event, start_date: start_date),
-                data: { turbo_frame: "event_drawer" },
-                class: "inline-flex items-center rounded-xl border border-zinc-800 bg-zinc-950/40 px-3 py-1.5 text-sm text-zinc-200 hover:bg-zinc-800/40 transition" %>
-        </div>
-      </div>
-    <% end %>
+    <div class="scrollbars min-h-0 flex-1 overflow-y-auto px-6 py-6 pb-10">
+      <%= render "events/form", event: event, start_date: start_date, cancel_drawer: true %>
+    </div>
   </div>
 <% end %>
