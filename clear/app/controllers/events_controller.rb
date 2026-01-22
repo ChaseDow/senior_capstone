@@ -14,7 +14,7 @@ class EventsController < ApplicationController
     return unless turbo_frame_request?
 
     render partial: "events/drawer_detail",
-           locals: { event: @event, start_date: parse_start_date(params[:start_date]) }
+           locals: { event: @event, start_date: params[:start_date] }
   end
 
   def new
@@ -26,8 +26,14 @@ class EventsController < ApplicationController
 
     if @event.save
       respond_to do |format|
-        format.html { redirect_to events_path, notice: "Event created." }
+        format.html { redirect_to event_path(@event), notice: "Event created." }
+
         format.turbo_stream do
+          unless turbo_frame_request?
+            redirect_to event_path(@event), status: :see_other
+            next
+          end
+
           start_date = parse_start_date(params[:start_date])
           occurrences = dashboard_occurrences_for(start_date)
 
@@ -37,24 +43,19 @@ class EventsController < ApplicationController
               partial: "dashboard/calendar_frame",
               locals: { events: occurrences, start_date: start_date }
             ),
-            turbo_stream.replace(
-              "event_drawer",
-              partial: "events/drawer_detail",
-              locals: { event: @event, start_date: start_date }
-            )
+            turbo_stream.update("event_drawer", "")
           ]
         end
       end
     else
       respond_to do |format|
         format.html { render :new, status: :unprocessable_entity }
-        format.turbo_stream do
-          start_date = parse_start_date(params[:start_date])
 
+        format.turbo_stream do
           render turbo_stream: turbo_stream.replace(
             "event_drawer",
             partial: "events/drawer_edit",
-            locals: { event: @event, start_date: start_date }
+            locals: { event: @event, start_date: params[:start_date] }
           ), status: :unprocessable_entity
         end
       end
@@ -62,17 +63,23 @@ class EventsController < ApplicationController
   end
 
   def edit
-    if turbo_frame_request?
-      render partial: "events/drawer_edit",
-             locals: { event: @event, start_date: parse_start_date(params[:start_date]) }
-    end
+    return unless turbo_frame_request?
+
+    render partial: "events/drawer_edit",
+           locals: { event: @event, start_date: params[:start_date] }
   end
 
   def update
     if @event.update(event_params)
       respond_to do |format|
-        format.html { redirect_to events_path, notice: "Event updated." }
+        format.html { redirect_to event_path(@event), notice: "Event updated." }
+
         format.turbo_stream do
+          unless turbo_frame_request?
+            redirect_to event_path(@event), status: :see_other
+            next
+          end
+
           start_date = parse_start_date(params[:start_date])
           occurrences = dashboard_occurrences_for(start_date)
 
@@ -85,7 +92,7 @@ class EventsController < ApplicationController
             turbo_stream.replace(
               "event_drawer",
               partial: "events/drawer_detail",
-              locals: { event: @event, start_date: start_date }
+              locals: { event: @event, start_date: params[:start_date] }
             )
           ]
         end
@@ -93,13 +100,12 @@ class EventsController < ApplicationController
     else
       respond_to do |format|
         format.html { render :edit, status: :unprocessable_entity }
-        format.turbo_stream do
-          start_date = parse_start_date(params[:start_date])
 
+        format.turbo_stream do
           render turbo_stream: turbo_stream.replace(
             "event_drawer",
             partial: "events/drawer_edit",
-            locals: { event: @event, start_date: start_date }
+            locals: { event: @event, start_date: params[:start_date] }
           ), status: :unprocessable_entity
         end
       end
@@ -111,7 +117,13 @@ class EventsController < ApplicationController
 
     respond_to do |format|
       format.html { redirect_to events_path, notice: "Event deleted." }
+
       format.turbo_stream do
+        unless turbo_frame_request?
+          redirect_to events_path, status: :see_other
+          next
+        end
+
         start_date = parse_start_date(params[:start_date])
         occurrences = dashboard_occurrences_for(start_date)
 

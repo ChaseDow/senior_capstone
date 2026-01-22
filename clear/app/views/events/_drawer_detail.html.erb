@@ -12,12 +12,11 @@
       end
   %>
 
-  <div class="flex h-full flex-col">
+  <div class="flex max-h-[85vh] flex-col">
     <div class="flex items-start justify-between border-b border-zinc-800 px-6 py-4">
       <div class="min-w-0">
         <div class="flex items-center gap-2">
-          <span class="h-3 w-3 rounded-full"
-                style="background-color:<%= event.color.presence || "#34D399" %>"></span>
+          <span class="h-3 w-3 rounded-full" style="background-color:<%= event.color.presence || "#34D399" %>"></span>
           <div class="text-sm font-semibold text-zinc-100 truncate">
             <%= event.title.presence || "(Untitled)" %>
           </div>
@@ -73,14 +72,14 @@
         <div class="flex items-center gap-2">
           <%= link_to "Edit",
                 edit_event_path(event, start_date: start_date),
-                data: { turbo_frame: "event_drawer", turbo_prefetch: "false" },
+                data: { turbo_frame: "event_drawer", turbo_prefetch: false },
                 class: "inline-flex items-center rounded-xl border border-zinc-800 bg-zinc-950/40 px-3 py-1.5 text-sm text-zinc-200 hover:bg-zinc-800/40 transition" %>
 
           <%= button_to "Delete",
                 event_path(event, start_date: start_date),
                 method: :delete,
                 class: "inline-flex items-center rounded-xl border border-rose-900/60 bg-rose-950/20 px-3 py-1.5 text-sm text-rose-200 hover:bg-rose-950/35 transition",
-                form: { data: { turbo_confirm: "Delete this event?", turbo_frame: "event_drawer", drawer_close_on_success: "true" } } %>
+                form: { data: { turbo_confirm: "Delete this event?", turbo_frame: "event_drawer" } } %>
         </div>
 
         <button
