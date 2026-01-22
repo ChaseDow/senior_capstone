@@ -14,7 +14,7 @@
 %>
 
 <% event_classes =
-  "absolute rounded-xl border px-2 py-1 text-[11px] shadow-sm transition " \
+  "absolute cursor-pointer rounded-xl border px-2 py-1 text-[11px] shadow-sm transition " \
   "hover:brightness-110 hover:saturate-110"
 %>
 
@@ -148,6 +148,8 @@
               <% start_label = seg[:seg_start].strftime("%-I:%M %p") %>
               <% end_label   = seg[:seg_end].strftime("%-I:%M %p") %>
 
+              <% url = edit_event_path(event, start_date: start_date.to_date) %>
+
               <% style_str =
                 "top: #{seg[:top]}px; " \
                 "height: #{seg[:height]}px; " \
@@ -158,7 +160,14 @@
                 "border-color: rgba(0,0,0,0.25);"
               %>
 
-              <%= link_to(event, class: event_classes, style: style_str) do %>
+              <%= link_to event_path(event, start_date: start_date.to_date),
+                class: event_classes,
+                style: style_str,
+                data: {
+                  turbo_frame: "event_drawer",
+                  action: "click->drawer#open",
+                  turbo_prefetch: false
+                } do %>
                 <div class="font-semibold truncate"><%= event.title.presence || "(Untitled)" %></div>
                 <div class="opacity-85"><%= start_label %> – <%= end_label %></div>
               <% end %>

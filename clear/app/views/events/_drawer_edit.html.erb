@@ -1,0 +1,28 @@
+<%= turbo_frame_tag "event_drawer" do %>
+  <div class="flex max-h-[85vh] flex-col">
+    <div class="flex items-start justify-between border-b border-zinc-800 px-6 py-4">
+      <div class="min-w-0">
+        <div class="text-sm font-semibold text-zinc-100 truncate">Edit event</div>
+        <div class="mt-1 text-xs text-zinc-500">Update details without leaving the dashboard</div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <%= link_to "Back",
+              event_path(event, start_date: start_date),
+              data: { turbo_frame: "event_drawer", turbo_prefetch: false },
+              class: "inline-flex items-center rounded-xl border border-zinc-800 bg-zinc-950/40 px-3 py-1.5 text-sm text-zinc-200 hover:bg-zinc-800/40 transition" %>
+
+        <button
+          type="button"
+          data-action="drawer#close"
+          class="inline-flex items-center rounded-xl border border-zinc-800 bg-zinc-950/40 px-3 py-1.5 text-sm text-zinc-200 hover:bg-zinc-800/40 transition">
+          ✕
+        </button>
+      </div>
+    </div>
+
+    <div class="scrollbars min-h-0 flex-1 overflow-y-auto px-6 py-6">
+      <%= render "events/form", event: event, start_date: start_date, cancel_drawer: true %>
+    </div>
+  </div>
+<% end %>

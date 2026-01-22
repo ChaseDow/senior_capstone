@@ -1,18 +1,8 @@
-<% content_for :page_title, "Events" %>
-<% content_for :page_subtitle, "Upcoming and past events"%>
-<div class="mx-auto max-w-5xl">
-  <div class="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6">
-    <div class="flex items-center justify-between">
-      <div>
-        <h1 class="text-xl font-semibold text-zinc-100">New Event</h1>
-        <p class="mt-1 text-sm text-zinc-400">Create a new event that isn’t tied to classes or work.</p>
-      </div>
-
-      <%= render Studs::SecondaryButtonComponent.new(label: "Back", href: events_path) %>
-    </div>
-
-    <div class="mt-6">
-      <%= render "form", event: @event %>
-    </div>
+<div class="rounded-2xl border border-zinc-800 bg-zinc-950/40 p-6">
+  <div class="mb-4">
+    <div class="text-base font-semibold text-zinc-100">New event</div>
+    <div class="text-sm text-zinc-500">Create a one-time or repeating event.</div>
   </div>
+
+  <%= render "form", event: @event, turbo: false %>
 </div>
