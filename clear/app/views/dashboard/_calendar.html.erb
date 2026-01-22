@@ -192,6 +192,9 @@
                   turbo_prefetch: false
                 } do %>
                 <div class="font-semibold truncate"><%= event.title.presence || "(Untitled)" %></div>
+                <% if event.location.present? %>
+                  <div class="opacity-85 truncate"><%= event.location %></div>
+                <% end %>
                 <div class="opacity-85"><%= start_label %> – <%= end_label %></div>
               <% end %>
             <% end %>
