@@ -1,10 +1,26 @@
-<% if @syllabus.file.attached? %>
-  <% if @syllabus.file.content_type == "application/pdf" %>
-    <iframe src="<%= rails_blob_url(@syllabus.file, disposition: 'inline') %>" width="100%" height="600px"></iframe>
-  <% else %>
-    <p class="text-zinc-400">
-      Cannot preview this file type. 
-      <a href="<%= rails_blob_url(@syllabus.file, disposition: 'attachment') %>" class="text-emerald-400 underline">Download here</a>.
-    </p>
+<% content_for :page_title, "Syllabuses" %>
+<% content_for :page_subtitle, "Uploaded syllabuses" %>
+
+<div class="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-xl font-semibold text-zinc-100"> <%= @syllabus.title %></h1>
+      <p class="mt-1 text-sm text-zinc-400"> <%= @syllabus.file.filename.to_s %>.</p>
+    </div>
+
+    <%= render Studs::SecondaryButtonComponent.new(label: "Back", href: syllabuses_path) %>
+  </div>
+
+  <div class="mt-6">
+      <% if @syllabus.file.attached? %>
+    <% if @syllabus.file.content_type == "application/pdf" %>
+      <iframe src="<%= rails_blob_url(@syllabus.file, disposition: 'inline') %>" width="100%" height="600px"></iframe>
+    <% else %>
+      <p class="text-zinc-400">
+        Cannot preview this file type. 
+        <a href="<%= rails_blob_url(@syllabus.file, disposition: 'attachment') %>" class="text-emerald-400 underline">Download here</a>.
+      </p>
+    <% end %>
   <% end %>
-<% end %>
+  </div>
+</div>
