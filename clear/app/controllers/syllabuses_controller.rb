@@ -1,14 +1,14 @@
+# app/controllers/syllabuses_controller.rb
 class SyllabusesController < ApplicationController
   layout "app_shell"
-  #has_many_attached : syllabuses
-  before_action :set_syllabus, only: %i[ show edit update destroy ]
+  before_action :set_syllabus, only: [:show, :destroy]
 
-  # GET /syllabuses or /syllabuses.json
+  # GET /syllabuses
   def index
-    @syllabuses = Syllabus.all
+    @syllabuses = Syllabus.all.order(created_at: :desc)
   end
 
-  # GET /syllabuses/1 or /syllabuses/1.json
+  # GET /syllabuses/1
   def show
   end
 
@@ -17,56 +17,29 @@ class SyllabusesController < ApplicationController
     @syllabus = Syllabus.new
   end
 
-  # GET /syllabuses/1/edit
-  def edit
-  end
-
-  # POST /syllabuses or /syllabuses.json
+  # POST /syllabuses
   def create
     @syllabus = Syllabus.new(syllabus_params)
 
-    respond_to do |format|
-      if @syllabus.save
-        format.html { redirect_to @syllabus, notice: "Syllabus was successfully created." }
-        format.json { render :show, status: :created, location: @syllabus }
-      else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @syllabus.errors, status: :unprocessable_entity }
-      end
+    if @syllabus.save
+      redirect_to @syllabus, notice: 'Syllabus was successfully uploaded.'
+    else
+      render :new, status: :unprocessable_entity
     end
   end
 
-  # PATCH/PUT /syllabuses/1 or /syllabuses/1.json
-  def update
-    respond_to do |format|
-      if @syllabus.update(syllabus_params)
-        format.html { redirect_to @syllabus, notice: "Syllabus was successfully updated.", status: :see_other }
-        format.json { render :show, status: :ok, location: @syllabus }
-      else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @syllabus.errors, status: :unprocessable_entity }
-      end
-    end
-  end
-
-  # DELETE /syllabuses/1 or /syllabuses/1.json
+  # DELETE /syllabuses/1
   def destroy
-    @syllabus.destroy!
-
-    respond_to do |format|
-      format.html { redirect_to syllabuses_path, notice: "Syllabus was successfully destroyed.", status: :see_other }
-      format.json { head :no_content }
-    end
+    @syllabus.destroy
+    redirect_to syllabuses_url, notice: 'Syllabus was successfully deleted.'
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
     def set_syllabus
-      @syllabus = Syllabus.find(params.expect(:id))
+      @syllabus = Syllabus.find(params[:id])
     end
 
-    # Only allow a list of trusted parameters through.
     def syllabus_params
-      params.fetch(:syllabus, {})
+      params.require(:syllabus).permit(:title, :created_at, :file)
     end
 end
