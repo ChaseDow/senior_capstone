@@ -55,7 +55,8 @@ users_data = [
             {
                 color: "#FF0000",
                 recurring: true,
-                repeat_until: now+7.day,
+                repeat_until: now+7.
+                day,
                 repeat_days: [
                     2,
                     4
@@ -64,6 +65,64 @@ users_data = [
                 starts_at: now.change(hour: 16, min: 0)-4.day,
                 ends_at: now.change(hour: 17, min: 0)-4.day,
                 location: "I need to study for an exam in my math class."
+            }
+        ]
+    },
+    {
+        email: "ryan@example.com",
+        password: "password123",
+        events: [
+            {
+                color: "#FFFFFF",
+                title: "Workout (Legs)",
+                starts_at: now.change(hour: 6, min: 0)+1.day,
+                ends_at: now.change(hour: 6, min: 25)+1.day,
+                location: "Lambwright",
+                description: "Treadmill / Leg Rows / Stretch"
+            },
+            {
+                color: "#FFFFFF",
+                title: "Go Back home",
+                starts_at: now.change(hour: 8, min: 0)+1.day,
+                ends_at: now.change(hour: 9, min: 30)+1.day,
+                location: "Home",
+                description: "Watch a Movie"
+            },
+            {
+                color: "#FFFFFB",
+                title: "Study Computer Architecture",
+                starts_at: now.change(hour: 10, min: 0)+1.day,
+                ends_at: now.change(hour: 12, min: 30)+1.day,
+                location: "Lambwright",
+                description: "Reseach what a ALU is "
+            }
+        ]
+    },
+    {
+        email: "edgar@example.com",
+        password: "password123",
+        events: [
+            {
+                color: "#FFFFFF",
+                title: "Go Back home",
+                starts_at: now.change(hour: 6, min: 0)+1.day,
+                ends_at: now.change(hour: 7, min: 30)+1.day,
+                location: "Lambwright",
+                description: "Walk the dog"
+            }
+        ]
+    },
+    {
+        email: "anousith@example.com",
+        password: "password123",
+        events: [
+            {
+                color: "#FFFFFF",
+                title: "Go Back home",
+                starts_at: now.change(hour: 4, min: 0)+1.day,
+                ends_at: now.change(hour: 5, min: 30)+1.day,
+                location: "Lambwright",
+                description: "Read a Book"
             }
         ]
     }
