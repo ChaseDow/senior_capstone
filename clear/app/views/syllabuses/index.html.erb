@@ -1,0 +1,79 @@
+<% content_for :page_title, "Syllabus" %>
+<% content_for :page_subtitle, "Upload and view your files here"%>
+<div class="rounded-2xl border border-emerald-900/35 bg-emerald-950/15 backdrop-blur-sm p-6">
+  <div class="flex items-center justify-between">
+    <div class="text-sm text-zinc-300">
+      Your events will show here.
+    </div>
+
+    <%= render Studs::PrimaryButtonComponent.new(
+          label: "Upload File",
+          href: new_syllabus_path,
+          color: :emerald
+        ) %>
+  </div>
+
+  <div class="mt-4 overflow-hidden rounded-2xl border border-emerald-900/30 bg-emerald-950/10">
+    <% occurrences = (@occurrences || @events || []) %>
+
+    <% if occurrences.any? %>
+      <div class="divide-y divide-emerald-900/25">
+        <% occurrences.each do |occ| %>
+          <% event = occ.respond_to?(:event) ? occ.event : occ %>
+
+          <div class="flex items-start justify-between gap-4 p-4 bg-emerald-950/10 hover:bg-emerald-900/10 transition border-l-4"
+               style="border-left-color: <%= event.color.presence || "#34D399" %>;">
+            <div class="min-w-0">
+              <p class="truncate font-medium text-zinc-100 flex items-center gap-2">
+                <%= link_to(event.title.presence || "(Untitled)", event_path(event), class: "hover:underline") %>
+
+                <% if event.recurring? %>
+                  <span class="rounded-full border border-emerald-900/40 bg-emerald-950/30 px-2 py-0.5 text-[11px] text-emerald-200">
+                    Repeats
+                  </span>
+                <% end %>
+              </p>
+
+              <% starts_at = occ.respond_to?(:starts_at) ? occ.starts_at : event.starts_at %>
+              <% ends_at   = occ.respond_to?(:ends_at)   ? occ.ends_at   : event.ends_at   %>
+
+              <p class="mt-1 text-sm text-zinc-400">
+                <%= starts_at&.strftime("%b %d, %Y • %I:%M %p") %>
+                <% if ends_at.present? %>
+                  – <%= ends_at.strftime("%I:%M %p") %>
+                <% end %>
+              </p>
+
+              <% if event.location.present? %>
+                <p class="text-sm text-zinc-400"><%= event.location %></p>
+              <% end %>
+
+              <% if event.recurring? && event.repeat_until.present? %>
+                <p class="mt-1 text-xs text-zinc-500">
+                  Until <%= event.repeat_until.strftime("%b %d, %Y") %>
+                </p>
+              <% end %>
+            </div>
+
+            <div class="flex shrink-0 items-center gap-2">
+              <%= render Studs::SecondaryButtonComponent.new(
+                    path: edit_event_path(event),
+                    label: "Edit",
+                    size: :sm
+                  ) %>
+
+              <%= button_to "Delete",
+                            event_path(event),
+                            method: :delete,
+                            form: { data: { turbo_confirm: "Delete this event?" } },
+                            class: "inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium
+                                    border border-red-500/40 text-red-200 hover:bg-red-950/40 transition" %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="p-6 text-sm text-zinc-400">No events yet.</div>
+    <% end %>
+  </div>
+</div>
