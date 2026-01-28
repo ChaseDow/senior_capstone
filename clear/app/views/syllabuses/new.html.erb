@@ -1,3 +1,6 @@
+<% content_for :page_title, "Syllabuses" %>
+<% content_for :page_subtitle, "Uploaded syllabuses" %>
+
 <div class="mt-6">
   <%= form_with model: @syllabus, html: { multipart: true }, class: "space-y-4", id: "syllabus-form" do |f| %>
     <% if @syllabus.errors.any? %>
@@ -16,7 +19,7 @@
 
     <div>
       <%= f.label :title, class: label_classes %>
-      <%= f.text_field :title, class: input_classes, placeholder: "e.g. Lecture notes, Lecture 1, Syllabus..." %>
+      <%= f.text_field :title, class: input_classes, placeholder: "e.g. BISC 1303- Biological Principles, Math 2413- Calculus I..." %>
     </div>
 
     <div>
