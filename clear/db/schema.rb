@@ -11,10 +11,14 @@
 # It's strongly recommended that you check this file into your version control system.
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 ActiveRecord::Schema[8.1].define(version: 2026_01_18_230733) do
 =======
 ActiveRecord::Schema[8.1].define(version: 2026_01_21_053708) do
 >>>>>>> 07099cb (added views, model, and controller)
+=======
+ActiveRecord::Schema[8.1].define(version: 2026_01_28_172903) do
+>>>>>>> c0d3ea7 (made changes to schema via migrations)
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -95,7 +99,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_21_053708) do
 
   create_table "syllabuses", force: :cascade do |t|
     t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.string "title", null: false
   end
 
   create_table "users", force: :cascade do |t|
