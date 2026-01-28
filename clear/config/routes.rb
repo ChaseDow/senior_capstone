@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :syllabuses
   devise_for :users
   resources :events
   resources :courses
