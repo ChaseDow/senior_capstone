@@ -22,7 +22,7 @@
 
 
 
-  <body class="min-h-screen bg-zinc-950 text-zinc-100">
+  <body class="min-h-screen bg-[var(--app-bg)] text-zinc-100">
     <% show_public_header =
         controller_name == "home" ||
         (controller.respond_to?(:devise_controller?) && controller.devise_controller?) %>

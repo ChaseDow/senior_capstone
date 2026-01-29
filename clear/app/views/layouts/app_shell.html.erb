@@ -20,7 +20,7 @@
     <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
   </head>
 
-  <body data-theme="green" class="min-h-screen bg-zinc-950 text-zinc-100">
+  <body data-theme="green" data-mode="black" class="min-h-screen bg-[var(--shell-bg)] text-[var(--shell-text)]">
     <div class="min-h-screen">
       <%= render Studs::TopBarComponent.new(title: (content_for?(:page_title) ? yield(:page_title) : "Dashboard" ), 
                                         subtitle: (content_for?(:page_subtitle) ? yield(:page_subtitle) : nil) ) do |t| %>

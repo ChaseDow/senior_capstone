@@ -1,4 +1,4 @@
-<div class="min-h-screen" data-controller="drawer">
+<div class="min-h-screen" data-controller="drawer" data-theme="green">
   <%= render Studs::TopBarComponent.new(title: "Dashboard", subtitle: "Overview") do |t| %>
     <% t.with_actions do %>
       <%= render Studs::SearchBarComponent.new(class_name: "w-80", placeholder: "Search…" ) %>
@@ -50,7 +50,7 @@
       aria-modal="true"
       class="pointer-events-auto w-[min(92vw,42rem)]
              max-h-[85vh] overflow-hidden
-             rounded-2xl border border-zinc-800 bg-zinc-950/90 backdrop-blur shadow-2xl
+             rounded-2xl border border-zinc-800 bg-[var(--shell-bg)] backdrop-blur shadow-2xl
              translate-x-[110vw] transition-transform duration-300 ease-in-out">
 
       <%= turbo_frame_tag "event_drawer",
