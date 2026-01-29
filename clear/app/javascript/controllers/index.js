@@ -12,3 +12,6 @@ application.register("hello", HelloController)
 
 import RecurrenceToggleController from "./recurrence_toggle_controller"
 application.register("recurrence-toggle", RecurrenceToggleController)
+
+import ThemeToggleController from "./theme_toggle_controller"
+application.register("theme-toggle", ThemeToggleController)
