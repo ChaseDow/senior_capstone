@@ -1,11 +1,12 @@
 @import "tailwindcss";
+
 /* =========================
-   Studs Theme (default: green)
+   Studs Accent Theme (Green) — ALWAYS ON
+   (This is your app’s identity / accents)
    ========================= */
 
-:root,
-body[data-theme="green"] {
-  /* Colors pulled from your palette image */
+:root {
+  /* Green accent palette (unchanged) */
   --studs-panel-bg: rgba(3, 98, 76, 0.18);        /* Bangladesh Green (#03624C) tinted */
   --studs-panel-bg-2: rgba(3, 98, 76, 0.10);      /* lighter surface */
   --studs-panel-hover: rgba(3, 98, 76, 0.22);     /* hover lift */
@@ -14,18 +15,75 @@ body[data-theme="green"] {
   --studs-divider: rgba(47, 169, 140, 0.16);      /* subtle divider */
 }
 
-/* Override common "gray panel" utilities app-wide */
-.bg-zinc-900\/40 { background-color: var(--studs-panel-bg) !important; }
-.border-zinc-800  { border-color: var(--studs-border) !important; }
+/* =========================
+   App Shell Modes (Black / Gray / Off-White)
+   These ONLY change the neutral background + panel feel.
+   Green accents remain.
+   ========================= */
 
-/* Tailwind divide utilities apply border-color to children */
-.divide-zinc-800 > :not([hidden]) ~ :not([hidden]) {
-  border-color: var(--studs-divider) !important;
+/* Default: black */
+body,
+body[data-mode="black"] {
+  --shell-bg: rgba(9, 9, 11, 1);        /* zinc-950 */
+  --shell-text: rgba(244, 244, 245, 1); /* zinc-100 */
+
+  /* neutral “panels” used by your common utility overrides */
+  --shell-panel: rgba(24, 24, 27, 0.60);   /* zinc-900/60 */
+  --shell-panel-2: rgba(9, 9, 11, 0.50);   /* zinc-950/50 */
+  --shell-panel-hover: rgba(39, 39, 42, 0.65); /* zinc-800/65 */
+  --shell-border: rgba(63, 63, 70, 0.60);  /* zinc-700 */
+  --shell-divider: rgba(63, 63, 70, 0.40);
 }
 
-.bg-zinc-900\/50 { background-color: var(--studs-panel-hover) !important; }
-.bg-zinc-950\/40 { background-color: var(--studs-panel-bg-2) !important; }
+/* Gray mode (dim) */
+body[data-mode="gray"] {
+  --shell-bg: rgba(24, 24, 27, 1);      /* zinc-900 */
+  --shell-text: rgba(244, 244, 245, 1);
 
+  --shell-panel: rgba(39, 39, 42, 0.55);
+  --shell-panel-2: rgba(24, 24, 27, 0.45);
+  --shell-panel-hover: rgba(63, 63, 70, 0.45);
+  --shell-border: rgba(161, 161, 170, 0.22);
+  --shell-divider: rgba(161, 161, 170, 0.14);
+}
+
+/* Off-white (warm light mode) */
+body[data-mode="off-white"] {
+  --shell-bg: rgba(252, 248, 239, 1);   /* warm near-white */
+  --shell-text: rgba(24, 24, 27, 1);    /* zinc-900 */
+
+  --shell-panel: rgba(245, 240, 225, 0.85);
+  --shell-panel-2: rgba(241, 234, 214, 0.75);
+  --shell-panel-hover: rgba(234, 224, 198, 0.80);
+  --shell-border: rgba(180, 160, 120, 0.30);
+  --shell-divider: rgba(180, 160, 120, 0.18);
+}
+
+/* Base shell colors */
+body {
+  background-color: var(--shell-bg);
+  color: var(--shell-text);
+}
+
+/* =========================
+   Global overrides (NEUTRAL panels)
+   These control the black/gray/off-white look.
+   ========================= */
+
+/* These are the utilities you use everywhere */
+.bg-zinc-900\/40 { background-color: var(--shell-panel) !important; }
+.bg-zinc-950\/40 { background-color: var(--shell-panel-2) !important; }
+.bg-zinc-900\/50 { background-color: var(--shell-panel-hover) !important; }
+
+.border-zinc-800 { border-color: var(--shell-border) !important; }
+
+.divide-zinc-800 > :not([hidden]) ~ :not([hidden]) {
+  border-color: var(--shell-divider) !important;
+}
+
+/* =========================
+   Autofill fixes (kept)
+   ========================= */
 @layer base {
   input:-webkit-autofill,
   input:-webkit-autofill:hover,
@@ -36,10 +94,10 @@ body[data-theme="green"] {
   select:-webkit-autofill,
   select:-webkit-autofill:hover,
   select:-webkit-autofill:focus {
-    -webkit-text-fill-color: #e4e4e7; 
+    -webkit-text-fill-color: #e4e4e7;
     caret-color: #e4e4e7;
 
-    -webkit-box-shadow: 0 0 0px 1000px rgba(9, 9, 11, 0.60) inset; 
+    -webkit-box-shadow: 0 0 0px 1000px rgba(9, 9, 11, 0.60) inset;
     box-shadow: 0 0 0px 1000px rgba(9, 9, 11, 0.60) inset;
 
     transition: background-color 9999s ease-in-out 0s;
@@ -53,7 +111,11 @@ body[data-theme="green"] {
     box-shadow: 0 0 0px 1000px rgba(9, 9, 11, 0.60) inset;
   }
 }
-/* Public-page aurora background (Home + Devise) */
+
+/* =========================
+   Public-page aurora background (Home + Devise)
+   (kept exactly)
+   ========================= */
 .aurora {
   background: #09090b; /* zinc-950 base */
 }
@@ -120,34 +182,26 @@ body[data-theme="green"] {
   100% { transform: translate3d(0, 0, 0) scale(1); }
 }
 
-/* Respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .aurora__orb {
     animation: none;
   }
 }
 
+/* =========================
+   Scrollbars (follow body[data-mode])
+   ========================= */
 @layer base {
   :root {
-    --sb-track: #f4f4f5;       /* light track */
-    --sb-thumb: #d4d4d8;       /* light thumb */
-    --sb-thumb-hover: #a1a1aa; /* light hover */
-  }
-
-  /* If you use Tailwind class-based dark mode (html.dark) */
-  html.dark {
     --sb-track: #18181b;
     --sb-thumb: #3f3f46;
     --sb-thumb-hover: #52525b;
   }
 
-  /* If you use system dark mode */
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --sb-track: #18181b;
-      --sb-thumb: #3f3f46;
-      --sb-thumb-hover: #52525b;
-    }
+  body[data-mode="off-white"] {
+    --sb-track: #f4efe3;
+    --sb-thumb: #d7cbb2;
+    --sb-thumb-hover: #c2b08f;
   }
 
   /* Firefox */
