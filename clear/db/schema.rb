@@ -10,15 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-ActiveRecord::Schema[8.1].define(version: 2026_01_18_230733) do
-=======
 ActiveRecord::Schema[8.1].define(version: 2026_01_21_053708) do
->>>>>>> 07099cb (added views, model, and controller)
-=======
-ActiveRecord::Schema[8.1].define(version: 2026_01_28_172903) do
->>>>>>> c0d3ea7 (made changes to schema via migrations)
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -114,12 +106,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_28_172903) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
-<<<<<<< HEAD
   add_foreign_key "courses", "users"
-=======
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
->>>>>>> 07099cb (added views, model, and controller)
   add_foreign_key "events", "users"
   add_foreign_key "schedules", "users"
 end
