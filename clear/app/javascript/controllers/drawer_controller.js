@@ -12,13 +12,33 @@ export default class extends Controller {
     }
     window.addEventListener("keydown", this._onKeydown)
 
+    if (this.hasFrameTarget) {
+      this._observer = new MutationObserver(() => this.syncWithFrame())
+      this._observer.observe(this.frameTarget, {
+        childList: true,
+        characterData: true,
+        subtree: true
+      })
+    }
+
     this.render()
   }
 
   disconnect() {
     window.removeEventListener("keydown", this._onKeydown)
+    this._observer?.disconnect()
+    window.clearTimeout(this._closeTimer)
   }
 
+  start() {
+    this._suppressSync = true
+
+    this.clearFrame()
+    this.showSkeleton()
+    this.open()
+
+    queueMicrotask(() => { this._suppressSync = false })
+  }
   open() {
     this.openValue = true
     this.render()
@@ -26,11 +46,16 @@ export default class extends Controller {
 
   close(event) {
     event?.preventDefault()
+
+    window.clearTimeout(this._closeTimer)
+
     this.openValue = false
     this.render()
 
-    window.setTimeout(() => {
-      if (!this.openValue && this.hasFrameTarget) this.frameTarget.innerHTML = ""
+    this.clearFrame()
+
+    this._closeTimer = window.setTimeout(() => {
+      if (!this.openValue) this.clearFrame()
     }, 320)
   }
 
@@ -52,6 +77,20 @@ export default class extends Controller {
     const form = event.detail.formSubmission?.formElement
     const shouldClose = form?.dataset?.drawerCloseOnSuccess === "true"
     if (shouldClose) this.close()
+  }
+
+  syncWithFrame() {
+    if (!this.hasFrameTarget) return
+    if (this._suppressSync) return
+
+    const empty = this.frameTarget.innerHTML.trim() === ""
+    if (empty && this.openValue) this.close()
+  }
+
+  clearFrame() {
+    if (!this.hasFrameTarget) return
+    this.frameTarget.innerHTML = ""
+    this.frameTarget.removeAttribute("src")
   }
 
   render() {
