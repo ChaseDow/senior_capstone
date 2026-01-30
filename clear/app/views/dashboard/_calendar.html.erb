@@ -99,14 +99,19 @@
           <% end %>
         </div>
 
+        <%# Grid lines: hour + half-hour %>
+        <div class="absolute inset-0 pointer-events-none">
+          <% 24.times do |i| %>
+            <div class="relative h-14">
+              <!-- Hour line -->
+              <div class="absolute top-0 left-0 w-full border-b border-emerald-800/60"></div>
 
+              <!-- 30-minute dashed line -->
+              <div class="absolute top-1/2 left-0 w-full border-b border-dashed border-blue-800/40"></div>
+            </div>
+          <% end %>
+        </div>
 
-          <%# Hour grid lines %>
-          <div class="absolute inset-0 pointer-events-none">
-            <% 24.times do %>
-              <div class="h-14 border-b border-emerald-900/60"></div>
-            <% end %>
-          </div>
           
           <%# Events overlay %>
           <div class="relative h-[1344px]">
