@@ -14,9 +14,10 @@
 %>
 
 <% event_classes =
-  "absolute cursor-pointer rounded-xl border px-2 py-1 text-[11px] shadow-sm transition " \
+  "absolute z-10 cursor-pointer rounded-xl border px-2 py-1 text-[11px] shadow-sm transition " \
   "hover:brightness-110 hover:saturate-110"
 %>
+
 
 <% events_by_day = events.group_by { |e| e.starts_at.in_time_zone.to_date } %>
 
@@ -83,13 +84,30 @@
         <% day_end   = day_start.end_of_day %>
 
         <div class="relative border-r border-zinc-800">
+          <%# Clickable time slots - 30 minutes each %>
+          <div class="absolute inset-0 z-1">
+            <% 48.times do |i| %>
+              <% slot_time = day_start + (i * 30).minutes %>
+              <%= link_to new_event_path(start_time: slot_time.iso8601),
+                      class: "timeslot absolute left-0 w-full
+                            hover:bg-indigo-500/10
+                            transition-colors
+                            cursor-pointer",
+                      style: "top: #{i * hour_height_px/2}px; height: #{hour_height_px/2}px;",
+                      data: { turbo: false } do %>
+            <% end %>
+          <% end %>
+        </div>
+
+
+
           <%# Hour grid lines %>
           <div class="absolute inset-0 pointer-events-none">
             <% 24.times do %>
-              <div class="h-14 border-b border-zinc-900/60"></div>
+              <div class="h-14 border-b border-emerald-900/60"></div>
             <% end %>
           </div>
-
+          
           <%# Events overlay %>
           <div class="relative h-[1344px]">
             <% day_events = events_by_day.fetch(day, []) %>
