@@ -18,7 +18,9 @@ class EventsController < ApplicationController
   end
 
   def new
-    @event = current_user.events.new
+    start_time = params[:start_time].present? ? Time.zone.parse(params[:start_time]) : nil
+
+    @event = current_user.events.new(starts_at: start_time)
   end
 
   def create
