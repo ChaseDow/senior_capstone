@@ -47,18 +47,19 @@
   <% end %>
 </div>
 
-<!-- JS just to show filename -->
 <script>
-  document.addEventListener("DOMContentLoaded", () => {
+  document.addEventListener("turbo:load", () => {
     const fileInput = document.getElementById("syllabus-file-input");
     const display = document.getElementById("file-name-display");
-
-    fileInput.addEventListener("change", () => {
-      if (fileInput.files.length > 0) {
-        display.textContent = fileInput.files[0].name;
-      } else {
-        display.textContent = "";
+    
+      if (fileInput || display){
+      fileInput.addEventListener("change", () => {
+        if (fileInput.files.length > 0) {
+          display.textContent = fileInput.files[0].name;
+        } else {
+          display.textContent = "";
+        }
+        });
       }
-    });
   });
 </script>
