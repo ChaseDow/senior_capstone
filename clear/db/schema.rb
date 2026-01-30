@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_21_053708) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_30_094611) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -92,6 +92,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_21_053708) do
   create_table "syllabuses", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "title", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id"], name: "index_syllabuses_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -111,4 +113,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_21_053708) do
   add_foreign_key "courses", "users"
   add_foreign_key "events", "users"
   add_foreign_key "schedules", "users"
+  add_foreign_key "syllabuses", "users"
 end
