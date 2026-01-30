@@ -1,0 +1,64 @@
+<% content_for :page_title, "Syllabuses" %>
+<% content_for :page_subtitle, "Uploaded syllabuses" %>
+
+<div class="mt-6">
+  <%= form_with model: @syllabus, html: { multipart: true }, class: "space-y-4", id: "syllabus-form" do |f| %>
+    <% if @syllabus.errors.any? %>
+      <div class="rounded-2xl border border-red-900 bg-red-950/40 p-4 text-red-200">
+        <p class="font-medium">Please fix the following:</p>
+        <ul class="mt-2 list-disc pl-6 text-sm">
+          <% @syllabus.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <% input_classes = "mt-1 w-full rounded-xl border border-zinc-800 bg-zinc-950/40 px-3 py-1.5 text-sm text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-emerald-300/40" %>
+    <% label_classes = "block text-sm font-medium text-zinc-200" %>
+
+    <div>
+      <%= f.label :title, class: label_classes %>
+      <%= f.text_field :title, class: input_classes, placeholder: "e.g. BISC 1303- Biological Principles, Math 2413- Calculus I..." %>
+    </div>
+
+    <div>
+      <%= f.label :file, "Upload File", class: label_classes %>
+      <label class="mt-1 flex flex-col items-center justify-center h-65 border-2 border-dashed border-zinc-700 bg-zinc-950/30 rounded-xl cursor-pointer hover:border-emerald-400 hover:bg-zinc-900/50 transition text-zinc-400 text-center relative">
+        <span class="mb-2">Click to Browse your Files</span>
+        <%= f.file_field :file,
+              accept: ".pdf,.doc,.docx",
+              class: "absolute w-0 h-0 opacity-0",
+              id: "syllabus-file-input" %>
+      </label>
+      <p id="file-name-display" class="mt-2 text-xs text-zinc-300 truncate"></p>
+      <p class="mt-1 text-xs text-zinc-500">
+        Accepted formats: PDF or DOCX.
+      </p>
+    </div>
+
+    <div class="flex items-center gap-2 pt-2">
+      <%= render Studs::PrimaryButtonComponent.new(
+            label: "Upload Syllabus",
+            type: "submit",
+            color: :emerald
+          ) %>
+    </div>
+  <% end %>
+</div>
+
+<!-- JS just to show filename -->
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const fileInput = document.getElementById("syllabus-file-input");
+    const display = document.getElementById("file-name-display");
+
+    fileInput.addEventListener("change", () => {
+      if (fileInput.files.length > 0) {
+        display.textContent = fileInput.files[0].name;
+      } else {
+        display.textContent = "";
+      }
+    });
+  });
+</script>
