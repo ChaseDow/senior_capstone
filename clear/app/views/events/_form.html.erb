@@ -39,7 +39,10 @@
     <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
       <div>
         <%= f.label :starts_at, "Start time", class: label_classes %>
-        <%= f.datetime_local_field :starts_at, class: input_classes %>
+        <%= f.datetime_local_field :starts_at,
+      value: @event.starts_at&.strftime("%Y-%m-%dT%H:%M"),
+      class: input_classes %>
+
       </div>
 
       <div>
