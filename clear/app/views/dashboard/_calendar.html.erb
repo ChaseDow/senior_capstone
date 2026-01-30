@@ -30,9 +30,9 @@
     </div>
 
     <nav class="flex items-center gap-2">
-      <%= link_to "Previous", url_for(start_date: prev_start), class: nav_btn %>
-      <%= link_to "Today",    url_for(start_date: today_start), class: nav_btn %>
-      <%= link_to "Next",     url_for(start_date: next_start), class: nav_btn %>
+      <%= link_to "Previous", dashboard_path(start_date: prev_start),  class: nav_btn, data: { turbo_frame: "dashboard_calendar" } %>
+      <%= link_to "Today",    dashboard_path(start_date: today_start), class: nav_btn, data: { turbo_frame: "dashboard_calendar" } %>
+      <%= link_to "Next",     dashboard_path(start_date: next_start),  class: nav_btn, data: { turbo_frame: "dashboard_calendar" } %>
     </nav>
   </div>
 
@@ -188,7 +188,7 @@
                 style: style_str,
                 data: {
                   turbo_frame: "event_drawer",
-                  action: "click->drawer#open",
+                  action: "click->drawer#start",
                   turbo_prefetch: false
                 } do %>
                 <div class="font-semibold truncate"><%= event.title.presence || "(Untitled)" %></div>
