@@ -1,0 +1,19 @@
+<% content_for :page_title, "Agenda" %>
+<% content_for :page_subtitle, "Today's Agenda"%>
+
+<div class="mt-4 overflow-hidden rounded-2xl border border-emerald-900/30 bg-emerald-950/10">
+  <aside class="w-wd shrink-0">
+    <%= render Studs::AgendaComponent.new(mode: :panel) do |a| %>
+      <% if @agenda.any? %>
+        <% @agenda.each do |agenda| %>
+          <% if agenda[:type] == "Event" %>
+            <% a.with_item(time: agenda[:time], title: agenda[:item].title, meta: agenda[:item].location, tag: "Event", tag_color: :orange) %>
+          <% elsif agenda[:type] == "Course" %>
+            <% a.with_item(time: agenda[:time], title: agenda[:item].title, meta: agenda[:item].location, tag: "Course", tag_color: :blue) %>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+  </aside>
+</div>
+

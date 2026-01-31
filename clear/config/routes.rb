@@ -3,7 +3,7 @@ Rails.application.routes.draw do
   devise_for :users
   resources :events
   resources :courses
-
+  resources :agenda
 
   if Rails.env.development?
     begin
