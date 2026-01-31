@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html data-mode="black" data-theme="green">
   <head>
     <title><%= content_for(:title) || "Clear" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -15,44 +15,56 @@
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
 
+    <script>
+      (function () {
+        try {
+          var mode = localStorage.getItem("mode");
+          if (mode) document.documentElement.dataset.mode = mode;
+        } catch (e) {}
+      })();
+    </script>
+
     <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
   </head>
 
-  <body data-theme="green" data-mode="black" class="min-h-screen bg-[var(--shell-bg)] text-[var(--shell-text)]">
-    <div class="min-h-screen">
-      <%= render Studs::TopBarComponent.new(title: (content_for?(:page_title) ? yield(:page_title) : "Dashboard" ), 
-                                        subtitle: (content_for?(:page_subtitle) ? yield(:page_subtitle) : nil) ) do |t| %>
-        <% t.with_actions do %>
-          <%= render Studs::SearchBarComponent.new(class_name: "w-80", placeholder: "Search…") %>
+  <body class="h-screen overflow-hidden bg-[var(--shell-bg)] text-[var(--shell-text)] antialiased">
+    <div class="h-screen flex flex-col bg-[var(--shell-bg)]">
+      <div class="shrink-0">
+        <%= render Studs::TopBarComponent.new(
+              title: (content_for?(:page_title) ? yield(:page_title) : "Dashboard"),
+              subtitle: (content_for?(:page_subtitle) ? yield(:page_subtitle) : nil)
+            ) do |t| %>
+          <% t.with_actions do %>
+            <%= render Studs::SearchBarComponent.new(class_name: "w-80", placeholder: "Search…") %>
+          <% end %>
         <% end %>
-      <% end %>
+      </div>
 
-      <div class="flex h-[calc(100vh-4rem)]">
+      <div class="flex flex-1 min-h-0 overflow-hidden">
         <%= render Studs::LeftNavComponent.new(
               brand: nil,
               items: [
                 { label: "Dashboard", path: "/dashboard", icon_name: "dashboard-circle-stroke-rounded" },
-                {label: "Agenda", path: "/agenda", icon_name: "timeline-event-stroke-rounded"},
+                { label: "Agenda",    path: "/agenda",    icon_name: "timeline-event-stroke-rounded" },
                 { label: "Events",    path: "/events",    icon_name: "timeline-event-stroke-rounded" },
-                { label: "Courses",    path: "/courses",    icon_name: "course-stroke-rounded" },
-                { label: "Schedule", path: "/schedule", icon_name: "timeline-event-stroke-rounded"},
+                { label: "Courses",   path: "/courses",   icon_name: "course-stroke-rounded" },
+                { label: "Schedule",  path: "/schedule",  icon_name: "timeline-event-stroke-rounded" },
                 { label: "UI",        path: "/ui",        icon_name: "search-01-stroke-rounded" },
                 { label: "Syllabus",  path: "/syllabuses",icon_name: "file-01-stroke-rounded" }
-              ],
-              class_name: "h-[calc(100vh-4rem)]"
+              ]
             ) %>
 
-        <div class="min-w-0 flex-1">
-          <div class="flex h-full gap-6 px-6 py-6">
-            <main class="min-w-0 flex-1">
-              <% if notice.present? %>
-                <div class="mb-4 rounded-2xl border border-emerald-900 bg-emerald-950/40 px-4 py-3 text-sm text-emerald-200">
-                  <%= notice %>
-                </div>
-              <% end %>
+        <div class="min-w-0 flex-1 min-h-0 overflow-hidden">
+          <div class="h-full px-6 py-6 overflow-hidden">
+            <% if notice.present? %>
+              <div class="mb-4 rounded-2xl border border-zinc-800 bg-zinc-900/40 px-4 py-3 text-sm">
+                <%= notice %>
+              </div>
+            <% end %>
 
+            <main class="h-full min-h-0 min-w-0 overflow-hidden">
               <%= yield %>
             </main>
           </div>

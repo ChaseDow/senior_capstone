@@ -15,22 +15,12 @@ module Studs
       return false if path.blank?
 
       return current_page?(path) if path == "/"
-
       current_page?(path) || request.path.start_with?(path)
-    end
-
-    def item_classes(active)
-      base = "flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition"
-      if active
-        "#{base} bg-zinc-800 text-emerald-200"
-      else
-        "#{base} text-zinc-200 hover:bg-zinc-900 hover:text-zinc-50"
-      end
     end
 
     def wrapper_classes
       [
-        "h-full w-64 shrink-0 border-r border-zinc-800 bg-zinc-950",
+        "studs-left-nav h-full w-64 shrink-0",
         @class_name
       ].compact.join(" ")
     end

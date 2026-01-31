@@ -1,42 +1,23 @@
-<div class="min-h-screen" data-controller="drawer" data-theme="green">
-  <%= render Studs::TopBarComponent.new(title: "Dashboard", subtitle: "Overview") do |t| %>
-    <% t.with_actions do %>
-      <%= render Studs::SearchBarComponent.new(class_name: "w-80", placeholder: "Search…" ) %>
-    <% end %>
-  <% end %>
+<div class="h-full min-h-0" data-controller="drawer">
+  <div class="flex h-full min-h-0 gap-6 overflow-hidden">
+    <!-- Calendar column -->
+    <section class="min-w-0 flex-1 min-h-0 overflow-hidden">
+      <%= render "dashboard/calendar_frame", events: @occurrences, start_date: @start_date %>
+    </section>
 
-  <div class="flex h-[calc(100vh-4rem)] overflow-hidden">
-    <%= render Studs::LeftNavComponent.new(
-          brand: nil,
-          items: [
-                { label: "Dashboard", path: "/dashboard", icon_name: "dashboard-circle-stroke-rounded" },
-                {label: "Agenda", path: "/agenda", icon_name: "timeline-event-stroke-rounded"},
-                { label: "Events",    path: "/events",    icon_name: "timeline-event-stroke-rounded" },
-                { label: "Courses",    path: "/courses",    icon_name: "course-stroke-rounded" },
-                { label: "Schedule", path: "/schedule", icon_name: "timeline-event-stroke-rounded"},
-                { label: "UI",        path: "/ui",        icon_name: "search-01-stroke-rounded" },
-                { label: "Syllabus",  path: "/syllabuses",icon_name: "file-01-stroke-rounded" }
-          ],
-          class_name: "h-[calc(100vh-4rem)]"
-        ) %>
-
-    <div class="min-w-0 flex-1">
-      <div class="flex h-full gap-6 px-6 py-6">
-        <main class="scrollbars min-w-0 flex-1 min-h-0 overflow-y-auto">
-          <%= render "dashboard/calendar_frame", events: @occurrences, start_date: @start_date %>
-        </main>
-
-        <aside class="scrollbars w-wd shrink-0 h-full overflow-y-auto">
-          <%= render Studs::AgendaComponent.new(title: "Agenda", subtitle: "Today", mode: :panel) do |a| %>
-            <% a.with_item(time: "9:00 AM", title: "CSC 405", meta: "Room 120", tag: "Class", tag_color: :blue) %>
-            <% a.with_item(time: "2:00 PM", title: "CSC 499", meta: "Room 108", tag: "Class", tag_color: :emerald) %>
-            <% a.with_item(time: "6:00 PM", title: "CSC 448", meta: "Room 224", tag: "Class", tag_color: :orange) %>
-          <% end %>
-        </aside>
+    <!-- Agenda column -->
+    <aside class="w-wd shrink-0 min-h-0 overflow-hidden">
+      <div class="h-full rounded-2xl studs-accent-card p-4 overflow-hidden">
+        <%= render Studs::AgendaComponent.new(title: "Agenda", subtitle: "Today", mode: :panel) do |a| %>
+          <% a.with_item(time: "9:00 AM", title: "CSC 405", meta: "Room 120", tag: "Class", tag_color: :blue) %>
+          <% a.with_item(time: "2:00 PM", title: "CSC 499", meta: "Room 108", tag: "Class", tag_color: :emerald) %>
+          <% a.with_item(time: "6:00 PM", title: "CSC 448", meta: "Room 224", tag: "Class", tag_color: :orange) %>
+        <% end %>
       </div>
-    </div>
+    </aside>
   </div>
 
+  <!-- Drawer overlay -->
   <div
     data-drawer-target="overlay"
     data-action="click->drawer#close"
@@ -50,7 +31,7 @@
       aria-modal="true"
       class="pointer-events-auto w-[min(92vw,42rem)]
              max-h-[85vh] overflow-hidden
-             rounded-2xl border border-zinc-800 bg-[var(--shell-bg)] backdrop-blur shadow-2xl
+             rounded-2xl border border-zinc-800 bg-[var(--shell-panel)] backdrop-blur shadow-2xl
              translate-x-[110vw] transition-transform duration-300 ease-in-out">
 
       <%= turbo_frame_tag "event_drawer",
