@@ -55,7 +55,7 @@ class AgendaController < ApplicationController
                               .ransack(term.present? ? { title_or_description_or_location_cont: term } : {})
                               .result
 
-    non_recurring_events = base_events.where(recurring: false) 
+    non_recurring_events = base_events.where(recurring: false)
                                       .where(starts_at: range_start..range_end)
 
     recurring_events = base_events.where(recurring: true)
@@ -99,8 +99,7 @@ class AgendaController < ApplicationController
       title: item&.title.presence || (is_course ? "(Untitled Course)" : "(Untitled Event)"),
       location: item&.location,
       description: item&.description,
-      professor: is_course ? item&.professor : nil,
+      professor: is_course ? item&.professor : nil
     }
   end
-
 end
