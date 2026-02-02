@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_02_223829) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_02_195659) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -75,6 +75,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_02_223829) do
     t.text "description"
     t.datetime "ends_at"
     t.string "location"
+    t.integer "priority"
     t.boolean "recurring", default: false, null: false
     t.integer "repeat_days", default: [], null: false, array: true
     t.date "repeat_until"
