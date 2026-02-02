@@ -1,0 +1,36 @@
+<div
+  data-controller="poll-frame"
+  data-poll-frame-status-value="<%= syllabus.parse_status %>"
+  data-poll-frame-interval-value="1500"
+  class="flex items-center gap-2"
+>
+  <% label =
+      if syllabus.course_id.present?
+        "Course created"
+      elsif syllabus.parse_status == "processing"
+        "Parsing…"
+      elsif syllabus.parse_status == "queued"
+        "Queued…"
+      else
+        "Create course"
+      end
+  %>
+
+  <%= button_to label,
+        create_course_syllabus_path(syllabus),
+        method: :post,
+        form: { data: { turbo_frame: dom_id(syllabus, :status) } },
+        disabled: syllabus.course_id.present? || syllabus.parse_status.in?(%w[queued processing]),
+        class: "inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-semibold
+                bg-emerald-600 hover:bg-emerald-500 text-white transition
+                disabled:opacity-50 disabled:cursor-not-allowed" %>
+
+  <% if syllabus.parse_status.present? %>
+    <span class="text-xs text-zinc-400">
+      Status: <%= syllabus.parse_status %>
+      <% if syllabus.parse_status == "failed" && syllabus.parse_error.present? %>
+        — <%= syllabus.parse_error %>
+      <% end %>
+    </span>
+  <% end %>
+</div>

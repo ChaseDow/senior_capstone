@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_30_094611) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_02_173345) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -43,11 +43,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_30_094611) do
   end
 
   create_table "courses", force: :cascade do |t|
+<<<<<<< HEAD
     t.string "color", default: "#34D399", null: false
+=======
+    t.string "code"
+>>>>>>> 5e09732 (Setting up parsing for syllabuses)
     t.datetime "created_at", null: false
     t.text "description"
     t.date "end_date"
     t.time "end_time"
+    t.time "ends_at"
+    t.string "instructor"
     t.string "location"
     t.string "meeting_days"
     t.string "professor"
@@ -56,6 +62,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_30_094611) do
     t.date "repeat_until"
     t.date "start_date"
     t.time "start_time"
+    t.time "starts_at"
     t.string "term"
     t.string "title"
     t.datetime "updated_at", null: false
@@ -96,9 +103,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_30_094611) do
   end
 
   create_table "syllabuses", force: :cascade do |t|
+    t.bigint "course_id"
     t.datetime "created_at", null: false
+    t.text "parse_error"
+    t.string "parse_status"
+    t.datetime "parsed_at"
+    t.text "parsed_text"
     t.string "title", null: false
     t.bigint "user_id", null: false
+    t.index ["course_id"], name: "index_syllabuses_on_course_id"
     t.index ["user_id"], name: "index_syllabuses_on_user_id"
   end
 
@@ -119,5 +132,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_30_094611) do
   add_foreign_key "courses", "users"
   add_foreign_key "events", "users"
   add_foreign_key "schedules", "users"
+  add_foreign_key "syllabuses", "courses", on_delete: :nullify
   add_foreign_key "syllabuses", "users"
 end

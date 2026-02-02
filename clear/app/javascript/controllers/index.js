@@ -10,5 +10,8 @@ application.register("drawer", DrawerController)
 import HelloController from "./hello_controller"
 application.register("hello", HelloController)
 
+import PollFrameController from "./poll_frame_controller"
+application.register("poll-frame", PollFrameController)
+
 import RecurrenceToggleController from "./recurrence_toggle_controller"
 application.register("recurrence-toggle", RecurrenceToggleController)
