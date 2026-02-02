@@ -1,7 +1,5 @@
 <!DOCTYPE html>
-<html>
-
- 
+<html data-mode="black" data-theme="green">
   <head>
     <title><%= content_for(:title) || "Clear" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -12,23 +10,31 @@
     <%= csp_meta_tag %>
 
     <%= yield :head %>
-    
+
     <%= favicon_link_tag asset_path("logo-favicon.png"), type: "image/png" %>
+
+    <!-- Apply saved mode BEFORE paint -->
+    <script>
+      (function () {
+        try {
+          var mode = localStorage.getItem("mode");
+          if (mode) document.documentElement.dataset.mode = mode;
+        } catch (e) {}
+      })();
+    </script>
 
     <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
   </head>
 
-
-
-  <body class="min-h-screen bg-zinc-950 text-zinc-100">
+  <body class="min-h-screen bg-[var(--shell-bg)] text-[var(--shell-text)] antialiased">
     <% show_public_header =
         controller_name == "home" ||
         (controller.respond_to?(:devise_controller?) && controller.devise_controller?) %>
 
     <% if show_public_header %>
-      <!-- Public aurora background -->
+      <!-- Public aurora background (hide in off-white mode) -->
       <div class="aurora pointer-events-none fixed inset-0 -z-10 overflow-hidden">
         <div class="aurora__gradient"></div>
         <div class="aurora__orb aurora__orb--1"></div>
@@ -37,16 +43,12 @@
         <div class="aurora__vignette"></div>
       </div>
 
-      <header class="border-b border-zinc-800/80 bg-zinc-950/60 backdrop-blur">
-        
+      <header class="border-b border-[color:var(--shell-border)] bg-black/20 backdrop-blur">
         <div class="flex w-full items-center justify-between px-4 py-5">
           <%= link_to root_path, class: "flex items-center gap-2" do %>
-            <%= image_tag "Logo.png",
-                          alt: "Clear",
-                          class: "h-6 w-auto" %>
-            <span class="text-sm font-semibold tracking-wide text-zinc-100">Clear</span>
+            <%= image_tag "Logo.png", alt: "Clear", class: "h-6 w-auto" %>
+            <span class="text-sm font-semibold tracking-wide text-[var(--shell-text)]">Clear</span>
           <% end %>
-          </nav>
         </div>
       </header>
     <% end %>
@@ -55,13 +57,13 @@
       <div class="fixed top-4 left-0 right-0 z-50 px-4">
         <div class="mx-auto w-full max-w-2xl space-y-3">
           <% if notice.present? %>
-            <div class="rounded-2xl border border-emerald-900 bg-emerald-950/40 px-4 py-3 text-sm text-emerald-200">
+            <div class="rounded-2xl border border-emerald-300/30 bg-zinc-900/40 px-4 py-3 text-sm text-[var(--shell-text)]">
               <%= notice %>
             </div>
           <% end %>
 
           <% if alert.present? %>
-            <div class="rounded-2xl border border-rose-900 bg-rose-950/40 px-4 py-3 text-sm text-rose-200">
+            <div class="rounded-2xl border border-rose-300/30 bg-rose-500/10 px-4 py-3 text-sm text-[var(--shell-text)]">
               <%= alert %>
             </div>
           <% end %>

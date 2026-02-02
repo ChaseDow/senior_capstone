@@ -2,5 +2,9 @@
 
 # This is used for testing UI pieces
 class UiController < ApplicationController
-  def show; end
+  layout "app_shell"
+  before_action :authenticate_user!
+
+  def show
+  end
 end

@@ -1,0 +1,390 @@
+/* app/assets/stylesheets/application.css */
+
+/* =========================
+   Modes (background + text)
+   Use html[data-mode] as the ONE source of truth.
+   JS sets: document.documentElement.dataset.mode = "black|gray|off-white"
+   ========================= */
+
+:root,
+html[data-mode="black"] {
+  /* GREEN MIST (dark) */
+  --shell-bg: #060807;                 /* near-black with green tint */
+  --shell-text: rgba(244,244,245,0.96);
+  --shell-muted: rgba(244,244,245,0.68);
+
+  --shell-panel: rgba(14, 24, 20, 0.62);       /* mist panel */
+  --shell-panel-2: rgba(8, 12, 10, 0.58);      /* deeper panel */
+  --shell-panel-hover: rgba(18, 32, 26, 0.66); /* hover/strong */
+
+  --shell-border: rgba(34, 197, 94, 0.18);     /* green border */
+  --shell-divider: rgba(34, 197, 94, 0.10);
+
+  --shell-topbar: rgba(10, 14, 12, 0.82);
+
+  /* Nav */
+  --nav-bg: rgba(7, 10, 9, 0.86);
+  --nav-border: rgba(34, 197, 94, 0.18);
+
+  --nav-link: rgba(244,244,245,0.82);
+  --nav-link-hover-bg: rgba(16, 28, 22, 0.62);
+  --nav-link-hover: rgba(244,244,245,0.98);
+
+  --nav-active-bg: rgba(34, 197, 94, 0.20);
+  --nav-active-text: rgba(236, 253, 245, 0.98);
+
+  --nav-icon: rgba(110,231,183,0.96);
+  --nav-icon-hover: rgba(244,244,245,0.98);
+  --nav-icon-active: rgba(167,243,208,1);
+
+  --shadow-card: 0 18px 40px rgba(0,0,0,0.45);
+  --glow-green: 0 0 0 1px rgba(34,197,94,0.12), 0 0 28px rgba(34,197,94,0.18);
+
+  /* Accent system (DARK = “Green Mist”) */
+  --accent-g1: rgba(34, 197, 94, 0.85);
+  --accent-g2: rgba(16, 185, 129, 0.80);
+  --accent-g3: rgba(5, 150, 105, 0.78);
+
+  --accent-text: rgba(255,255,255,0.96);
+  --accent-text-muted: rgba(255,255,255,0.78);
+
+  --accent-border: rgba(255,255,255,0.22);
+  --accent-inset: rgba(255,255,255,0.14);
+
+  /* Calendar surface in dark/gray */
+  --calendar-surface:
+    radial-gradient(900px circle at 20% 20%, rgba(34,197,94,0.18), transparent 62%),
+    radial-gradient(800px circle at 80% 20%, rgba(16,185,129,0.12), transparent 70%),
+    linear-gradient(180deg, rgba(34,197,94,0.10), rgba(0,0,0,0) 55%),
+    rgba(8, 12, 10, 0.80);
+}
+
+html[data-mode="gray"] {
+  /* GREEN MIST (gray variant) */
+  --shell-bg: #0f1311;
+  --shell-text: rgba(244,244,245,0.96);
+  --shell-muted: rgba(244,244,245,0.68);
+
+  --shell-panel: rgba(22, 32, 28, 0.60);
+  --shell-panel-2: rgba(14, 18, 16, 0.56);
+  --shell-panel-hover: rgba(28, 42, 36, 0.66);
+
+  --shell-border: rgba(34, 197, 94, 0.16);
+  --shell-divider: rgba(34, 197, 94, 0.10);
+
+  --shell-topbar: rgba(20, 26, 24, 0.78);
+
+  --nav-bg: rgba(14, 18, 16, 0.82);
+  --nav-border: rgba(34, 197, 94, 0.16);
+
+  --nav-link: rgba(244,244,245,0.84);
+  --nav-link-hover-bg: rgba(28, 42, 36, 0.62);
+  --nav-link-hover: rgba(244,244,245,0.98);
+
+  --nav-active-bg: rgba(34, 197, 94, 0.18);
+  --nav-active-text: rgba(236, 253, 245, 0.98);
+
+  --nav-icon: rgba(110,231,183,0.96);
+  --nav-icon-hover: rgba(244,244,245,0.98);
+  --nav-icon-active: rgba(167,243,208,1);
+
+  --shadow-card: 0 16px 36px rgba(0,0,0,0.38);
+  --glow-green: 0 0 0 1px rgba(34,197,94,0.10), 0 0 24px rgba(34,197,94,0.16);
+
+  /* Accent system (still misty) */
+  --accent-g1: rgba(34, 197, 94, 0.82);
+  --accent-g2: rgba(16, 185, 129, 0.78);
+  --accent-g3: rgba(5, 150, 105, 0.76);
+
+  --accent-text: rgba(255,255,255,0.96);
+  --accent-text-muted: rgba(255,255,255,0.78);
+
+  --accent-border: rgba(255,255,255,0.20);
+  --accent-inset: rgba(255,255,255,0.12);
+
+  --calendar-surface:
+    radial-gradient(900px circle at 20% 20%, rgba(34,197,94,0.16), transparent 62%),
+    radial-gradient(800px circle at 80% 20%, rgba(16,185,129,0.10), transparent 70%),
+    linear-gradient(180deg, rgba(34,197,94,0.08), rgba(0,0,0,0) 55%),
+    rgba(14, 18, 16, 0.78);
+}
+
+/* OFF-WHITE (cream + bright gradient) */
+html[data-mode="off-white"] {
+  --shell-bg: #fbf1df;              /* warm cream */
+  --shell-text: rgba(24,24,27,0.96);
+  --shell-muted: rgba(24,24,27,0.58);
+
+  --shell-panel: rgba(255, 251, 244, 0.94);
+  --shell-panel-2: rgba(246, 234, 210, 0.88);
+  --shell-panel-hover: rgba(238, 222, 192, 0.82);
+
+  --shell-border: rgba(120, 92, 40, 0.20);
+  --shell-divider: rgba(120, 92, 40, 0.14);
+
+  --shell-topbar: rgba(60, 50, 35, 0.14);
+
+  --nav-bg: rgba(255, 251, 244, 0.90);
+  --nav-border: rgba(120, 92, 40, 0.18);
+
+  --nav-link: rgba(24,24,27,0.92);
+  --nav-link-hover-bg: rgba(246,234,210,0.88);
+  --nav-link-hover: rgba(24,24,27,1);
+
+  --nav-active-bg: rgba(16,185,129,0.14);
+  --nav-active-text: rgba(4,120,87,1);
+
+  --nav-icon: rgba(4,120,87,1);
+  --nav-icon-hover: rgba(24,24,27,1);
+  --nav-icon-active: rgba(4,120,87,1);
+
+  --shadow-card: 0 18px 38px rgba(0,0,0,0.14);
+  --glow-green: 0 0 0 1px rgba(16,185,129,0.10), 0 0 18px rgba(16,185,129,0.12);
+
+  /* Accent system (OFF-WHITE = bright lime->green->emerald) */
+  --accent-g1: rgba(132, 204, 22, 0.96);  /* lime */
+  --accent-g2: rgba(34, 197, 94, 0.94);   /* green */
+  --accent-g3: rgba(16, 185, 129, 0.92);  /* emerald */
+
+  --accent-text: rgba(255,255,255,0.96);
+  --accent-text-muted: rgba(255,255,255,0.78);
+
+  --accent-border: rgba(255,255,255,0.28);
+  --accent-inset: rgba(255,255,255,0.18);
+
+  --calendar-surface:
+    linear-gradient(180deg, rgba(255,255,255,0.70), rgba(255,255,255,0.70)),
+    rgba(255, 251, 244, 0.94);
+}
+
+/* =========================
+   Global base
+   ========================= */
+
+html, body {
+  background-color: var(--shell-bg);
+  color: var(--shell-text);
+}
+
+/* =========================
+   Tailwind utility “bridges”
+   ========================= */
+
+.bg-zinc-900\/40 { background-color: var(--shell-panel) !important; }
+.bg-zinc-950\/40 { background-color: var(--shell-panel-2) !important; }
+.bg-zinc-900\/50 { background-color: var(--shell-panel-hover) !important; }
+
+.border-zinc-800 { border-color: var(--shell-border) !important; }
+.divide-zinc-800 > :not([hidden]) ~ :not([hidden]) { border-color: var(--shell-divider) !important; }
+
+.text-zinc-100 { color: var(--shell-text) !important; }
+.text-zinc-400 { color: var(--shell-muted) !important; }
+
+/* =========================
+   Left Nav (variable-driven)
+   ========================= */
+
+.studs-left-nav {
+  background: var(--nav-bg);
+  border-right: 1px solid var(--nav-border);
+}
+
+.studs-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem; /* gap-3 */
+  border-radius: 0.75rem; /* rounded-xl */
+  padding: 0.5rem 0.75rem; /* py-2 px-3 */
+  font-size: 0.875rem; /* text-sm */
+  transition: background-color .15s ease, color .15s ease, box-shadow .15s ease;
+  color: var(--nav-link);
+}
+
+.studs-nav-link:hover {
+  background: var(--nav-link-hover-bg);
+  color: var(--nav-link-hover);
+}
+
+.studs-nav-link.is-active {
+  background: var(--nav-active-bg);
+  color: var(--nav-active-text);
+  box-shadow: var(--glow-green);
+}
+
+.studs-nav-icon {
+  color: var(--nav-icon);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.studs-nav-link:hover .studs-nav-icon { color: var(--nav-icon-hover); }
+.studs-nav-link.is-active .studs-nav-icon { color: var(--nav-icon-active); }
+
+/* Active fallback via aria-current */
+.studs-nav-link[aria-current="page"] {
+  background: var(--nav-active-bg);
+  color: var(--nav-active-text);
+  box-shadow: var(--glow-green);
+}
+
+.studs-nav-link[aria-current="page"] .studs-nav-icon {
+  color: var(--nav-icon-active);
+}
+
+/* =========================
+   Accent (calendar + agenda)
+   ========================= */
+
+.studs-accent-frame {
+  background: linear-gradient(135deg, var(--accent-g1), var(--accent-g2) 45%, var(--accent-g3));
+  box-shadow: var(--shadow-card);
+}
+
+/* IMPORTANT:
+   This must be opaque-ish so the border gradient doesn't bleed into the grid area.
+   We use the calendar surface token here.
+*/
+.studs-accent-frame__inner {
+  background: var(--calendar-surface);
+  border-radius: inherit;
+}
+
+/* Green gradient bar */
+.studs-accent-bar {
+  color: var(--accent-text);
+  background:
+    radial-gradient(900px circle at 15% 20%, rgba(255,255,255,0.22), transparent 60%),
+    linear-gradient(135deg, var(--accent-g1), var(--accent-g2) 45%, var(--accent-g3));
+  border: 1px solid rgba(0,0,0,0.08);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.18);
+}
+
+/* Dark/gray: make bars feel “misty”, not neon */
+html[data-mode="black"] .studs-accent-bar,
+html[data-mode="gray"]  .studs-accent-bar {
+  background:
+    radial-gradient(900px circle at 15% 20%, rgba(255,255,255,0.14), transparent 62%),
+    linear-gradient(135deg, var(--accent-g1), var(--accent-g2) 45%, var(--accent-g3)),
+    linear-gradient(0deg, rgba(0,0,0,0.30), rgba(0,0,0,0.10));
+  border: 1px solid rgba(34,197,94,0.22);
+  box-shadow: var(--shadow-card), var(--glow-green);
+}
+
+/* Full accent card */
+.studs-accent-card {
+  color: var(--accent-text);
+  background:
+    radial-gradient(900px circle at 18% 15%, rgba(255,255,255,0.22), transparent 60%),
+    radial-gradient(700px circle at 82% 20%, rgba(255,255,255,0.10), transparent 70%),
+    linear-gradient(135deg, var(--accent-g1), var(--accent-g2) 45%, var(--accent-g3));
+  border: 1px solid rgba(0,0,0,0.08);
+  box-shadow: var(--shadow-card);
+}
+
+/* Dark/gray: agenda/card should be misty dark, not a bright block */
+html[data-mode="black"] .studs-accent-card,
+html[data-mode="gray"]  .studs-accent-card {
+  background:
+    radial-gradient(900px circle at 20% 15%, rgba(34,197,94,0.18), transparent 62%),
+    radial-gradient(700px circle at 80% 25%, rgba(16,185,129,0.12), transparent 70%),
+    linear-gradient(180deg, rgba(0,0,0,0.18), rgba(0,0,0,0.38)),
+    linear-gradient(135deg, var(--accent-g1), var(--accent-g2) 45%, var(--accent-g3));
+  border: 1px solid rgba(34,197,94,0.22);
+  box-shadow: var(--shadow-card), var(--glow-green);
+}
+
+/* Soft inner panel for content sitting on green */
+.studs-accent-soft {
+  background: rgba(255,255,255,0.16);
+  border: 1px solid rgba(255,255,255,0.22);
+}
+
+/* Accent “chip” buttons */
+.studs-accent-chip {
+  color: var(--accent-text);
+  background: rgba(255,255,255,0.14);
+  border: 1px solid rgba(255,255,255,0.22);
+  backdrop-filter: blur(8px);
+}
+.studs-accent-chip:hover { background: rgba(255,255,255,0.18); }
+
+/* Calendar surface helper class (grid area background) */
+.studs-calendar-surface {
+  background: var(--calendar-surface);
+}
+
+/* Solid translucent time rail (no gradient) */
+.studs-calendar-rail {
+  background: rgba(16, 185, 129, 0.10); /* see-through green */
+  backdrop-filter: blur(6px);
+}
+
+html[data-mode="black"] .studs-calendar-rail,
+html[data-mode="gray"]  .studs-calendar-rail {
+  background: rgba(16, 185, 129, 0.08);
+}
+
+/* Grid lines */
+.studs-grid-hour { border-bottom: 1px solid rgba(0,0,0,0.10); }
+.studs-grid-half { border-bottom: 1px dashed rgba(0,0,0,0.08); }
+
+html[data-mode="black"] .studs-grid-hour,
+html[data-mode="gray"]  .studs-grid-hour { border-bottom-color: rgba(255,255,255,0.10); }
+
+html[data-mode="black"] .studs-grid-half,
+html[data-mode="gray"]  .studs-grid-half { border-bottom-color: rgba(255,255,255,0.08); }
+
+/* Zinc utility text inside accent areas */
+.studs-accent-card .text-zinc-400,
+.studs-accent-bar  .text-zinc-400 { color: var(--accent-text-muted) !important; }
+
+.studs-accent-card .text-zinc-100,
+.studs-accent-bar  .text-zinc-100 { color: var(--accent-text) !important; }
+
+/* =========================
+   Icon enforcement (SVGs should follow currentColor)
+   ========================= */
+
+.studs-nav-icon svg,
+.studs-nav-icon svg * {
+  stroke: currentColor !important;
+}
+
+.studs-nav-icon svg [fill]:not([fill="none"]) {
+  fill: currentColor !important;
+}
+
+/* =========================
+   NAV COLOR ENFORCEMENT
+   (fixes icons not changing on active/hover/mode)
+   ========================= */
+
+.studs-nav-link { color: var(--nav-link) !important; }
+.studs-nav-link:hover { color: var(--nav-link-hover) !important; }
+
+.studs-nav-link.is-active,
+.studs-nav-link[aria-current="page"] {
+  color: var(--nav-active-text) !important;
+  box-shadow: var(--glow-green);
+}
+
+.studs-nav-icon { color: var(--nav-icon) !important; }
+.studs-nav-link:hover .studs-nav-icon { color: var(--nav-icon-hover) !important; }
+
+.studs-nav-link.is-active .studs-nav-icon,
+.studs-nav-link[aria-current="page"] .studs-nav-icon {
+  color: var(--nav-icon-active) !important;
+}
+
+/* Make SVG obey parent color (kills hardcoded svg text-* classes) */
+.studs-nav-icon svg { color: inherit !important; }
+
+/* Force strokes/fills to follow currentColor (works only for INLINE svg) */
+.studs-nav-icon svg,
+.studs-nav-icon svg * { stroke: currentColor !important; }
+
+.studs-nav-icon svg [fill]:not([fill="none"]) {
+  fill: currentColor !important;
+}
+

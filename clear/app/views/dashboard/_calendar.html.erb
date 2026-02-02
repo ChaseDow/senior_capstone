@@ -8,196 +8,189 @@
 <% next_start  = week_start_date + 7.days %>
 <% today_start = Date.current.beginning_of_week %>
 
-<% nav_btn =
-  "inline-flex items-center rounded-xl border border-zinc-800 bg-zinc-950/40 px-3 py-1.5 text-sm text-zinc-200 " \
-  "hover:bg-zinc-800/40 hover:text-zinc-50 transition"
-%>
+<% nav_btn = "inline-flex items-center rounded-xl px-3 py-1.5 text-sm transition studs-accent-chip" %>
 
 <% event_classes =
   "absolute z-10 cursor-pointer rounded-xl border px-2 py-1 text-[11px] shadow-sm transition " \
   "hover:brightness-110 hover:saturate-110"
 %>
 
-
 <% events_by_day = events.group_by { |e| e.starts_at.in_time_zone.to_date } %>
 
-<div class="flex h-full min-h-0 flex-col">
-  <div class="mb-4 flex items-center justify-between gap-3">
-    <div class="text-base font-semibold text-zinc-100">
-      <%= week_start_date.strftime("%b %-d") %>
-      <span class="text-zinc-500">–</span>
-      <%= (week_start_date + 6.days).strftime("%b %-d, %Y") %>
-    </div>
+<div class="flex h-full min-h-0 flex-col overflow-hidden">
+  <!-- GREEN GRADIENT TOP BAR (keep) -->
+  <div class="mb-3 rounded-2xl studs-accent-bar px-4 py-3">
+    <div class="flex items-center justify-between gap-3">
+      <div class="text-base font-semibold">
+        <%= week_start_date.strftime("%b %-d") %>
+        <span class="opacity-80">–</span>
+        <%= (week_start_date + 6.days).strftime("%b %-d, %Y") %>
+      </div>
 
-    <nav class="flex items-center gap-2">
-      <%= link_to "Previous", dashboard_path(start_date: prev_start),  class: nav_btn, data: { turbo_frame: "dashboard_calendar" } %>
-      <%= link_to "Today",    dashboard_path(start_date: today_start), class: nav_btn, data: { turbo_frame: "dashboard_calendar" } %>
-      <%= link_to "Next",     dashboard_path(start_date: next_start),  class: nav_btn, data: { turbo_frame: "dashboard_calendar" } %>
-    </nav>
+      <nav class="flex items-center gap-2">
+        <%= link_to "Previous", dashboard_path(start_date: prev_start),
+              class: nav_btn, data: { turbo_frame: "dashboard_calendar" } %>
+        <%= link_to "Today", dashboard_path(start_date: today_start),
+              class: nav_btn, data: { turbo_frame: "dashboard_calendar" } %>
+        <%= link_to "Next", dashboard_path(start_date: next_start),
+              class: nav_btn, data: { turbo_frame: "dashboard_calendar" } %>
+      </nav>
+    </div>
   </div>
 
-  <div class="min-h-0 flex-1 overflow-auto rounded-2xl border border-zinc-800 bg-zinc-950/10">
-    <div class="sticky top-0 z-20 grid grid-cols-[4rem_repeat(7,minmax(0,1fr))] border-b border-zinc-800 bg-zinc-950/70 backdrop-blur">
-      <div class="h-12 border-r border-zinc-800"></div>
+  <!-- Gradient frame (border only). Inner is solid mist surface. -->
+  <div class="studs-accent-frame rounded-2xl p-[1px] flex-1 min-h-0 overflow-hidden">
+    <!-- THIS is the scroll owner -->
+    <div class="studs-accent-frame__inner rounded-2xl h-full min-h-0 overflow-y-auto overflow-x-hidden">
+      <!-- Weekday header row uses gradient bar -->
+      <div class="sticky top-0 z-20 grid grid-cols-[4rem_repeat(7,minmax(0,1fr))] studs-accent-bar border-b border-transparent">
+        <div class="h-12 border-r border-white/20"></div>
 
-      <% days.each do |day| %>
-        <% is_today = (day == Date.current) %>
-        <div class="h-12 border-r border-zinc-800 px-3 py-2">
-          <div class="flex items-center justify-between">
-            <div class="text-sm font-medium text-zinc-100">
-              <%= day.strftime("%a") %>
-              <span class="text-zinc-400"><%= day.strftime("%-m/%-d") %></span>
+        <% days.each do |day| %>
+          <% is_today = (day == Date.current) %>
+          <div class="h-12 border-r border-white/20 px-3 py-2">
+            <div class="flex items-center justify-between">
+              <div class="text-sm font-medium">
+                <%= day.strftime("%a") %>
+                <span class="opacity-80"><%= day.strftime("%-m/%-d") %></span>
+              </div>
+
+              <% if is_today %>
+                <span class="rounded-full bg-white/18 px-2 py-0.5 text-[11px] text-white">Today</span>
+              <% end %>
             </div>
-
-            <% if is_today %>
-              <span class="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[11px] text-emerald-300">Today</span>
-            <% end %>
-          </div>
-        </div>
-      <% end %>
-    </div>
-
-    <div class="grid grid-cols-[4rem_repeat(7,minmax(0,1fr))]">
-      <%# Time labels %>
-      <div class="border-r border-zinc-800">
-        <% 24.times do |h| %>
-          <div class="h-14 border-b border-zinc-900/60 px-2 pt-1 text-right text-[11px] text-zinc-500">
-            <% label =
-              if h == 0
-                "12 AM"
-              elsif h < 12
-                "#{h} AM"
-              elsif h == 12
-                "12 PM"
-              else
-                "#{h - 12} PM"
-              end
-            %>
-            <%= label %>
           </div>
         <% end %>
       </div>
 
-      <%# Day columns %>
-      <% days.each do |day| %>
-        <% day_start = Time.zone.local(day.year, day.month, day.day, 0, 0, 0) %>
-        <% day_end   = day_start.end_of_day %>
-
-        <div class="relative border-r border-zinc-800">
-          <%# Clickable time slots - 30 minutes each %>
-          <div class="absolute inset-0 z-1">
-            <% 48.times do |i| %>
-              <% slot_time = day_start + (i * 30).minutes %>
-              <%= link_to new_event_path(start_time: slot_time.iso8601),
-                      class: "timeslot absolute left-0 w-full
-                            hover:bg-indigo-500/10
-                            transition-colors
-                            cursor-pointer",
-                      style: "top: #{i * hour_height_px/2}px; height: #{hour_height_px/2}px;",
-                      data: { turbo: false } do %>
-            <% end %>
-          <% end %>
-        </div>
-
-        <%# Grid lines: hour + half-hour %>
-        <div class="absolute inset-0 pointer-events-none">
-          <% 24.times do |i| %>
-            <div class="relative h-14">
-              <!-- Hour line -->
-              <div class="absolute top-0 left-0 w-full border-b border-emerald-800/60"></div>
-
-              <!-- 30-minute dashed line -->
-              <div class="absolute top-1/2 left-0 w-full border-b border-dashed border-blue-800/40"></div>
+      <!-- Dim grid background lives here -->
+      <div class="studs-calendar-grid grid grid-cols-[4rem_repeat(7,minmax(0,1fr))]">
+        <!-- Time labels (solid translucent green, NOT gradient) -->
+        <div class="border-r border-[var(--shell-divider)] studs-calendar-rail">
+          <% 24.times do |h| %>
+            <div class="h-14 px-2 pt-1 text-right text-[11px] text-[var(--shell-muted)] studs-grid-hour">
+              <% label =
+                if h == 0
+                  "12 AM"
+                elsif h < 12
+                  "#{h} AM"
+                elsif h == 12
+                  "12 PM"
+                else
+                  "#{h - 12} PM"
+                end
+              %>
+              <%= label %>
             </div>
           <% end %>
         </div>
 
-          
-          <%# Events overlay %>
-          <div class="relative h-[1344px]">
-            <% day_events = events_by_day.fetch(day, []) %>
+        <!-- Day columns -->
+        <% days.each do |day| %>
+          <% day_start = Time.zone.local(day.year, day.month, day.day, 0, 0, 0) %>
+          <% day_end   = day_start.end_of_day %>
 
-            <% segments =
-              day_events.map do |e|
-                event_record = e.respond_to?(:event) ? e.event : e
+          <div class="relative border-r border-[var(--shell-divider)]">
+            <!-- Clickable time slots -->
+            <div class="absolute inset-0 z-[1]">
+              <% 48.times do |i| %>
+                <% slot_time = day_start + (i * 30).minutes %>
+                <%= link_to new_event_path(start_time: slot_time.iso8601),
+                      class: "timeslot absolute left-0 w-full hover:bg-emerald-500/10 transition-colors cursor-pointer",
+                      style: "top: #{i * hour_height_px / 2}px; height: #{hour_height_px / 2}px;",
+                      data: { turbo: false } do %>
+                <% end %>
+              <% end %>
+            </div>
 
-                start_at = e.starts_at.in_time_zone
-                finish_at =
-                  if e.respond_to?(:ends_at) && e.ends_at.present?
-                    e.ends_at.in_time_zone
-                  else
-                    start_at + 1.hour
-                  end
+            <!-- Grid lines -->
+            <div class="absolute inset-0 pointer-events-none">
+              <% 24.times do %>
+                <div class="relative h-14">
+                  <div class="absolute top-0 left-0 w-full studs-grid-hour"></div>
+                  <div class="absolute top-1/2 left-0 w-full studs-grid-half"></div>
+                </div>
+              <% end %>
+            </div>
 
-                seg_start = [start_at, day_start].max
-                seg_end   = [finish_at, day_end].min
-                next if seg_end <= seg_start
+            <!-- Events overlay -->
+            <div class="relative h-[1344px]">
+              <% day_events = events_by_day.fetch(day, []) %>
 
-                minutes_from_midnight = ((seg_start - day_start) / 60.0)
-                duration_minutes      = ((seg_end - seg_start) / 60.0)
+              <% segments =
+                day_events.map do |e|
+                  event_record = e.respond_to?(:event) ? e.event : e
 
-                {
-                  event: event_record,
-                  seg_start: seg_start,
-                  seg_end: seg_end,
-                  top: (minutes_from_midnight * px_per_minute),
-                  height: ([duration_minutes, 15].max * px_per_minute),
-                  col: 0
-                }
-              end.compact.sort_by { |s| s[:seg_start] }
-            %>
+                  start_at = e.starts_at.in_time_zone
+                  finish_at =
+                    if e.respond_to?(:ends_at) && e.ends_at.present?
+                      e.ends_at.in_time_zone
+                    else
+                      start_at + 1.hour
+                    end
 
-            <% active = [] %>
-            <% max_cols = 1 %>
+                  seg_start = [start_at, day_start].max
+                  seg_end   = [finish_at, day_end].min
+                  next if seg_end <= seg_start
 
-            <% segments.each do |seg| %>
-              <% active.reject! { |a| a[:seg_end] <= seg[:seg_start] } %>
+                  minutes_from_midnight = ((seg_start - day_start) / 60.0)
+                  duration_minutes      = ((seg_end - seg_start) / 60.0)
 
-              <% used = active.map { |a| a[:col] } %>
-              <% col = 0 %>
-              <% col += 1 while used.include?(col) %>
-
-              <% seg[:col] = col %>
-              <% active << seg %>
-
-              <% max_cols = [max_cols, (active.map { |a| a[:col] }.max.to_i + 1)].max %>
-            <% end %>
-
-            <% width_pct = (100.0 / max_cols) %>
-
-            <% segments.each do |seg| %>
-              <% event = seg[:event] %>
-              <% left_pct = seg[:col] * width_pct %>
-              <% start_label = seg[:seg_start].strftime("%-I:%M %p") %>
-              <% end_label   = seg[:seg_end].strftime("%-I:%M %p") %>
-
-              <% url = edit_event_path(event, start_date: start_date.to_date) %>
-
-              <% style_str =
-                "top: #{seg[:top]}px; " \
-                "height: #{seg[:height]}px; " \
-                "left: calc(#{left_pct}% + 4px); " \
-                "width: calc(#{width_pct}% - 8px); " \
-                "background-color: #{event.color.presence || "#34D399"}; " \
-                "color: #{event.contrast_text_color}; " \
-                "border-color: rgba(0,0,0,0.25);"
+                  {
+                    event: event_record,
+                    seg_start: seg_start,
+                    seg_end: seg_end,
+                    top: (minutes_from_midnight * px_per_minute),
+                    height: ([duration_minutes, 15].max * px_per_minute),
+                    col: 0
+                  }
+                end.compact.sort_by { |s| s[:seg_start] }
               %>
 
-              <%= link_to event_path(event, start_date: start_date.to_date),
-                class: event_classes,
-                style: style_str,
-                data: {
-                  turbo_frame: "event_drawer",
-                  action: "click->drawer#start",
-                  turbo_prefetch: false
-                } do %>
-                <div class="font-semibold truncate"><%= event.title.presence || "(Untitled)" %></div>
-                <div class="opacity-85"><%= start_label %> – <%= end_label %></div>
+              <% active = [] %>
+              <% max_cols = 1 %>
+
+              <% segments.each do |seg| %>
+                <% active.reject! { |a| a[:seg_end] <= seg[:seg_start] } %>
+                <% used = active.map { |a| a[:col] } %>
+                <% col = 0 %>
+                <% col += 1 while used.include?(col) %>
+
+                <% seg[:col] = col %>
+                <% active << seg %>
+                <% max_cols = [max_cols, (active.map { |a| a[:col] }.max.to_i + 1)].max %>
               <% end %>
-            <% end %>
+
+              <% width_pct = (100.0 / max_cols) %>
+
+              <% segments.each do |seg| %>
+                <% event = seg[:event] %>
+                <% left_pct = seg[:col] * width_pct %>
+                <% start_label = seg[:seg_start].strftime("%-I:%M %p") %>
+                <% end_label   = seg[:seg_end].strftime("%-I:%M %p") %>
+
+                <% style_str =
+                  "top: #{seg[:top]}px; " \
+                  "height: #{seg[:height]}px; " \
+                  "left: calc(#{left_pct}% + 4px); " \
+                  "width: calc(#{width_pct}% - 8px); " \
+                  "background-color: #{event.color.presence || "#34D399"}; " \
+                  "color: #{event.contrast_text_color}; " \
+                  "border-color: rgba(0,0,0,0.18);"
+                %>
+
+                <%= link_to event_path(event, start_date: start_date.to_date),
+                  class: event_classes,
+                  style: style_str,
+                  data: { turbo_frame: "event_drawer", action: "click->drawer#start", turbo_prefetch: false } do %>
+                  <div class="font-semibold truncate"><%= event.title.presence || "(Untitled)" %></div>
+                  <div class="opacity-85"><%= start_label %> – <%= end_label %></div>
+                <% end %>
+              <% end %>
+            </div>
           </div>
-        </div>
-      <% end %>
+        <% end %>
+      </div>
     </div>
   </div>
 </div>

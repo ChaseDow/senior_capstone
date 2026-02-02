@@ -1,15 +1,10 @@
-<%= link_to @path, class: classes do %>
-  <% if @icon_name.present? %>
-    <% icon_wrap_classes =
-      if @active
-        "shrink-0 [&>svg]:h-5 [&>svg]:w-5 [&>svg]:opacity-90 [&_*]:fill-none [&_*]:stroke-emerald-200"
-      else
-        "shrink-0 [&>svg]:h-5 [&>svg]:w-5 [&>svg]:opacity-90 [&_*]:fill-none [&_*]:stroke-emerald-300 group-hover:[&_*]:stroke-zinc-50"
-      end
-    %>
+<%= link_to @path,
+  class: ["studs-nav-link", ("is-active" if @active)].compact.join(" "),
+  aria: { current: (@active ? "page" : nil) } do %>
 
-    <span class="<%= icon_wrap_classes %>">
-      <%= helpers.icon @icon_name, library: "huge_icons" %>
+  <% if @icon_name.present? %>
+    <span class="studs-nav-icon">
+      <%= helpers.icon @icon_name %>
     </span>
   <% end %>
 
