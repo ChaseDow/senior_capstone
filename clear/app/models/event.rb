@@ -5,7 +5,6 @@ class Event < ApplicationRecord
 
   validates :title, presence: true
   validates :starts_at, presence: true
-  validates :priority, presence: true
   validate :ends_at_after_starts_at, if: -> { starts_at.present? && ends_at.present? }
 
   validates :color,
