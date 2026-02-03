@@ -1,0 +1,50 @@
+<div class="flex items-center gap-2">
+  <% label =
+      if syllabus.course_id.present?
+        "Course created"
+      elsif syllabus.parse_status == "processing"
+        "Parsing…"
+      elsif syllabus.parse_status == "queued"
+        "Queued…"
+      elsif syllabus.course_draft.present?
+        "Review"
+      else
+        "Create course"
+      end
+  %>
+
+  <% if syllabus.course_id.present? %>
+    <%= render Studs::PrimaryButtonComponent.new(
+          label: label,
+          href: course_path(syllabus.course_id),
+          color: :emerald,
+          data: { turbo_frame: "_top" }
+        ) %>
+
+  <% elsif syllabus.course_draft.present? %>
+    <%= render Studs::PrimaryButtonComponent.new(
+          label: label,
+          href: course_preview_syllabus_path(syllabus),
+          color: :emerald,
+          data: { turbo_frame: "_top" }
+        ) %>
+
+  <% else %>
+    <%= render Studs::PrimaryButtonComponent.new(
+          label: label,
+          href: create_course_syllabus_path(syllabus),
+          color: :emerald,
+          data: { turbo_method: :post, turbo_frame: "_top" },
+          disabled: syllabus.parse_status.in?(%w[queued processing])
+        ) %>
+  <% end %>
+
+  <% if syllabus.parse_status.present? %>
+    <span class="text-xs text-zinc-400">
+      Status: <%= syllabus.parse_status %>
+      <% if syllabus.parse_status == "failed" && syllabus.parse_error.present? %>
+        — <%= syllabus.parse_error %>
+      <% end %>
+    </span>
+  <% end %>
+</div>

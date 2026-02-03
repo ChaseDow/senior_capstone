@@ -1,0 +1,13 @@
+<%= turbo_frame_tag dom_id(@syllabus, :course_preview),
+      data: {
+        controller: "poll-frame",
+        poll_frame_active_value: @syllabus.parse_status.in?(%w[queued processing]),
+        poll_frame_interval_value: 1500,
+        poll_frame_src_value: course_preview_frame_syllabus_path(@syllabus)
+      } do %>
+
+  <%= render "syllabuses/course_preview_body",
+        syllabus: @syllabus,
+        course: @course %>
+
+<% end %>

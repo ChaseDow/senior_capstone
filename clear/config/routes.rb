@@ -1,9 +1,20 @@
 Rails.application.routes.draw do
-  resources :syllabuses
   devise_for :users
   resources :events
   resources :courses
   resources :agenda
+
+  resources :syllabuses do
+    member do
+      post :create_course
+      get  :status
+      get  :course_preview
+      get  :course_preview_frame
+      post :confirm_course
+    end
+  end
+
+
 
   if Rails.env.development?
     begin

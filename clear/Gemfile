@@ -23,6 +23,11 @@ gem "simple_calendar"
 
 gem "tailwindcss-rails"
 
+gem "pdf-reader"
+
+gem "docx"
+
+
 gem "devise"
 
 

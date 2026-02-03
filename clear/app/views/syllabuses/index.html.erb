@@ -38,12 +38,16 @@
                     size: :sm
                   ) %>
 
+              <%= turbo_frame_tag dom_id(syllabus, :status), src: status_syllabus_path(syllabus) do %>
+                <%= render "syllabuses/status", syllabus: syllabus %>
+              <% end %>
+
               <%= button_to "Delete",
                     syllabus_path(syllabus),
                     method: :delete,
                     form: { data: { turbo_confirm: "Delete this syllabus?" } },
                     class: "inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium
-                    border border-red-500/40 text-red-200 hover:bg-red-950/40 transition" 
+                    border border-red-500/40 text-red-200 hover:bg-red-950/40 transition"
               %>
             </div>
           </div>
