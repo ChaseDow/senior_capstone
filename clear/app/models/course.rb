@@ -6,10 +6,9 @@ class Course < ApplicationRecord
 
   # A course must have a title
   validates :title, presence: true
-
   validates :end_date, presence: true
 
-  # Ensure the meeting time window makes sesne
+  # Ensure the meeting time window makes sense
   validate :end_time_after_start_time, if: -> { start_time.present? && end_time.present? }
 
   # Ensure the course end date is not before the start date
@@ -23,22 +22,22 @@ class Course < ApplicationRecord
             },
             allow_nil: true
 
-  # Normalize color before validation so blank or lowercase input
+  # Normalize fields before validation
   before_validation :normalize_color
-
-  # Courses are inherently recurring
-  validate :repeat_days_present
-
-  # Ensure repeat_days only contains valid weekday integers (0–6).
-  validate :repeat_days_are_valid_weekdays
-
+  before_validation :normalize_meeting_days
+  before_validation :sync_repeat_days_from_meeting_days
   before_validation :normalize_repeat_days
   before_validation :force_recurrence_defaults
+
+  # Courses are inherently recurring in our app
+  validate :repeat_days_present
+  validate :repeat_days_are_valid_weekdays
 
   # Used by the dashboard calendar
   Occurrence = Struct.new(:event, :starts_at, :ends_at, keyword_init: true) do
     delegate :id, :title, :location, :description, :color, :contrast_text_color, to: :event
   end
+
   # Generate course occurrences within the given date range
   def occurrences_between(range_start, range_end)
     return [] if start_date.blank? || end_date.blank? || repeat_days.blank? || start_time.blank?
@@ -52,11 +51,12 @@ class Course < ApplicationRecord
     while d <= window_end
       if repeat_days.include?(d.wday)
         occ_start = Time.zone.local(d.year, d.month, d.day, start_time.hour, start_time.min, start_time.sec)
+
         occ_end =
           if end_time.present?
-            Time.zone.local(d.year, d.month, d.day,
-                            end_time.hour, end_time.min, end_time.sec)
+            Time.zone.local(d.year, d.month, d.day, end_time.hour, end_time.min, end_time.sec)
           end
+
         out << Occurrence.new(event: self, starts_at: occ_start, ends_at: occ_end)
       end
       d += 1.day
@@ -85,7 +85,29 @@ class Course < ApplicationRecord
     self.repeat_until = end_date if end_date.present?
   end
 
-  # Converts repeat_days into a clean, predictable format
+  def normalize_color
+    self.color = color.to_s.strip.upcase
+    self.color = "#34D399" if color.blank?
+  end
+
+  def normalize_meeting_days
+    self.meeting_days = meeting_days.to_s.upcase.gsub(/[^MTWRF]/, "").presence
+  end
+
+  def sync_repeat_days_from_meeting_days
+    return if meeting_days.blank?
+
+    map = {
+      "M" => 1,
+      "T" => 2,
+      "W" => 3,
+      "R" => 4,
+      "F" => 5
+    }
+
+    self.repeat_days = meeting_days.chars.filter_map { |ch| map[ch] }
+  end
+
   def normalize_repeat_days
     self.repeat_days =
       Array(repeat_days)
@@ -95,36 +117,24 @@ class Course < ApplicationRecord
         .sort
   end
 
-  # Ensures the color is uppercase and defaults to the same green used by Events if none is provided.
-  def normalize_color
-    self.color = color.to_s.strip.upcase
-    self.color = "#34D399" if color.blank?
-  end
-
-  # Courses must occur on at least one weekday.
   def repeat_days_present
     errors.add(:repeat_days, "pick at least one day") if repeat_days.blank?
   end
 
-  # Valid weekday values
   def repeat_days_are_valid_weekdays
     return if repeat_days.blank?
 
-    invalid =
-      repeat_days.reject { |d| d.is_a?(Integer) && d.between?(0, 6) }
-
+    invalid = repeat_days.reject { |d| d.is_a?(Integer) && d.between?(0, 6) }
     errors.add(:repeat_days, "contains invalid weekday values") if invalid.any?
   end
 
   def end_time_after_start_time
     return if end_time >= start_time
-
     errors.add(:end_time, "must be after the start time")
   end
 
   def end_date_after_start_date
     return if end_date >= start_date
-
     errors.add(:end_date, "must be after the start date")
   end
 

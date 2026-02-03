@@ -8,20 +8,17 @@ class SyllabusParseJob < ApplicationJob
 
     syllabus.update!(parse_status: "processing", parse_error: nil)
 
-    text  = Syllabuses::TextExtractor.call(syllabus)
-    attrs = Syllabuses::CourseAttributesExtractor.call(text, fallback_title: syllabus.title)
+    text  = ::Syllabuses::TextExtractor.call(syllabus)
+    attrs = ::Syllabuses::CourseAttributesExtractor.call(text, fallback_title: syllabus.title)
 
-    normalize_meeting_days!(attrs)
-    remap_attrs_to_course_schema!(attrs)
-
-    draft = slice_to_course_columns(attrs)
-    draft = normalize_values_for_json(draft)
+    draft = build_course_draft(attrs)
 
     syllabus.update!(
-      course_draft: draft,
       parsed_text: text,
       parsed_at: Time.current,
-      parse_status: "done"
+      course_draft: draft,
+      parse_status: "done",
+      parse_error: nil
     )
   rescue => e
     syllabus&.update(parse_status: "failed", parse_error: "#{e.class}: #{e.message}")
@@ -30,45 +27,68 @@ class SyllabusParseJob < ApplicationJob
 
   private
 
-  def slice_to_course_columns(attrs)
-    allowed = Course.column_names.map(&:to_sym)
-    attrs.slice(*allowed)
+  def build_course_draft(attrs)
+    draft = {}
+
+    draft[:title]       = attrs[:title]
+    draft[:code]        = attrs[:code]
+    draft[:term]        = attrs[:term]
+    draft[:professor]   = attrs[:professor]
+    draft[:instructor]  = attrs[:instructor] || attrs[:professor]
+    draft[:meeting_days]= normalize_meeting_days(attrs[:meeting_days])
+    draft[:location]    = attrs[:location]
+    draft[:start_date]  = attrs[:start_date]
+    draft[:end_date]    = attrs[:end_date]
+    draft[:description] = attrs[:description]
+
+    start_raw = attrs[:start_time] || attrs[:starts_at]
+    end_raw   = attrs[:end_time]   || attrs[:ends_at]
+
+    start_hhmm = normalize_time_for_db(start_raw)
+    end_hhmm   = normalize_time_for_db(end_raw)
+
+    if start_hhmm.present? && end_hhmm.present? && minutes(end_hhmm) <= minutes(start_hhmm)
+      end_hhmm = nil
+    end
+
+    draft[:start_time] = start_hhmm
+    draft[:end_time]   = end_hhmm
+
+    draft[:starts_at]  = start_hhmm
+    draft[:ends_at]    = end_hhmm
+
+    draft.compact
   end
 
-  def normalize_values_for_json(attrs)
-    attrs.transform_values do |v|
-      case v
-      when Date
-        v.iso8601
+  def normalize_meeting_days(raw)
+    s = raw.to_s.upcase.gsub(/[^MTWRF]/, "")
+    s.presence
+  end
+
+  def normalize_time_for_db(v)
+    return nil if v.blank?
+
+    str =
+      if v.is_a?(Time)
+        v.strftime("%H:%M")
       else
-        v
+        v.to_s.strip
       end
+
+    if str.match?(/\A\d{1,2}:\d{2}:\d{2}\z/)
+      str = str.split(":").first(2).join(":")
     end
+
+    if str.match?(/\A\d{1,2}:\d{2}\z/)
+      h, m = str.split(":")
+      return format("%02d:%02d", h.to_i, m.to_i)
+    end
+
+    nil
   end
 
-  def normalize_meeting_days!(attrs)
-    raw = attrs[:meeting_days]
-    return if raw.blank?
-
-    attrs[:meeting_days] = raw.to_s.upcase.gsub(/[^MTWRF]/, "").presence
-  end
-
-  def remap_attrs_to_course_schema!(attrs)
-    cols = Course.column_names
-
-    # professor vs instructor
-    if cols.include?("instructor") && attrs[:professor].present?
-      attrs[:instructor] ||= attrs[:professor]
-    end
-    if cols.include?("professor") && attrs[:professor].blank? && attrs[:instructor].present?
-      attrs[:professor] = attrs[:instructor]
-    end
-
-    if cols.include?("start_time") && attrs[:starts_at].present?
-      attrs[:start_time] ||= attrs[:starts_at]
-    end
-    if cols.include?("end_time") && attrs[:ends_at].present?
-      attrs[:end_time] ||= attrs[:ends_at]
-    end
+  def minutes(hhmm)
+    h, m = hhmm.split(":").map(&:to_i)
+    h * 60 + m
   end
 end

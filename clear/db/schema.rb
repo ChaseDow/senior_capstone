@@ -43,11 +43,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_02_223829) do
   end
 
   create_table "courses", force: :cascade do |t|
-<<<<<<< HEAD
     t.string "color", default: "#34D399", null: false
-=======
     t.string "code"
->>>>>>> 5e09732 (Setting up parsing for syllabuses)
     t.datetime "created_at", null: false
     t.text "description"
     t.date "end_date"

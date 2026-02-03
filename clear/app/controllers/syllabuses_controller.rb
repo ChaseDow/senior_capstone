@@ -96,7 +96,8 @@ end
       :start_date, :end_date,
       :start_time, :end_time,
       :starts_at, :ends_at,
-      :description
+      :description,
+      :color, :recurring, :repeat_until, repeat_days: []
     )
   end
 
