@@ -13,14 +13,12 @@ class SyllabusParseJob < ApplicationJob
 
     normalize_meeting_days!(attrs)
     remap_attrs_to_course_schema!(attrs)
-    attrs = slice_to_course_columns(attrs)
 
-    course = syllabus.course || syllabus.user.courses.new
-    course.assign_attributes(attrs)
-    course.save!
+    draft = slice_to_course_columns(attrs)
+    draft = normalize_values_for_json(draft)
 
     syllabus.update!(
-      course: course,
+      course_draft: draft,
       parsed_text: text,
       parsed_at: Time.current,
       parse_status: "done"
@@ -37,20 +35,24 @@ class SyllabusParseJob < ApplicationJob
     attrs.slice(*allowed)
   end
 
-  # Your validation expects "MWF" or "TR" (letters)
+  def normalize_values_for_json(attrs)
+    attrs.transform_values do |v|
+      case v
+      when Date
+        v.iso8601
+      else
+        v
+      end
+    end
+  end
+
   def normalize_meeting_days!(attrs)
     raw = attrs[:meeting_days]
     return if raw.blank?
 
-    if raw.is_a?(String)
-      attrs[:meeting_days] = raw.upcase.gsub(/[^MTWRF]/, "").presence
-      return
-    end
-
     attrs[:meeting_days] = raw.to_s.upcase.gsub(/[^MTWRF]/, "").presence
   end
 
-  # Map extractor keys to the column names your Course actually uses
   def remap_attrs_to_course_schema!(attrs)
     cols = Course.column_names
 
@@ -62,7 +64,6 @@ class SyllabusParseJob < ApplicationJob
       attrs[:professor] = attrs[:instructor]
     end
 
-    # starts_at/ends_at vs start_time/end_time
     if cols.include?("start_time") && attrs[:starts_at].present?
       attrs[:start_time] ||= attrs[:starts_at]
     end

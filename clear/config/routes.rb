@@ -7,7 +7,10 @@ Rails.application.routes.draw do
   resources :syllabuses do
     member do
       post :create_course
-      get :status
+      get  :status
+      get  :course_preview
+      get  :course_preview_frame
+      post :confirm_course
     end
   end
 

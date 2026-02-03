@@ -1,0 +1,15 @@
+<% content_for :page_title, "Course Preview" %>
+<% content_for :page_subtitle, @syllabus.title %>
+
+<div class="rounded-2xl border border-emerald-900/35 bg-emerald-950/15 backdrop-blur-sm p-6">
+  <p class="text-sm text-zinc-300">
+    We'll parse the syllabus, then show you a pre-filled course. Review and fix anything before creating.
+  </p>
+
+  <div class="mt-4">
+    <%= turbo_frame_tag dom_id(@syllabus, :course_preview),
+          src: course_preview_frame_syllabus_path(@syllabus) do %>
+      <div class="text-sm text-zinc-400">Loading…</div>
+    <% end %>
+  </div>
+</div>

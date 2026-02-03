@@ -1,0 +1,71 @@
+<% if syllabus.parse_status.in?(%w[queued processing]) %>
+  <div class="text-sm text-zinc-300">Parsing…</div>
+<% elsif syllabus.parse_status == "failed" %>
+  <div class="text-sm text-red-200">
+    Parsing failed: <%= syllabus.parse_error %>
+  </div>
+<% else %>
+  <%= form_with model: course,
+        url: confirm_course_syllabus_path(syllabus),
+        method: :post,
+        data: { turbo_frame: "_top" } do |f| %>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <div class="text-xs text-zinc-400 mb-1">Title</div>
+        <%= f.text_field :title, class: "w-full rounded-xl bg-emerald-950/10 border border-emerald-900/30 px-3 py-2 text-zinc-100" %>
+      </div>
+
+      <div>
+        <div class="text-xs text-zinc-400 mb-1">Code</div>
+        <%= f.text_field :code, class: "w-full rounded-xl bg-emerald-950/10 border border-emerald-900/30 px-3 py-2 text-zinc-100" %>
+      </div>
+
+      <div>
+        <div class="text-xs text-zinc-400 mb-1">Term</div>
+        <%= f.text_field :term, class: "w-full rounded-xl bg-emerald-950/10 border border-emerald-900/30 px-3 py-2 text-zinc-100" %>
+      </div>
+
+      <div>
+        <div class="text-xs text-zinc-400 mb-1">Professor</div>
+        <%# use :professor or :instructor depending on your schema; leaving :professor here %>
+        <%= f.text_field :professor, class: "w-full rounded-xl bg-emerald-950/10 border border-emerald-900/30 px-3 py-2 text-zinc-100" %>
+      </div>
+
+      <div>
+        <div class="text-xs text-zinc-400 mb-1">Meeting Days</div>
+        <%= f.text_field :meeting_days, class: "w-full rounded-xl bg-emerald-950/10 border border-emerald-900/30 px-3 py-2 text-zinc-100" %>
+      </div>
+
+      <div>
+        <div class="text-xs text-zinc-400 mb-1">Location</div>
+        <%= f.text_field :location, class: "w-full rounded-xl bg-emerald-950/10 border border-emerald-900/30 px-3 py-2 text-zinc-100" %>
+      </div>
+
+      <div>
+        <div class="text-xs text-zinc-400 mb-1">Start Time</div>
+        <%= f.text_field :start_time, class: "w-full rounded-xl bg-emerald-950/10 border border-emerald-900/30 px-3 py-2 text-zinc-100" %>
+      </div>
+
+      <div>
+        <div class="text-xs text-zinc-400 mb-1">End Time</div>
+        <%= f.text_field :end_time, class: "w-full rounded-xl bg-emerald-950/10 border border-emerald-900/30 px-3 py-2 text-zinc-100" %>
+      </div>
+
+      <div>
+        <div class="text-xs text-zinc-400 mb-1">Start Date</div>
+        <%= f.date_field :start_date, class: "w-full rounded-xl bg-emerald-950/10 border border-emerald-900/30 px-3 py-2 text-zinc-100" %>
+      </div>
+
+      <div>
+        <div class="text-xs text-zinc-400 mb-1">End Date</div>
+        <%= f.date_field :end_date, class: "w-full rounded-xl bg-emerald-950/10 border border-emerald-900/30 px-3 py-2 text-zinc-100" %>
+      </div>
+    </div>
+
+        <div class="mt-4">
+        <%= f.submit "Create course",
+                class: "inline-flex items-center rounded-xl bg-emerald-500 px-4 py-2 text-sm font-semibold text-emerald-950 hover:bg-emerald-400 transition" %>
+        </div>
+  <% end %>
+<% end %>

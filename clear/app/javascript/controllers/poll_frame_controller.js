@@ -1,37 +1,44 @@
+// app/javascript/controllers/poll_frame_controller.js
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static values = {
-    status: String,
-    interval: { type: Number, default: 1500 },
+    active: Boolean,
+    interval: Number,
+    src: String,
   }
 
   connect() {
-    this.startIfNeeded()
+    this.start()
   }
 
   disconnect() {
     this.stop()
   }
 
-  startIfNeeded() {
-    if (this.statusValue === "queued" || this.statusValue === "processing") {
-      this.start()
-    } else {
-      this.stop()
-    }
+  activeValueChanged() {
+    this.start()
   }
 
   start() {
-    if (this.timer) return
-    this.timer = setInterval(() => {
-      const frame = this.element.closest("turbo-frame")
-      if (frame) frame.reload()
-    }, this.intervalValue)
+    this.stop()
+    if (!this.activeValue) return
+
+    const ms = this.intervalValue || 1500
+    this.timer = setInterval(() => this.reload(), ms)
   }
 
   stop() {
     if (this.timer) clearInterval(this.timer)
     this.timer = null
+  }
+
+  reload() {
+    const base = this.srcValue
+    if (!base) return
+
+    const url = new URL(base, window.location.origin)
+    url.searchParams.set("_ts", Date.now()) // bust cache
+    this.element.setAttribute("src", url.toString())
   }
 }

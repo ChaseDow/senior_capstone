@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_02_173345) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_02_223829) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -103,6 +103,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_02_173345) do
   end
 
   create_table "syllabuses", force: :cascade do |t|
+    t.jsonb "course_draft"
     t.bigint "course_id"
     t.datetime "created_at", null: false
     t.text "parse_error"
