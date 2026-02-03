@@ -18,7 +18,6 @@
   "hover:brightness-110 hover:saturate-110"
 %>
 
-
 <% events_by_day = events.group_by { |e| e.starts_at.in_time_zone.to_date } %>
 
 <div class="flex h-full min-h-0 flex-col">
@@ -95,31 +94,26 @@
                             cursor-pointer",
                       style: "top: #{i * hour_height_px/2}px; height: #{hour_height_px/2}px;",
                       data: { turbo: false } do %>
+              <% end %>
             <% end %>
-          <% end %>
-        </div>
+          </div>
 
-        <%# Grid lines: hour + half-hour %>
-        <div class="absolute inset-0 pointer-events-none">
-          <% 24.times do |i| %>
-            <div class="relative h-14">
-              <!-- Hour line -->
-              <div class="absolute top-0 left-0 w-full border-b border-emerald-800/60"></div>
+          <%# Grid lines: hour + half-hour %>
+          <div class="absolute inset-0 pointer-events-none">
+            <% 24.times do |i| %>
+              <div class="relative h-14">
+                <div class="absolute top-0 left-0 w-full border-b border-emerald-800/60"></div>
+                <div class="absolute top-1/2 left-0 w-full border-b border-dashed border-blue-800/40"></div>
+              </div>
+            <% end %>
+          </div>
 
-              <!-- 30-minute dashed line -->
-              <div class="absolute top-1/2 left-0 w-full border-b border-dashed border-blue-800/40"></div>
-            </div>
-          <% end %>
-        </div>
-
-          
-          <%# Events overlay %>
           <div class="relative h-[1344px]">
             <% day_events = events_by_day.fetch(day, []) %>
 
             <% segments =
               day_events.map do |e|
-                event_record = e.respond_to?(:event) ? e.event : e
+                record = e.respond_to?(:event) ? e.event : e
 
                 start_at = e.starts_at.in_time_zone
                 finish_at =
@@ -137,7 +131,7 @@
                 duration_minutes      = ((seg_end - seg_start) / 60.0)
 
                 {
-                  event: event_record,
+                  record: record,
                   seg_start: seg_start,
                   seg_end: seg_end,
                   top: (minutes_from_midnight * px_per_minute),
@@ -165,36 +159,83 @@
 
             <% width_pct = (100.0 / max_cols) %>
 
+            <% # Courses: spine + stronger stripes + dashed border
+               course_css =
+                 "background-image:" \
+                 " linear-gradient(to right, rgba(255,255,255,0.62) 0px, rgba(255,255,255,0.62) 6px, rgba(255,255,255,0.0) 6px)," \
+                 " repeating-linear-gradient(135deg, rgba(255,255,255,0.32) 0px, rgba(255,255,255,0.32) 8px, rgba(255,255,255,0.0) 8px, rgba(255,255,255,0.0) 16px);" \
+                 " background-blend-mode: overlay;" \
+                 " box-shadow: inset 0 0 0 1px rgba(255,255,255,0.22), 0 1px 2px rgba(0,0,0,0.35);" \
+                 " border-style: dashed;" \
+                 " border-left-style: solid;" \
+                 " border-left-width: 6px;" \
+                 " border-left-color: rgba(255,255,255,0.72);"
+
+               # Events: simple solid
+               event_css =
+                 "box-shadow: 0 1px 2px rgba(0,0,0,0.28);" \
+                 " border-style: solid;"
+            %>
+
             <% segments.each do |seg| %>
-              <% event = seg[:event] %>
+              <% record = seg[:record] %>
               <% left_pct = seg[:col] * width_pct %>
               <% start_label = seg[:seg_start].strftime("%-I:%M %p") %>
               <% end_label   = seg[:seg_end].strftime("%-I:%M %p") %>
 
-              <% url = edit_event_path(event, start_date: start_date.to_date) %>
+              <% is_course = record.model_name.singular == "course" %>
+
+              <% base_bg   = record.color.presence || "#34D399" %>
+              <% base_text = record.respond_to?(:contrast_text_color) ? record.contrast_text_color : "#F9FAFB" %>
+
+              <% badge_class =
+                if is_course
+                  "bg-white/35 text-black/80"
+                else
+                  "bg-black/25 text-white/90"
+                end
+              %>
+
+              <% type_label = is_course ? "COURSE" : "EVENT" %>
 
               <% style_str =
                 "top: #{seg[:top]}px; " \
                 "height: #{seg[:height]}px; " \
                 "left: calc(#{left_pct}% + 4px); " \
                 "width: calc(#{width_pct}% - 8px); " \
-                "background-color: #{event.color.presence || "#34D399"}; " \
-                "color: #{event.contrast_text_color}; " \
-                "border-color: rgba(0,0,0,0.25);"
+                "background-color: #{base_bg}; " \
+                "color: #{base_text}; " \
+                "border-color: rgba(0,0,0,0.25); " \
+                "#{is_course ? course_css : event_css}"
               %>
 
-              <%= link_to event_path(event, start_date: start_date.to_date),
-                class: event_classes,
+              <%= link_to polymorphic_path(record, start_date: start_date.to_date),
+                class: "#{event_classes} #{is_course ? "rounded-2xl" : "rounded-xl"}",
                 style: style_str,
                 data: {
                   turbo_frame: "event_drawer",
                   action: "click->drawer#start",
                   turbo_prefetch: false
                 } do %>
-                <div class="font-semibold truncate"><%= event.title.presence || "(Untitled)" %></div>
-                <% if event.location.present? %>
-                  <div class="opacity-85 truncate"><%= event.location %></div>
+
+                <div class="mb-0.5 flex items-center justify-between gap-2">
+                  <div class="min-w-0">
+                    <div class="font-semibold truncate">
+                      <%= record.title.presence || "(Untitled)" %>
+                    </div>
+                  </div>
+
+                  <span class="shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-semibold tracking-wide <%= badge_class %>">
+                    <%= type_label %>
+                  </span>
+                </div>
+
+                <% if is_course && record.respond_to?(:professor) && record.professor.present? %>
+                  <div class="opacity-85 truncate"><%= record.professor %></div>
+                <% elsif record.respond_to?(:location) && record.location.present? %>
+                  <div class="opacity-85 truncate"><%= record.location %></div>
                 <% end %>
+
                 <div class="opacity-85"><%= start_label %> – <%= end_label %></div>
               <% end %>
             <% end %>
