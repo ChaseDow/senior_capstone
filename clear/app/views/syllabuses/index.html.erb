@@ -7,12 +7,17 @@
       Your uploaded syllabuses will appear below.
     </div>
 
-    <%= render Studs::PrimaryButtonComponent.new(
-          label: "New Syllabus",
-          href: new_syllabus_path,
-          color: :emerald
-        ) %>
+
+    <div class="flex justify-end space-x-5">
+      <%= render Studs::SearchBarComponent.new(class_name: "w-80", placeholder: "Search…" ) %>
+      <%= render Studs::PrimaryButtonComponent.new(
+            label: "New Syllabus",
+            href: new_syllabus_path,
+            color: :emerald
+          ) %>
+    </div>
   </div>
+
 
   <div class="mt-4 overflow-hidden rounded-2xl border border-emerald-900/30 bg-emerald-950/10">
     <% if @syllabuses.any? %>

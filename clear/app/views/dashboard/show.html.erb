@@ -1,7 +1,6 @@
 <div class="min-h-screen" data-controller="drawer">
   <%= render Studs::TopBarComponent.new(title: "Dashboard", subtitle: "Overview") do |t| %>
     <% t.with_actions do %>
-      <%= render Studs::SearchBarComponent.new(class_name: "w-80", placeholder: "Search…" ) %>
     <% end %>
   <% end %>
 
@@ -11,11 +10,11 @@
           items: [
                 { label: "Dashboard", path: "/dashboard", icon_name: "dashboard-circle-stroke-rounded" },
                 {label: "Agenda", path: "/agenda", icon_name: "timeline-event-stroke-rounded"},
-                { label: "Events",    path: "/events",    icon_name: "timeline-event-stroke-rounded" },
                 { label: "Courses",    path: "/courses",    icon_name: "course-stroke-rounded" },
+                { label: "Events",    path: "/events",    icon_name: "timeline-event-stroke-rounded" },
                 { label: "Schedule", path: "/schedule", icon_name: "timeline-event-stroke-rounded"},
-                { label: "UI",        path: "/ui",        icon_name: "search-01-stroke-rounded" },
-                { label: "Syllabus",  path: "/syllabuses",icon_name: "file-01-stroke-rounded" }
+                { label: "Syllabus",  path: "/syllabuses",icon_name: "file-01-stroke-rounded" },
+                { label: "UI",        path: "/ui",        icon_name: "search-01-stroke-rounded" }
           ],
           class_name: "h-[calc(100vh-4rem)]"
         ) %>

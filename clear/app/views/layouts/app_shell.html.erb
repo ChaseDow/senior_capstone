@@ -24,9 +24,6 @@
     <div class="min-h-screen">
       <%= render Studs::TopBarComponent.new(title: (content_for?(:page_title) ? yield(:page_title) : "Dashboard" ), 
                                         subtitle: (content_for?(:page_subtitle) ? yield(:page_subtitle) : nil) ) do |t| %>
-        <% t.with_actions do %>
-          <%= render Studs::SearchBarComponent.new(class_name: "w-80", placeholder: "Search…") %>
-        <% end %>
       <% end %>
 
       <div class="flex h-[calc(100vh-4rem)]">
@@ -34,12 +31,12 @@
               brand: nil,
               items: [
                 { label: "Dashboard", path: "/dashboard", icon_name: "dashboard-circle-stroke-rounded" },
-                {label: "Agenda", path: "/agenda", icon_name: "timeline-event-stroke-rounded"},
-                { label: "Events",    path: "/events",    icon_name: "timeline-event-stroke-rounded" },
+                {label: "Agenda", path: "/agenda", icon_name: "view-agenda-stroke-rounded"},
                 { label: "Courses",    path: "/courses",    icon_name: "course-stroke-rounded" },
+                { label: "Events",    path: "/events",    icon_name: "timeline-event-stroke-rounded" },
                 { label: "Schedule", path: "/schedule", icon_name: "timeline-event-stroke-rounded"},
-                { label: "UI",        path: "/ui",        icon_name: "search-01-stroke-rounded" },
-                { label: "Syllabus",  path: "/syllabuses",icon_name: "file-01-stroke-rounded" }
+                { label: "Syllabus",  path: "/syllabuses",icon_name: "file-01-stroke-rounded" },
+                { label: "UI",        path: "/ui",        icon_name: "search-01-stroke-rounded" }
               ],
               class_name: "h-[calc(100vh-4rem)]"
             ) %>
