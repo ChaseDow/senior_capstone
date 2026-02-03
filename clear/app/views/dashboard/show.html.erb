@@ -28,9 +28,11 @@
 
         <aside class="scrollbars w-wd shrink-0 h-full overflow-y-auto">
           <%= render Studs::AgendaComponent.new(title: "Agenda", subtitle: "Today", mode: :panel) do |a| %>
-            <% a.with_item(time: "9:00 AM", title: "CSC 405", meta: "Room 120", tag: "Class", tag_color: :blue) %>
+          
+            <% a.with_item(time: "9:00 AM", title: "CSC 405", meta: "Room 120", tag: "Class", tag_color: :blue) %> 
             <% a.with_item(time: "2:00 PM", title: "CSC 499", meta: "Room 108", tag: "Class", tag_color: :emerald) %>
             <% a.with_item(time: "6:00 PM", title: "CSC 448", meta: "Room 224", tag: "Class", tag_color: :orange) %>
+
           <% end %>
         </aside>
       </div>

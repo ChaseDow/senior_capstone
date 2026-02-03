@@ -52,7 +52,7 @@
                 <%= item.title %>
               </div>
 
-              <% if item.starts_at.present? %>
+              <% if item.starts_at.present? %>vie
                 <div class="text-xs text-zinc-500">
                   <%= item.starts_at.strftime("%I:%M %p") %>
                 </div>
@@ -61,7 +61,7 @@
           <% end %>
         <% else %>
           <div class="mt-6 text-center text-xs text-zinc-600 italic">
-            No items
+            Nothing scheduled for this day.
           </div>
         <% end %>
       </div>
