@@ -4,7 +4,7 @@ module Studs
   class AgendaComponent < ::ViewComponent::Base
     renders_many :items, "Studs::AgendaItemComponent"
 
-    def initialize(title: "Agenda", subtitle: nil, mode: :panel, empty_message: "Nothing scheduled.", class_name: nil)
+    def initialize(title: "Agenda", subtitle: nil, mode: :panel, empty_message: "Nothing scheduled yet.", class_name: nil)
       @title = title
       @subtitle = subtitle
       @mode = mode
