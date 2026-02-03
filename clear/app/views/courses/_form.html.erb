@@ -13,21 +13,38 @@
   <% input_classes = "mt-1 w-full rounded-xl border border-zinc-800 bg-zinc-950/40 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-orange-300/50" %>
   <% label_classes = "block text-sm font-medium text-zinc-200" %>
 
-  <div>
-    <%= f.label :title, class: label_classes %>
-    <%= f.text_field :title, class: input_classes, placeholder: "e.g. ENGL 1013 - Freshman Composition I, CSC 1303 - The Science of Computing I ..." %>
-  </div>
-
-
-  <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+  <div class="space-y-4">
     <div>
-      <%= f.label :term, "Term", class: label_classes%>
-      <%= f.text_field :term, class: input_classes, placeholder: "e.g. Fall 2025, Spring 2026 ..."%>
+      <%= f.label :title, "Course name *", class: label_classes %>
+      <%= f.text_field :title, class: input_classes, placeholder: "e.g. ENGL 1013 - Freshman Composition I, CSC 1303 - The Science of Computing I ..." %>
+    </div>
+
+
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <div>
+        <%= f.label :start_time, "Start time", class: label_classes %>
+        <%= f.time_field :start_time, class: input_classes %>
+      </div>
+
+      <div>
+        <%= f.label :end_time, "End time", class: label_classes %>
+        <%= f.time_field :end_time, class: input_classes %>
+      </div>
+
+      <div>
+        <%= f.label :start_date, "Start date", class: label_classes %>
+        <%= f.date_field :start_date, class: input_classes %>
+      </div>
+
+      <div>
+        <%= f.label :end_date, "End date", class: label_classes %>
+        <%= f.date_field :end_date, class: input_classes %>
+      </div>
     </div>
 
     <div>
-      <%= f.label :meeting_days, "Meeting Days", class: label_classes%>
-      <%= f.text_field :meeting_days, class: input_classes, placeholder: "MWF or TR"%>
+      <%= f.label :term, "Term", class: label_classes%>
+      <%= f.text_field :term, class: input_classes, placeholder: "e.g. Fall 2025, Spring 2026 ..."%>
     </div>
 
     <div>
@@ -36,43 +53,74 @@
     </div>
 
     <div>
-      <%= f.label :start_time, "Start time", class: label_classes %>
-      <%= f.time_field :start_time, class: input_classes %>
+      <%= f.label :location, class: label_classes %>
+      <%= f.text_field :location, class: input_classes, placeholder: "e.g. IESB 220, NETH 153" %>
     </div>
 
     <div>
-      <%= f.label :end_time, "End time", class: label_classes %>
-      <%= f.time_field :end_time, class: input_classes %>
+      <%= f.label :description, class: label_classes %>
+      <%= f.text_area :description, rows: 3, class: input_classes, placeholder: "Course Details..." %>
     </div>
 
-    <div>
-      <%= f.label :start_date, "Start date", class: label_classes %>
-      <%= f.date_field :start_date, class: input_classes %>
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2 items-start">
+      <div class="self-start rounded-2xl border border-emerald-900/30 bg-emerald-950/10 p-4 relative">
+
+        <div class="pr-10">
+          <div class="text-sm font-medium text-zinc-200">Repeat *</div>
+          <div class="text-xs text-zinc-400">Repeat on selected weekdays</div>
+        </div>
+
+        <div class="mt-4 space-y-3">
+          <div class="text-xs text-zinc-400">Days</div>
+
+          <div class="grid grid-cols-7 gap-2">
+            <% day_labels = [["Su", 0], ["Mo", 1], ["Tu", 2], ["We", 3], ["Th", 4], ["Fr", 5], ["Sa", 6]] %>
+
+            <% day_labels.each do |lbl, wday| %>
+              <label class="relative">
+                <%= f.check_box :repeat_days, { multiple: true, class: "peer sr-only" }, wday, nil %>
+
+                <div class="flex h-9 items-center justify-center rounded-xl border border-zinc-800 bg-zinc-950/30
+                            text-xs font-medium text-zinc-300 transition
+                            hover:bg-zinc-900/40
+                            peer-checked:border-emerald-200
+                            peer-checked:bg-emerald-400/70
+                            peer-checked:text-white
+                            peer-checked:ring-2 peer-checked:ring-emerald-200/70">
+                  <%= lbl %>
+                </div>
+
+                <span class="pointer-events-none absolute right-2 top-1/2 hidden -translate-y-1/2 text-[10px] text-white peer-checked:inline">
+                  ✓
+                </span>
+              </label>
+            <% end %>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="self-start rounded-2xl border border-emerald-900/30 bg-emerald-950/10 p-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <div class="text-sm font-medium text-zinc-200">Course color</div>
+            <div class="text-xs text-zinc-400">Used as the calendar highlight.</div>
+          </div>
+
+          <%= f.color_field :color,
+                class: "h-10 w-14 cursor-pointer rounded-xl border border-zinc-800 bg-zinc-950/40" %>
+        </div>
+      </div>
     </div>
 
-    <div>
-      <%= f.label :end_date, "End date", class: label_classes %>
-      <%= f.date_field :end_date, class: input_classes %>
+    <div class="flex items-center gap-2 pt-2">
+      <%= render Studs::PrimaryButtonComponent.new(
+            label: (course.persisted? ? "Update course" : "Create course"),
+            type: "submit",
+            color: :orange
+          ) %>
+
+      <%= render Studs::SecondaryButtonComponent.new(label: "Cancel", href: courses_path) %>
     </div>
-  </div>
-
-  <div>
-    <%= f.label :location, class: label_classes %>
-    <%= f.text_field :location, class: input_classes, placeholder: "e.g. IESB 220, NETH 153" %>
-  </div>
-
-  <div>
-    <%= f.label :description, class: label_classes %>
-    <%= f.text_area :description, rows: 3, class: input_classes, placeholder: "Course Details..." %>
-  </div>
-
-  <div class="flex items-center gap-2 pt-2">
-    <%= render Studs::PrimaryButtonComponent.new(
-          label: (course.persisted? ? "Update course" : "Create course"),
-          type: "submit",
-          color: :orange
-        ) %>
-
-    <%= render Studs::SecondaryButtonComponent.new(label: "Cancel", href: courses_path) %>
   </div>
 <% end %>

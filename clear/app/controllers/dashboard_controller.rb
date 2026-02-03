@@ -13,13 +13,22 @@ class DashboardController < ApplicationController
       .where("recurring = FALSE OR repeat_until >= ?", range_start.to_date)
       .order(starts_at: :asc)
 
-    @events = base_events
-    @occurrences = base_events.flat_map { |e| e.occurrences_between(range_start, range_end) }
-                            .sort_by(&:starts_at)
+    event_occurrences =
+      base_events.flat_map { |e| e.occurrences_between(range_start, range_end) }
+
+    base_courses = current_user.courses
+      .where("start_date <= ?", range_end.to_date)
+      .where("end_date >= ?", range_start.to_date)
+      .order(start_date: :asc)
+
+    course_occurrences =
+      base_courses.flat_map { |c| c.occurrences_between(range_start, range_end) }
+
+    @occurrences = (event_occurrences + course_occurrences).sort_by(&:starts_at)
 
     return unless turbo_frame_request?
 
     render partial: "dashboard/calendar_frame",
-          locals: { events: @occurrences, start_date: @start_date }
+           locals: { events: @occurrences, start_date: @start_date }
   end
 end

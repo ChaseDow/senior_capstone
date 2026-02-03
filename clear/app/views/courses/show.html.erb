@@ -22,14 +22,20 @@
       </div>
       
       <div class="mt-2 text-sm text-zinc-400">
-        <% if @course.meeting_days.present? %>
-          <span class="mr-2"><%= @course.meeting_days %></span>
-        <% end %>
-
         <% if @course.start_time.present? && @course.end_time.present? %>
-          <span><%= @course.start_time.strftime("%-I:%M%P") %>–<%= @course.end_time.strftime("%-I:%M%P") %></span>
-        <% elsif @course.start_time.present? %>
-          <span><%= @course.start_time.strftime("%-I:%M%P") %></span>
+          <% day_labels = [["Sun", 0], ["Mon", 1], ["Tue", 2], ["Wed", 3], ["Thu", 4], ["Fri", 5], ["Sat", 6]] %>
+          <% day_map = day_labels.map { |lbl, wday| [wday, lbl] }.to_h %>
+
+          <% selected_days =
+            Array(@course.repeat_days)
+              .sort
+              .map { |d| day_map[d] }
+              .compact
+              .join("|")
+          %>
+          <%= selected_days %>
+          •
+          <%= @course.start_time.strftime("%-I:%M%P") %> – <%= @course.end_time.strftime("%-I:%M%P") %>
         <% end %>
       </div>
 
@@ -42,6 +48,12 @@
           Ends <%= @course.end_date.strftime("%b %-d, %Y") %>
         <% end %>
       </div>
+
+      <% if @course.end_date.present? %>
+        <p class="mt-1 text-xs text-zinc-500">
+          Until <%= @course.end_date.strftime("%b %d, %Y") %>
+        </p>
+      <% end %>
     </div>
 
     <div class="flex shrink-0 items-center gap-2">

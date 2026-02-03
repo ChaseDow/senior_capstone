@@ -43,6 +43,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_30_094611) do
   end
 
   create_table "courses", force: :cascade do |t|
+    t.string "color", default: "#34D399", null: false
     t.datetime "created_at", null: false
     t.text "description"
     t.date "end_date"
@@ -50,12 +51,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_30_094611) do
     t.string "location"
     t.string "meeting_days"
     t.string "professor"
+    t.boolean "recurring", default: false, null: false
+    t.integer "repeat_days", default: [], null: false, array: true
+    t.date "repeat_until"
     t.date "start_date"
     t.time "start_time"
     t.string "term"
     t.string "title"
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
+    t.index ["user_id", "repeat_until"], name: "index_courses_on_user_id_and_repeat_until"
+    t.index ["user_id", "start_date"], name: "index_courses_on_user_id_and_start_date"
     t.index ["user_id"], name: "index_courses_on_user_id"
   end
 

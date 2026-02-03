@@ -48,14 +48,15 @@ class CoursesController < ApplicationController
     params.require(:course).permit(
       :title,
       :term,
-      :meeting_days,
+      :color,
       :start_date,
       :end_date,
       :start_time,
       :end_time,
       :professor,
       :location,
-      :description
+      :description,
+      repeat_days: []
     )
   end
 end
