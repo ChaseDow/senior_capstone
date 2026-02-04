@@ -1,5 +1,10 @@
-<% hour_height_px = 56 %>
-<% px_per_minute  = hour_height_px / 60.0 %>
+<%# --- Sizing knobs (projector-friendly) --- %>
+<% hour_height_px   = 72 %> <%# try 64/72/80 %>
+<% header_height_px = 64 %>
+<% time_col_px      = 88 %>
+
+<% px_per_minute = hour_height_px / 60.0 %>
+<% day_height_px = 24 * hour_height_px %>
 
 <% week_start_date = start_date.to_date.beginning_of_week %>
 <% days            = (0..6).map { |i| week_start_date + i } %>
@@ -9,20 +14,22 @@
 <% today_start = Date.current.beginning_of_week %>
 
 <% nav_btn =
-  "inline-flex items-center rounded-xl border border-zinc-800 bg-zinc-950/40 px-3 py-1.5 text-sm text-zinc-200 " \
-  "hover:bg-zinc-800/40 hover:text-zinc-50 transition"
+  "inline-flex items-center rounded-xl border px-4 py-2 text-sm font-medium transition " \
+  "border-emerald-500/25 bg-emerald-500/10 text-emerald-100 " \
+  "hover:bg-emerald-500/15 hover:border-emerald-400/30"
 %>
 
 <% event_classes =
-  "absolute z-10 cursor-pointer rounded-xl border px-2 py-1 text-[11px] shadow-sm transition " \
-  "hover:brightness-110 hover:saturate-110"
+  "absolute z-10 cursor-pointer rounded-2xl border border-black/20 px-3 py-2 text-[12px] leading-snug shadow-md " \
+  "hover:brightness-110 hover:saturate-110 transition"
 %>
 
 <% events_by_day = events.group_by { |e| e.starts_at.in_time_zone.to_date } %>
 
 <div class="flex h-full min-h-0 flex-col">
-  <div class="mb-4 flex items-center justify-between gap-3">
-    <div class="text-base font-semibold text-zinc-100">
+  <!-- Title + nav -->
+  <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+    <div class="text-lg font-semibold text-zinc-100">
       <%= week_start_date.strftime("%b %-d") %>
       <span class="text-zinc-500">–</span>
       <%= (week_start_date + 6.days).strftime("%b %-d, %Y") %>
@@ -35,32 +42,50 @@
     </nav>
   </div>
 
-  <div class="min-h-0 flex-1 overflow-auto rounded-2xl border border-zinc-800 bg-zinc-950/10">
-    <div class="sticky top-0 z-20 grid grid-cols-[4rem_repeat(7,minmax(0,1fr))] border-b border-zinc-800 bg-zinc-950/70 backdrop-blur">
-      <div class="h-12 border-r border-zinc-800"></div>
+  <!-- Calendar shell -->
+  <div class="min-h-0 flex-1 overflow-auto rounded-2xl border border-emerald-900/40 bg-emerald-950/10 shadow-[inset_0_0_0_1px_rgba(16,185,129,0.08)]">
+    <!-- Sticky header -->
+    <div
+      class="sticky top-0 z-20 border-b border-emerald-900/35 bg-zinc-950/80 backdrop-blur"
+      style="height: <%= header_height_px %>px;"
+    >
+      <div class="grid h-full" style="grid-template-columns: <%= time_col_px %>px repeat(7, minmax(0, 1fr));">
+        <div class="border-r border-emerald-900/25"></div>
 
-      <% days.each do |day| %>
-        <% is_today = (day == Date.current) %>
-        <div class="h-12 border-r border-zinc-800 px-3 py-2">
-          <div class="flex items-center justify-between">
-            <div class="text-sm font-medium text-zinc-100">
-              <%= day.strftime("%a") %>
-              <span class="text-zinc-400"><%= day.strftime("%-m/%-d") %></span>
+        <% days.each do |day| %>
+          <% is_today   = (day == Date.current) %>
+          <% is_weekend = day.saturday? || day.sunday? %>
+
+          <div class="border-r border-emerald-900/25 px-4 py-3 <%= is_weekend ? "bg-white/0" : "" %> <%= is_today ? "bg-emerald-500/10" : "" %>">
+            <div class="flex items-center justify-between gap-3">
+              <div class="min-w-0">
+                <div class="text-base font-semibold text-zinc-100">
+                  <%= day.strftime("%a") %>
+                  <span class="ml-2 text-sm font-medium text-zinc-300"><%= day.strftime("%-m/%-d") %></span>
+                </div>
+                <div class="text-xs text-zinc-400"><%= day.strftime("%B") %></div>
+              </div>
+
+              <% if is_today %>
+                <span class="shrink-0 rounded-full bg-emerald-400/20 px-2.5 py-1 text-xs font-semibold text-emerald-200">
+                  Today
+                </span>
+              <% end %>
             </div>
-
-            <% if is_today %>
-              <span class="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[11px] text-emerald-300">Today</span>
-            <% end %>
           </div>
-        </div>
-      <% end %>
+        <% end %>
+      </div>
     </div>
 
-    <div class="grid grid-cols-[4rem_repeat(7,minmax(0,1fr))]">
-      <%# Time labels %>
-      <div class="border-r border-zinc-800">
+    <!-- Body grid -->
+    <div class="grid" style="grid-template-columns: <%= time_col_px %>px repeat(7, minmax(0, 1fr));">
+      <!-- Time labels -->
+      <div class="border-r border-emerald-900/25">
         <% 24.times do |h| %>
-          <div class="h-14 border-b border-zinc-900/60 px-2 pt-1 text-right text-[11px] text-zinc-500">
+          <div
+            class="border-b border-emerald-900/20 px-3 pt-2 text-right text-sm font-semibold text-zinc-300"
+            style="height: <%= hour_height_px %>px;"
+          >
             <% label =
               if h == 0
                 "12 AM"
@@ -77,38 +102,39 @@
         <% end %>
       </div>
 
-      <%# Day columns %>
+      <!-- Day columns -->
       <% days.each do |day| %>
         <% day_start = Time.zone.local(day.year, day.month, day.day, 0, 0, 0) %>
         <% day_end   = day_start.end_of_day %>
 
-        <div class="relative border-r border-zinc-800">
-          <%# Clickable time slots - 30 minutes each %>
-          <div class="absolute inset-0 z-1">
+        <% is_today   = (day == Date.current) %>
+        <% is_weekend = day.saturday? || day.sunday? %>
+
+        <div class="relative border-r border-emerald-900/25 <%= is_weekend ? "bg-white/0" : "" %> <%= is_today ? "bg-emerald-500/10" : "" %>">
+          <!-- Clickable time slots (30 min) -->
+          <div class="absolute inset-0 z-[1]">
             <% 48.times do |i| %>
               <% slot_time = day_start + (i * 30).minutes %>
               <%= link_to new_event_path(start_time: slot_time.iso8601),
-                      class: "timeslot absolute left-0 w-full
-                            hover:bg-indigo-500/10
-                            transition-colors
-                            cursor-pointer",
-                      style: "top: #{i * hour_height_px/2}px; height: #{hour_height_px/2}px;",
-                      data: { turbo: false } do %>
+                    class: "timeslot absolute left-0 w-full hover:bg-emerald-500/10 transition-colors cursor-pointer",
+                    style: "top: #{i * (hour_height_px / 2.0)}px; height: #{hour_height_px / 2.0}px;",
+                    data: { turbo: false } do %>
               <% end %>
             <% end %>
           </div>
 
-          <%# Grid lines: hour + half-hour %>
+          <!-- Grid lines -->
           <div class="absolute inset-0 pointer-events-none">
-            <% 24.times do |i| %>
-              <div class="relative h-14">
-                <div class="absolute top-0 left-0 w-full border-b border-emerald-800/60"></div>
-                <div class="absolute top-1/2 left-0 w-full border-b border-dashed border-blue-800/40"></div>
+            <% 24.times do %>
+              <div class="relative" style="height: <%= hour_height_px %>px;">
+                <div class="absolute top-0 left-0 w-full border-b border-emerald-900/20"></div>
+                <div class="absolute top-1/2 left-0 w-full border-b border-dashed border-emerald-900/12"></div>
               </div>
             <% end %>
           </div>
 
-          <div class="relative h-[1344px]">
+          <!-- Event layer -->
+          <div class="relative" style="height: <%= day_height_px %>px;">
             <% day_events = events_by_day.fetch(day, []) %>
 
             <% segments =
@@ -159,22 +185,17 @@
 
             <% width_pct = (100.0 / max_cols) %>
 
-            <% # Courses: spine + stronger stripes + dashed border
+            <% # Courses: textured but readable
                course_css =
                  "background-image:" \
-                 " linear-gradient(to right, rgba(255,255,255,0.62) 0px, rgba(255,255,255,0.62) 6px, rgba(255,255,255,0.0) 6px)," \
-                 " repeating-linear-gradient(135deg, rgba(255,255,255,0.32) 0px, rgba(255,255,255,0.32) 8px, rgba(255,255,255,0.0) 8px, rgba(255,255,255,0.0) 16px);" \
+                 " linear-gradient(to right, rgba(255,255,255,0.60) 0px, rgba(255,255,255,0.60) 6px, rgba(255,255,255,0.0) 6px)," \
+                 " repeating-linear-gradient(135deg, rgba(255,255,255,0.20) 0px, rgba(255,255,255,0.20) 10px, rgba(255,255,255,0.0) 10px, rgba(255,255,255,0.0) 20px);" \
                  " background-blend-mode: overlay;" \
-                 " box-shadow: inset 0 0 0 1px rgba(255,255,255,0.22), 0 1px 2px rgba(0,0,0,0.35);" \
-                 " border-style: dashed;" \
                  " border-left-style: solid;" \
                  " border-left-width: 6px;" \
-                 " border-left-color: rgba(255,255,255,0.72);"
+                 " border-left-color: rgba(255,255,255,0.70);"
 
-               # Events: simple solid
-               event_css =
-                 "box-shadow: 0 1px 2px rgba(0,0,0,0.28);" \
-                 " border-style: solid;"
+               event_css = ""
             %>
 
             <% segments.each do |seg| %>
@@ -184,15 +205,14 @@
               <% end_label   = seg[:seg_end].strftime("%-I:%M %p") %>
 
               <% is_course = record.model_name.singular == "course" %>
-
               <% base_bg   = record.color.presence || "#34D399" %>
               <% base_text = record.respond_to?(:contrast_text_color) ? record.contrast_text_color : "#F9FAFB" %>
 
               <% badge_class =
                 if is_course
-                  "bg-white/35 text-black/80"
+                  "bg-white/40 text-black/90"
                 else
-                  "bg-black/25 text-white/90"
+                  "bg-black/25 text-white/95"
                 end
               %>
 
@@ -201,16 +221,16 @@
               <% style_str =
                 "top: #{seg[:top]}px; " \
                 "height: #{seg[:height]}px; " \
-                "left: calc(#{left_pct}% + 4px); " \
-                "width: calc(#{width_pct}% - 8px); " \
+                "left: calc(#{left_pct}% + 6px); " \
+                "width: calc(#{width_pct}% - 12px); " \
                 "background-color: #{base_bg}; " \
                 "color: #{base_text}; " \
-                "border-color: rgba(0,0,0,0.25); " \
+                "border-color: rgba(0,0,0,0.22); " \
                 "#{is_course ? course_css : event_css}"
               %>
 
               <%= link_to polymorphic_path(record, start_date: start_date.to_date),
-                class: "#{event_classes} #{is_course ? "rounded-2xl" : "rounded-xl"}",
+                class: event_classes,
                 style: style_str,
                 data: {
                   turbo_frame: "event_drawer",
@@ -218,25 +238,25 @@
                   turbo_prefetch: false
                 } do %>
 
-                <div class="mb-0.5 flex items-center justify-between gap-2">
+                <div class="mb-1 flex items-center justify-between gap-2">
                   <div class="min-w-0">
-                    <div class="font-semibold truncate">
+                    <div class="font-semibold truncate text-[13px]">
                       <%= record.title.presence || "(Untitled)" %>
                     </div>
                   </div>
 
-                  <span class="shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-semibold tracking-wide <%= badge_class %>">
+                  <span class="shrink-0 rounded-md px-2 py-0.5 text-[10px] font-semibold tracking-wide <%= badge_class %>">
                     <%= type_label %>
                   </span>
                 </div>
 
                 <% if is_course && record.respond_to?(:professor) && record.professor.present? %>
-                  <div class="opacity-85 truncate"><%= record.professor %></div>
+                  <div class="opacity-90 truncate"><%= record.professor %></div>
                 <% elsif record.respond_to?(:location) && record.location.present? %>
-                  <div class="opacity-85 truncate"><%= record.location %></div>
+                  <div class="opacity-90 truncate"><%= record.location %></div>
                 <% end %>
 
-                <div class="opacity-85"><%= start_label %> – <%= end_label %></div>
+                <div class="opacity-90 font-medium"><%= start_label %> – <%= end_label %></div>
               <% end %>
             <% end %>
           </div>

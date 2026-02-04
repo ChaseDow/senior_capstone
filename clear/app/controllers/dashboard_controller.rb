@@ -1,4 +1,5 @@
 class DashboardController < ApplicationController
+  layout "app_shell"
   before_action :authenticate_user!
 
   def show

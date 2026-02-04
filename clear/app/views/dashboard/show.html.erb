@@ -1,49 +1,29 @@
-<div class="min-h-screen" data-controller="drawer">
-  <%= render Studs::TopBarComponent.new(title: "Dashboard", subtitle: "Overview") do |t| %>
-    <% t.with_actions do %>
-    <% end %>
-  <% end %>
+<div class="-mx-6 -my-6 h-full min-h-0" data-controller="drawer">
+  <div class="flex h-full min-h-0 min-w-0 gap-4 p-4">
+    <section class="min-w-0 flex-1 min-h-0">
+      <%= render "dashboard/calendar_frame", events: @occurrences, start_date: @start_date %>
+    </section>
 
-  <div class="flex h-[calc(100vh-4rem)] overflow-hidden">
-    <%= render Studs::LeftNavComponent.new(
-          brand: nil,
-          items: [
-                { label: "Dashboard", path: "/dashboard", icon_name: "dashboard-circle-stroke-rounded" },
-                {label: "Agenda", path: "/agenda", icon_name: "timeline-event-stroke-rounded"},
-                { label: "Courses",    path: "/courses",    icon_name: "course-stroke-rounded" },
-                { label: "Events",    path: "/events",    icon_name: "timeline-event-stroke-rounded" },
-                { label: "Schedule", path: "/schedule", icon_name: "timeline-event-stroke-rounded"},
-                { label: "Syllabus",  path: "/syllabuses",icon_name: "file-01-stroke-rounded" },
-                { label: "UI",        path: "/ui",        icon_name: "search-01-stroke-rounded" }
-          ],
-          class_name: "h-[calc(100vh-4rem)]"
-        ) %>
-
-    <div class="min-w-0 flex-1">
-      <div class="flex h-full gap-6 px-6 py-6">
-        <main class="scrollbars min-w-0 flex-1 min-h-0 overflow-y-auto">
-          <%= render "dashboard/calendar_frame", events: @occurrences, start_date: @start_date %>
-        </main>
-
-        <aside class="scrollbars w-wd shrink-0 h-full overflow-y-auto">
-          <%= render Studs::AgendaComponent.new(title: "Agenda", subtitle: "Today", mode: :panel) do |a| %>
-          
-            <% a.with_item(time: "9:00 AM", title: "CSC 405", meta: "Room 120", tag: "Class", tag_color: :blue) %> 
-            <% a.with_item(time: "2:00 PM", title: "CSC 499", meta: "Room 108", tag: "Class", tag_color: :emerald) %>
-            <% a.with_item(time: "6:00 PM", title: "CSC 448", meta: "Room 224", tag: "Class", tag_color: :orange) %>
-
-          <% end %>
-        </aside>
+    <aside class="w-wd shrink-0 min-h-0 overflow-hidden">
+      <div class="h-full min-h-0 overflow-y-auto scrollbars">
+        <%= render Studs::AgendaComponent.new(title: "Agenda", subtitle: "Today", mode: :panel) do |a| %>
+          <% a.with_item(time: "9:00 AM", title: "CSC 405", meta: "Room 120", tag: "Class", tag_color: :blue) %>
+          <% a.with_item(time: "2:00 PM", title: "CSC 499", meta: "Room 108", tag: "Class", tag_color: :emerald) %>
+          <% a.with_item(time: "6:00 PM", title: "CSC 448", meta: "Room 224", tag: "Class", tag_color: :orange) %>
+        <% end %>
       </div>
-    </div>
+    </aside>
   </div>
 
+
+  <!-- Drawer overlay -->
   <div
     data-drawer-target="overlay"
     data-action="click->drawer#close"
     class="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
   </div>
 
+  <!-- Drawer panel -->
   <div class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none px-4">
     <div
       data-drawer-target="panel"

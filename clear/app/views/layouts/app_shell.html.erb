@@ -1,59 +1,70 @@
 <!DOCTYPE html>
-<html>
+<html class="h-full">
   <head>
     <title><%= content_for(:title) || "Clear" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="application-name" content="Clear">
     <meta name="mobile-web-app-capable" content="yes">
+
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
-
     <%= yield :head %>
 
-    <link rel="icon" href="/icon.png" type="image/png">
-    <link rel="icon" href="/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icon.png">
+    <%= favicon_link_tag "logo-favicon.png", rel: "icon", type: "image/png" %>
 
     <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
   </head>
 
-  <body data-theme="green" class="min-h-screen bg-zinc-950 text-zinc-100">
-    <div class="min-h-screen">
-      <%= render Studs::TopBarComponent.new(title: (content_for?(:page_title) ? yield(:page_title) : "Dashboard" ), 
-                                        subtitle: (content_for?(:page_subtitle) ? yield(:page_subtitle) : nil) ) do |t| %>
-      <% end %>
+  <body data-theme="green" class="h-full overflow-hidden bg-zinc-950 text-zinc-100">
+    <div class="flex h-full min-h-0 flex-col overflow-hidden">
+      <!-- Top bar (fixed height, no guessing with calc) -->
+      <header class="shrink-0">
+        <%= render Studs::TopBarComponent.new(
+              title: (content_for?(:page_title) ? yield(:page_title) : "Dashboard"),
+              subtitle: (content_for?(:page_subtitle) ? yield(:page_subtitle) : nil)
+            ) do |t| %>
+        <% end %>
+      </header>
 
-      <div class="flex h-[calc(100vh-4rem)]">
-        <%= render Studs::LeftNavComponent.new(
-              brand: nil,
-              items: [
-                { label: "Dashboard", path: "/dashboard", icon_name: "dashboard-circle-stroke-rounded" },
-                {label: "Agenda", path: "/agenda", icon_name: "view-agenda-stroke-rounded"},
-                { label: "Courses",    path: "/courses",    icon_name: "course-stroke-rounded" },
-                { label: "Events",    path: "/events",    icon_name: "timeline-event-stroke-rounded" },
-                { label: "Schedule", path: "/schedule", icon_name: "timeline-event-stroke-rounded"},
-                { label: "Syllabus",  path: "/syllabuses",icon_name: "file-01-stroke-rounded" },
-                { label: "UI",        path: "/ui",        icon_name: "search-01-stroke-rounded" }
-              ],
-              class_name: "h-[calc(100vh-4rem)]"
-            ) %>
+      <!-- App body -->
+      <div class="flex min-h-0 flex-1 overflow-hidden">
+        <!-- Left nav -->
+        <aside class="shrink-0 h-full overflow-y-auto">
+          <%= render Studs::LeftNavComponent.new(
+                brand: nil,
+                items: [
+                  { label: "Dashboard", path: "/dashboard", icon_name: "dashboard-circle-stroke-rounded" },
+                  { label: "Agenda",    path: "/agenda",    icon_name: "view-agenda-stroke-rounded" },
+                  { label: "Courses",   path: "/courses",   icon_name: "course-stroke-rounded" },
+                  { label: "Events",    path: "/events",    icon_name: "timeline-event-stroke-rounded" },
+                  { label: "Schedule",  path: "/schedule",  icon_name: "timeline-event-stroke-rounded" },
+                  { label: "Syllabus",  path: "/syllabuses",icon_name: "file-01-stroke-rounded" },
+                  { label: "UI",        path: "/ui",        icon_name: "search-01-stroke-rounded" }
+                ],
+                class_name: "h-full"
+              ) %>
+        </aside>
 
-        <div class="min-w-0 flex-1">
-          <div class="flex h-full gap-6 px-6 py-6">
-            <main class="min-w-0 flex-1">
-              <% if notice.present? %>
-                <div class="mb-4 rounded-2xl border border-emerald-900 bg-emerald-950/40 px-4 py-3 text-sm text-emerald-200">
-                  <%= notice %>
-                </div>
-              <% end %>
+        <main class="min-w-0 min-h-0 flex-1 overflow-y-auto scrollbars">
+          <div class="px-6 py-6">
+            <% if notice.present? %>
+              <div class="mb-4 rounded-2xl border border-emerald-900 bg-emerald-950/40 px-4 py-3 text-sm text-emerald-200">
+                <%= notice %>
+              </div>
+            <% end %>
 
-              <%= yield %>
-            </main>
+            <% if alert.present? %>
+              <div class="mb-4 rounded-2xl border border-rose-900 bg-rose-950/40 px-4 py-3 text-sm text-rose-200">
+                <%= alert %>
+              </div>
+            <% end %>
+
+            <%= yield %>
           </div>
-        </div>
+        </main>
       </div>
     </div>
   </body>
