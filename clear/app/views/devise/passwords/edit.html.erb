@@ -14,19 +14,67 @@
       <%= f.hidden_field :reset_password_token %>
 
       <div class="space-y-4">
-        <div>
+        <div class="relative">
           <%= f.label :password, "New password", class: "text-sm text-zinc-300" %>
           <%= f.password_field :password,
+                id: "new-password",
                 autofocus: true,
                 autocomplete: "new-password",
-                class: "mt-2 w-full rounded-xl border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-zinc-100 placeholder-zinc-500 focus:border-emerald-500/60 focus:outline-none focus:ring-2 focus:ring-emerald-500/30" %>
+                class: "mt-2 w-full rounded-xl border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-zinc-100 placeholder-zinc-500 focus:border-emerald-500/60 focus:outline-none focus:ring-2 focus:ring-emerald-500/30",
+                placeholder: "your new password" %>
+
+                <button type="button"
+                  id="toggle_password"
+                  class="absolute right-3 top-[calc(50%+1rem)] -translate-y-1/2
+                        rounded-md p-1
+                        text-zinc-400
+                        hover:text-zinc-100
+                        hover:bg-zinc-800/60
+                        focus:outline-none
+                        focus:ring-2 focus:ring-emerald-500/40
+                        transition">
+
+
+                    <span id="icon-show">
+                      <%= icon "search-01-stroke-rounded", class: "h-5 w-5" %>
+                    </span>
+
+                    <span id="icon-hide" class="hidden">
+                      <%= icon "search-01-stroke-rounded", class: "h-5 w-5" %>
+                    </span>
+
+                </button>
         </div>
 
-        <div>
+        <div class="relative">
           <%= f.label :password_confirmation, "Confirm new password", class: "text-sm text-zinc-300" %>
           <%= f.password_field :password_confirmation,
+                id: "confirm-password",
                 autocomplete: "new-password",
-                class: "mt-2 w-full rounded-xl border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-zinc-100 placeholder-zinc-500 focus:border-emerald-500/60 focus:outline-none focus:ring-2 focus:ring-emerald-500/30" %>
+                class: "mt-2 w-full rounded-xl border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-zinc-100 placeholder-zinc-500 focus:border-emerald-500/60 focus:outline-none focus:ring-2 focus:ring-emerald-500/30",
+                placeholder: "re-type new password" %>
+
+                <button type="button"
+                  id="toggle_confirm_password"
+                  class="absolute right-3 top-[calc(50%+1rem)] -translate-y-1/2
+                        rounded-md p-1
+                        text-zinc-400
+                        hover:text-zinc-100
+                        hover:bg-zinc-800/60
+                        focus:outline-none
+                        focus:ring-2 focus:ring-emerald-500/40
+                        transition">
+
+
+                    <span id="confirm-icon-show">
+                      <%= icon "search-01-stroke-rounded", class: "h-5 w-5" %>
+                    </span>
+
+                    <span id="confirm-icon-hide" class="hidden">
+                      <%= icon "search-01-stroke-rounded", class: "h-5 w-5" %>
+                    </span>
+
+                </button>
         </div>
 
         <%= f.submit "Update password",
@@ -37,3 +85,35 @@
     <%= render "devise/shared/links" %>
   </div>
 </div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const button = document.getElementById("toggle_password");
+    const password = document.getElementById("new-password");
+    const showIcon = document.getElementById("icon-show");
+    const hideIcon = document.getElementById("icon-hide");
+
+    button.addEventListener("click", () => {
+      const isHidden = password.type === "password";
+
+      password.type = isHidden ? "text" : "password";
+      showIcon.classList.toggle("hidden", isHidden);
+      hideIcon.classList.toggle("hidden", !isHidden);
+    });
+  });
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const button = document.getElementById("toggle_confirm_password");
+    const password = document.getElementById("confirm-password");
+    const showIcon = document.getElementById("confirm-icon-show");
+    const hideIcon = document.getElementById("confirm-icon-hide");
+
+    button.addEventListener("click", () => {
+      const isHidden = password.type === "password";
+
+      password.type = isHidden ? "text" : "password";
+      showIcon.classList.toggle("hidden", isHidden);
+      hideIcon.classList.toggle("hidden", !isHidden);
+    });
+  });
+</script>
