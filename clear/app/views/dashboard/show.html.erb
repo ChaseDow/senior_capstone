@@ -1,50 +1,44 @@
-<div class="min-h-screen" data-controller="drawer">
-  <%= render Studs::TopBarComponent.new(title: "Dashboard", subtitle: "Overview") do |t| %>
-    <% t.with_actions do %>
-      <%= render Studs::SearchBarComponent.new(class_name: "w-80", placeholder: "Search…" ) %>
-    <% end %>
-  <% end %>
-
-  <div class="flex h-[calc(100vh-4rem)] overflow-hidden">
-    <%= render Studs::LeftNavComponent.new(
-          brand: nil,
-          items: [
-                { label: "Dashboard", path: "/dashboard", icon_name: "dashboard-circle-stroke-rounded" },
-                {label: "Agenda", path: "/agenda", icon_name: "timeline-event-stroke-rounded"},
-                { label: "Events",    path: "/events",    icon_name: "timeline-event-stroke-rounded" },
-                { label: "Courses",    path: "/courses",    icon_name: "course-stroke-rounded" },
-                { label: "Schedule", path: "/schedule", icon_name: "timeline-event-stroke-rounded"},
-                { label: "UI",        path: "/ui",        icon_name: "search-01-stroke-rounded" },
-                { label: "Syllabus",  path: "/syllabuses",icon_name: "file-01-stroke-rounded" }
-          ],
-          class_name: "h-[calc(100vh-4rem)]"
-        ) %>
-
-    <div class="min-w-0 flex-1">
-      <div class="flex h-full gap-6 px-6 py-6">
-        <main class="scrollbars min-w-0 flex-1 min-h-0 overflow-y-auto">
-          <%= render "dashboard/calendar_frame", events: @occurrences, start_date: @start_date %>
-        </main>
-
-        <aside class="scrollbars w-wd shrink-0 h-full overflow-y-auto">
-          <%= render Studs::AgendaComponent.new(title: "Agenda", subtitle: "Today", mode: :panel) do |a| %>
-          
-            <% a.with_item(time: "9:00 AM", title: "CSC 405", meta: "Room 120", tag: "Class", tag_color: :blue) %> 
-            <% a.with_item(time: "2:00 PM", title: "CSC 499", meta: "Room 108", tag: "Class", tag_color: :emerald) %>
-            <% a.with_item(time: "6:00 PM", title: "CSC 448", meta: "Room 224", tag: "Class", tag_color: :orange) %>
-
-          <% end %>
-        </aside>
-      </div>
-    </div>
+<div
+  class="-mx-6 -my-6 h-full min-h-0 relative"
+  data-controller="drawer agenda-drawer"
+  data-agenda-drawer-url-value="<%= dashboard_agenda_path %>"
+>
+  <div class="flex h-full min-h-0 min-w-0 p-4">
+    <section class="min-w-0 flex-1 min-h-0">
+      <%= render "dashboard/calendar_frame", events: @occurrences, start_date: @start_date %>
+    </section>
   </div>
-
+  <div
+    data-agenda-drawer-target="overlay"
+    data-action="click->agenda-drawer#close"
+    class="absolute inset-0 z-40 bg-black/0 opacity-0 pointer-events-none transition-opacity duration-300">
+  </div>
+  <div
+    data-agenda-drawer-target="panel"
+    role="dialog"
+    aria-modal="true"
+    class="absolute right-4 top-4 bottom-4 z-50 pointer-events-auto
+           overflow-hidden rounded-2xl border border-emerald-900/40
+           bg-zinc-950/40 shadow-2xl
+           translate-x-[120%] transition-transform duration-300 ease-in-out"
+    style="width: 0px;"
+  >
+    <%= turbo_frame_tag "agenda_drawer",
+          class: "block h-full w-full",
+          data: {
+            agenda_drawer_target: "frame",
+            action: "turbo:before-fetch-request->agenda-drawer#showSkeleton turbo:frame-load->agenda-drawer#frameLoaded"
+          } do %>
+    <% end %>
+  </div>
+  <template data-agenda-drawer-target="skeleton">
+    <%= render "dashboard/agenda_drawer_skeleton" %>
+  </template>
   <div
     data-drawer-target="overlay"
     data-action="click->drawer#close"
     class="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
   </div>
-
   <div class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none px-4">
     <div
       data-drawer-target="panel"
@@ -53,8 +47,8 @@
       class="pointer-events-auto w-[min(92vw,42rem)]
              max-h-[85vh] overflow-hidden
              rounded-2xl border border-zinc-800 bg-zinc-950/90 backdrop-blur shadow-2xl
-             translate-x-[110vw] transition-transform duration-300 ease-in-out">
-
+             translate-x-[110vw] transition-transform duration-300 ease-in-out"
+    >
       <%= turbo_frame_tag "event_drawer",
             class: "block h-full",
             data: {
@@ -64,7 +58,6 @@
       <% end %>
     </div>
   </div>
-
   <template data-drawer-target="skeleton">
     <%= render "events/drawer_skeleton" %>
   </template>

@@ -4,6 +4,9 @@
 
 import { application } from "./application"
 
+import AgendaDrawerController from "./agenda_drawer_controller"
+application.register("agenda-drawer", AgendaDrawerController)
+
 import DrawerController from "./drawer_controller"
 application.register("drawer", DrawerController)
 
@@ -15,3 +18,6 @@ application.register("poll-frame", PollFrameController)
 
 import RecurrenceToggleController from "./recurrence_toggle_controller"
 application.register("recurrence-toggle", RecurrenceToggleController)
+
+import SidebarController from "./sidebar_controller"
+application.register("sidebar", SidebarController)

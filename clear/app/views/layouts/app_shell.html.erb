@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html class="h-full">
   <head>
     <title><%= content_for(:title) || "Clear" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -8,55 +8,85 @@
     <meta name="mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
-
     <%= yield :head %>
-
-    <link rel="icon" href="/icon.png" type="image/png">
-    <link rel="icon" href="/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icon.png">
-
+    <%= favicon_link_tag "logo-favicon.png", rel: "icon", type: "image/png" %>
     <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
   </head>
-
-  <body data-theme="green" class="min-h-screen bg-zinc-950 text-zinc-100">
-    <div class="min-h-screen">
-      <%= render Studs::TopBarComponent.new(title: (content_for?(:page_title) ? yield(:page_title) : "Dashboard" ), 
-                                        subtitle: (content_for?(:page_subtitle) ? yield(:page_subtitle) : nil) ) do |t| %>
-        <% t.with_actions do %>
-          <%= render Studs::SearchBarComponent.new(class_name: "w-80", placeholder: "Search…") %>
-        <% end %>
-      <% end %>
-
-      <div class="flex h-[calc(100vh-4rem)]">
-        <%= render Studs::LeftNavComponent.new(
-              brand: nil,
-              items: [
-                { label: "Dashboard", path: "/dashboard", icon_name: "dashboard-circle-stroke-rounded" },
-                {label: "Agenda", path: "/agenda", icon_name: "timeline-event-stroke-rounded"},
-                { label: "Events",    path: "/events",    icon_name: "timeline-event-stroke-rounded" },
-                { label: "Courses",    path: "/courses",    icon_name: "course-stroke-rounded" },
-                { label: "Schedule", path: "/schedule", icon_name: "timeline-event-stroke-rounded"},
-                { label: "UI",        path: "/ui",        icon_name: "search-01-stroke-rounded" },
-                { label: "Syllabus",  path: "/syllabuses",icon_name: "file-01-stroke-rounded" }
-              ],
-              class_name: "h-[calc(100vh-4rem)]"
-            ) %>
-
-        <div class="min-w-0 flex-1">
-          <div class="flex h-full gap-6 px-6 py-6">
-            <main class="min-w-0 flex-1">
-              <% if notice.present? %>
-                <div class="mb-4 rounded-2xl border border-emerald-900 bg-emerald-950/40 px-4 py-3 text-sm text-emerald-200">
-                  <%= notice %>
-                </div>
-              <% end %>
-
-              <%= yield %>
-            </main>
+  <body data-theme="green" class="h-full overflow-hidden bg-zinc-950 text-zinc-100">
+    <div data-controller="sidebar" class="flex h-full min-h-0 overflow-hidden">
+      <aside
+        data-sidebar-target="sidebar"
+        data-collapsed="false"
+        class="group/sidebar flex h-full flex-col overflow-hidden
+               w-64 data-[collapsed=true]:w-16 transition-[width] duration-200
+               border-r border-emerald-900/30 bg-[#15261d]"
+      >
+        <div class="shrink-0 flex items-center gap-3 px-3 py-3">
+          <button
+            type="button"
+            data-action="sidebar#toggle"
+            class="inline-flex h-10 w-10 items-center justify-center rounded-xl
+                  border border-white/10 bg-zinc-950/30 hover:bg-white/5 transition
+                 text-zinc-200 hover:text-zinc-50
+                  [&_svg]:text-current
+                  [&_svg_*]:stroke-current
+                  [&_svg_*]:fill-none"
+            aria-label="Toggle navigation"
+          >
+            <span class="[&>svg]:h-6 [&>svg]:w-6">
+              <%= icon "menu-01-stroke-rounded" %>
+            </span>
+          </button>
+          <div class="min-w-0 group-data-[collapsed=true]/sidebar:hidden">
+            <div class="text-base font-semibold tracking-tight text-zinc-100 truncate">Clear</div>
+            <div class="text-sm text-zinc-300/80 truncate">Navigation</div>
           </div>
         </div>
+        <!-- Sidebar content -->
+        <div class="flex-1 min-h-0 overflow-y-auto">
+          <%= render Studs::LeftNavComponent.new(
+                brand: nil,
+                items: [
+                  { label: "Dashboard", path: "/dashboard", icon_name: "dashboard-circle-stroke-rounded" },
+                  { label: "Agenda",    path: "/agenda",    icon_name: "view-agenda-stroke-rounded" },
+                  { label: "Courses",   path: "/courses",   icon_name: "course-stroke-rounded" },
+                  { label: "Events",    path: "/events",    icon_name: "timeline-event-stroke-rounded" },
+                  { label: "Schedule",  path: "/schedule",  icon_name: "timeline-event-stroke-rounded" },
+                  { label: "Syllabus",  path: "/syllabuses",icon_name: "file-01-stroke-rounded" },
+                  { label: "UI",        path: "/ui",        icon_name: "search-01-stroke-rounded" }
+                ],
+                class_name: "h-full"
+              ) %>
+        </div>
+      </aside>
+      <!-- RIGHT COLUMN (top bar + page content) -->
+      <div class="flex min-w-0 flex-1 flex-col overflow-hidden">
+        <!-- Top bar -->
+        <header class="shrink-0">
+          <%= render Studs::TopBarComponent.new(
+                title: (content_for?(:page_title) ? yield(:page_title) : "Dashboard"),
+                subtitle: (content_for?(:page_subtitle) ? yield(:page_subtitle) : nil)
+              ) do |t| %>
+          <% end %>
+        </header>
+        <!-- Page content -->
+        <main class="min-w-0 min-h-0 flex-1 overflow-y-auto scrollbars">
+          <div class="px-6 py-6">
+            <% if notice.present? %>
+              <div class="mb-4 rounded-2xl border border-emerald-900 bg-emerald-950/40 px-4 py-3 text-sm text-emerald-200">
+                <%= notice %>
+              </div>
+            <% end %>
+            <% if alert.present? %>
+              <div class="mb-4 rounded-2xl border border-rose-900 bg-rose-950/40 px-4 py-3 text-sm text-rose-200">
+                <%= alert %>
+              </div>
+            <% end %>
+            <%= yield %>
+          </div>
+        </main>
       </div>
     </div>
   </body>

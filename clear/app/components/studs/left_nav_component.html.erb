@@ -1,37 +1,49 @@
-<aside class="<%= wrapper_classes %>">
-  <div class="flex h-full flex-col px-3 py-4">
-    <% if @brand.present? %>
-      <div class="mb-4 px-3 text-sm font-semibold text-zinc-100">
-        <%= @brand %>
+<div class="<%= class_names('flex h-full min-h-0 flex-col', @class_name) %>">
+  <nav class="flex-1 min-h-0 p-2 space-y-1">
+    <% @items.each do |item| %>
+      <% active = active_path?(item[:path]) %>
+      <%= link_to item[:path],
+          title: item[:label],
+          aria: (active ? { current: "page" } : {}),
+          class: link_classes(active) do %>
+        <span class="shrink-0 <%= icon_classes(active) %>">
+          <span class="shrink-0 <%= icon_classes(active) %>
+             [&_svg]:text-current
+             [&_svg]:w-6 [&_svg]:h-6
+             [&_svg_*]:stroke-current">
+            <%= helpers.icon item[:icon_name] %>
+          </span>
+        </span>
+        <span class="truncate group-data-[collapsed=true]/sidebar:hidden">
+          <%= item[:label] %>
+        </span>
+      <% end %>
+    <% end %>
+  </nav>
+  <div class="shrink-0 border-t border-white/10 p-2">
+    <% user = (helpers.current_user rescue nil) %>
+    <% if user&.respond_to?(:email) %>
+      <div class="px-3 py-2 text-xs text-zinc-400 group-data-[collapsed=true]/sidebar:hidden">
+        <%= user.email %>
       </div>
     <% end %>
-
-    <nav class="space-y-1">
-      <% @items.each do |item| %>
-        <%= render Studs::LeftNavLinkComponent.new(
-              label: item[:label],
-              path: item[:path],
-              icon_name: item[:icon_name],
-              active: active_item?(item)
-            ) %>
-      <% end %>
-    </nav>
-
-    <% if helpers.user_signed_in? %>
-      <div class="mt-auto pt-4">
-        <div class="border-t border-zinc-800 pt-4">
-          <div class="px-3 pb-2 text-xs text-zinc-400 truncate">
-            <%= helpers.current_user.email %>
-          </div>
-
-          <%= button_to helpers.destroy_user_session_path,
-                method: :delete,
-                data: { turbo: false },
-                class: "w-full rounded-xl border border-zinc-800 bg-zinc-900/40 px-3 py-2 text-sm text-zinc-100 hover:bg-zinc-900 cursor-pointer" do %>
-            Sign out
-          <% end %>
-        </div>
-      </div>
+    <%= button_to destroy_user_session_path,
+    method: :delete,
+    form: { class: "w-full" },
+    title: "Sign out",
+    class: "w-full group flex items-center gap-3 rounded-xl border border-white/10
+            bg-zinc-950/40 px-3 py-2.5 text-base font-medium
+            text-zinc-100 hover:bg-white/5 transition
+            group-data-[collapsed=true]/sidebar:justify-center
+            group-data-[collapsed=true]/sidebar:px-2" do %>
+      <span class="shrink-0 text-zinc-200 hover:text-zinc-50
+               [&_svg]:w-6 [&_svg]:h-6
+               [&_svg]:text-current
+               [&_svg_*]:stroke-current
+               [&_svg_*]:fill-none">
+        <%= helpers.icon "logout-01-stroke-rounded" %>
+      </span>
+      <span class="truncate group-data-[collapsed=true]/sidebar:hidden">Sign out</span>
     <% end %>
   </div>
-</aside>
+</div>
