@@ -6,48 +6,64 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="application-name" content="Clear">
     <meta name="mobile-web-app-capable" content="yes">
-
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
     <%= yield :head %>
-
     <%= favicon_link_tag "logo-favicon.png", rel: "icon", type: "image/png" %>
-
     <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
   </head>
-
   <body data-theme="green" class="h-full overflow-hidden bg-zinc-950 text-zinc-100">
-    <div class="flex h-full min-h-0 flex-col overflow-hidden">
-      <!-- Top bar (fixed height, no guessing with calc) -->
-      <header class="shrink-0">
-        <%= render Studs::TopBarComponent.new(
-              title: (content_for?(:page_title) ? yield(:page_title) : "Dashboard"),
-              subtitle: (content_for?(:page_subtitle) ? yield(:page_subtitle) : nil)
-            ) do |t| %>
-        <% end %>
+    <div data-controller="sidebar" class="flex h-full min-h-0 flex-col overflow-hidden">
+      <!-- Top bar -->
+      <header class="shrink-0 relative">
+        <!-- Hamburger toggle (does not require changing TopBarComponent) -->
+        <button
+          type="button"
+          data-action="sidebar#toggle"
+          class="absolute left-4 top-1/2 -translate-y-1/2 inline-flex h-10 w-10 items-center justify-center
+                 rounded-xl border border-white/10 bg-zinc-950/40 hover:bg-white/5 transition"
+          aria-label="Toggle navigation"
+        >
+          <span class="[&>svg]:h-6 [&>svg]:w-6">
+            <%= icon "menu-01-stroke-rounded" %>
+          </span>
+        </button>
+        <!-- Add left padding so the title doesn't overlap the hamburger -->
+        <div class="pl-16">
+          <%= render Studs::TopBarComponent.new(
+                title: (content_for?(:page_title) ? yield(:page_title) : "Dashboard"),
+                subtitle: (content_for?(:page_subtitle) ? yield(:page_subtitle) : nil)
+              ) do |t| %>
+          <% end %>
+        </div>
       </header>
-
       <!-- App body -->
       <div class="flex min-h-0 flex-1 overflow-hidden">
-        <!-- Left nav -->
-        <aside class="shrink-0 h-full overflow-y-auto">
-          <%= render Studs::LeftNavComponent.new(
-                brand: nil,
-                items: [
-                  { label: "Dashboard", path: "/dashboard", icon_name: "dashboard-circle-stroke-rounded" },
-                  { label: "Agenda",    path: "/agenda",    icon_name: "view-agenda-stroke-rounded" },
-                  { label: "Courses",   path: "/courses",   icon_name: "course-stroke-rounded" },
-                  { label: "Events",    path: "/events",    icon_name: "timeline-event-stroke-rounded" },
-                  { label: "Schedule",  path: "/schedule",  icon_name: "timeline-event-stroke-rounded" },
-                  { label: "Syllabus",  path: "/syllabuses",icon_name: "file-01-stroke-rounded" },
-                  { label: "UI",        path: "/ui",        icon_name: "search-01-stroke-rounded" }
-                ],
-                class_name: "h-full"
-              ) %>
+        <!-- Left nav (collapsible) -->
+        <aside
+          data-sidebar-target="sidebar"
+          data-collapsed="false"
+          class="group/sidebar shrink-0 h-full overflow-hidden border-r border-white/10 bg-zinc-950/40
+                 w-64 data-[collapsed=true]:w-16 transition-[width] duration-200"
+        >
+          <div class="h-full overflow-y-auto">
+            <%= render Studs::LeftNavComponent.new(
+                  brand: nil,
+                  items: [
+                    { label: "Dashboard", path: "/dashboard", icon_name: "dashboard-circle-stroke-rounded" },
+                    { label: "Agenda",    path: "/agenda",    icon_name: "view-agenda-stroke-rounded" },
+                    { label: "Courses",   path: "/courses",   icon_name: "course-stroke-rounded" },
+                    { label: "Events",    path: "/events",    icon_name: "timeline-event-stroke-rounded" },
+                    { label: "Schedule",  path: "/schedule",  icon_name: "timeline-event-stroke-rounded" },
+                    { label: "Syllabus",  path: "/syllabuses",icon_name: "file-01-stroke-rounded" },
+                    { label: "UI",        path: "/ui",        icon_name: "search-01-stroke-rounded" }
+                  ],
+                  class_name: "h-full"
+                ) %>
+          </div>
         </aside>
-
         <main class="min-w-0 min-h-0 flex-1 overflow-y-auto scrollbars">
           <div class="px-6 py-6">
             <% if notice.present? %>
@@ -55,13 +71,11 @@
                 <%= notice %>
               </div>
             <% end %>
-
             <% if alert.present? %>
               <div class="mb-4 rounded-2xl border border-rose-900 bg-rose-950/40 px-4 py-3 text-sm text-rose-200">
                 <%= alert %>
               </div>
             <% end %>
-
             <%= yield %>
           </div>
         </main>

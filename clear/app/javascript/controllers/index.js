@@ -18,3 +18,6 @@ application.register("poll-frame", PollFrameController)
 
 import RecurrenceToggleController from "./recurrence_toggle_controller"
 application.register("recurrence-toggle", RecurrenceToggleController)
+
+import SidebarController from "./sidebar_controller"
+application.register("sidebar", SidebarController)
