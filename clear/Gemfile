@@ -81,3 +81,5 @@ group :test do
 end
 
 gem "view_component", "~> 4.1"
+
+gem "htmlbeautifier", "~> 1.4", group: :development
