@@ -23,9 +23,13 @@
   <div class="shrink-0 border-t border-white/10 p-2">
     <% user = (helpers.current_user rescue nil) %>
     <% if user&.respond_to?(:email) %>
-      <div class="px-3 py-2 text-xs text-zinc-400 group-data-[collapsed=true]/sidebar:hidden">
+      <%= link_to profile_path,
+        class: "px-3 py-2 text-xs text-zinc-400 hover:text-zinc-200
+            transition block
+            group-data-[collapsed=true]/sidebar:hidden 
+            hover:bg-white/5 rounded-lg" do %>
         <%= user.email %>
-      </div>
+      <% end %>
     <% end %>
     <%= button_to destroy_user_session_path,
     method: :delete,
