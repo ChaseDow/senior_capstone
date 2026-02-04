@@ -33,6 +33,7 @@ Rails.application.routes.draw do
   end
 
   get "/dashboard", to: "dashboard#show"
+  get "dashboard/agenda", to: "dashboard#agenda", as: :dashboard_agenda
   get "/ui", to: "ui#show"
   get "/schedule", to: "schedule#week"
   get "/schedule/week", to: "schedule#week"

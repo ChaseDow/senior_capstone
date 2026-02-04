@@ -4,6 +4,9 @@
 
 import { application } from "./application"
 
+import AgendaDrawerController from "./agenda_drawer_controller"
+application.register("agenda-drawer", AgendaDrawerController)
+
 import DrawerController from "./drawer_controller"
 application.register("drawer", DrawerController)
 

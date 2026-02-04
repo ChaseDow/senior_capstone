@@ -1,0 +1,105 @@
+<% occs = Array(occurrences) %>
+<div class="h-full w-full flex flex-col" data-agenda-count="<%= occs.size %>">
+  <div class="bg-[#233a2a]/92 border-b border-emerald-900/35 px-4 py-3">
+    <div class="flex items-center justify-between">
+      <div class="min-w-0">
+        <div class="text-sm font-semibold text-emerald-100">Agenda</div>
+        <div class="mt-0.5 text-xs text-emerald-100/70">
+          <%= date.strftime("%A, %B %-d") %>
+          <% if occs.size.positive? %>
+            • <%= occs.size %> item<%= "s" if occs.size != 1 %>
+          <% end %>
+        </div>
+      </div>
+      <button
+        type="button"
+        class="inline-flex items-center rounded-xl border border-emerald-500/25 bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-100 hover:bg-emerald-500/15"
+        data-action="click->agenda-drawer#close"
+        >
+        Close
+      </button>
+    </div>
+  </div>
+  <div class="flex-1 min-h-0 bg-zinc-950/95">
+    <div class="h-full overflow-auto px-3 py-3">
+      <% if occs.empty? %>
+        <div class="rounded-2xl border border-white/10 bg-zinc-900/40 px-4 py-4 text-sm text-zinc-200">
+          Nothing scheduled.
+        </div>
+      <% else %>
+        <div class="space-y-2">
+          <% occs.each do |o| %>
+            <% record =
+                if o.respond_to?(:event) && o.event.present?
+                  o.event
+                elsif o.respond_to?(:course) && o.course.present?
+                  o.course
+                else
+                  o
+                end
+            %>
+            <% start_at = o.starts_at.in_time_zone %>
+            <% end_at =
+                if o.respond_to?(:ends_at) && o.ends_at.present?
+                  o.ends_at.in_time_zone
+                else
+                  start_at + 1.hour
+                end
+            %>
+            <% is_course = record.respond_to?(:model_name) && record.model_name.singular == "course" %>
+            <% base_bg   = record.respond_to?(:color) && record.color.present? ? record.color : "#34D399" %>
+            <% tint_bg     = rgba(base_bg, 0.14) %>
+            <% tint_hover  = rgba(base_bg, 0.20) %>
+            <% tint_border = rgba(base_bg, 0.35) %>
+            <% tint_bar    = rgba(base_bg, 0.90) %>
+            <% meta =
+                if is_course && record.respond_to?(:professor) && record.professor.present?
+                  record.professor
+                elsif record.respond_to?(:location) && record.location.present?
+                  record.location
+                end
+            %>
+            <div
+              class="rounded-2xl border p-3 transition"
+              style="
+                background-color: <%= tint_bg %>;
+                border-color: <%= tint_border %>;
+                border-left: 6px solid <%= tint_bar %>;
+              "
+              onmouseenter="this.style.backgroundColor='<%= tint_hover %>'"
+              onmouseleave="this.style.backgroundColor='<%= tint_bg %>'"
+            >
+              <div class="flex items-start justify-between gap-3">
+                <div class="min-w-0">
+                  <div class="flex items-center gap-2">
+                    <span class="inline-flex h-2.5 w-2.5 rounded-full" style="background-color:<%= tint_bar %>"></span>
+                    <div class="truncate text-sm font-semibold text-zinc-50">
+                      <%= record.respond_to?(:title) ? (record.title.presence || "(Untitled)") : "(Untitled)" %>
+                    </div>
+                  </div>
+                  <div class="mt-1 text-xs font-medium text-zinc-200/90">
+                    <%= start_at.strftime("%-I:%M %p") %> – <%= end_at.strftime("%-I:%M %p") %>
+                    <span class="mx-1 text-zinc-300/60">•</span>
+                    <%= is_course ? "Course" : "Event" %>
+                  </div>
+                  <% if meta.present? %>
+                    <div class="mt-1 truncate text-xs text-zinc-300/80"><%= meta %></div>
+                  <% end %>
+                </div>
+                <%= link_to "Open",
+                      polymorphic_path(record),
+                      class: "shrink-0 rounded-xl border px-3 py-1.5 text-xs font-semibold text-zinc-50 transition hover:brightness-110",
+                      style: "border-color: #{tint_border}; background-color: #{rgba(base_bg, 0.18)};",
+                      data: {
+                        turbo_frame: "event_drawer",
+                        action: "click->drawer#start click->agenda-drawer#close",
+                        turbo_prefetch: false
+                      } %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
