@@ -28,10 +28,14 @@
       <%= week_start_date.strftime("%B %Y") %>
     </div>
     <nav class="flex items-center gap-2">
+      <%= link_to "Previous", url_for(start_date: prev_start), class: nav_btn %>
+      <%= link_to "Today",    url_for(start_date: today_start), class: nav_btn %>
+      <%= link_to "Next",     url_for(start_date: next_start), class: nav_btn %>
+      <span class="mx-1 h-6 w-px bg-emerald-500/20"></span>
       <button
-  type="button"
-  class="<%= nav_btn %>"
-  data-action="click->agenda-drawer#open"
+    type="button"
+    class="<%= nav_btn %>"
+    data-action="click->agenda-drawer#open"
         data-agenda-drawer-date-param="<%= Date.current.iso8601 %>"
         >
         Agenda
