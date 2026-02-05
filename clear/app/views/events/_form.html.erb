@@ -51,9 +51,16 @@
       </div>
     </div>
 
-    <div>
-      <%= f.label :location, class: label_classes %>
-      <%= f.text_field :location, class: input_classes, placeholder: "e.g. Library, Room 210" %>
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div>
+        <%= f.label :location, class: label_classes %>
+        <%= f.text_field :location, class: input_classes, placeholder: "e.g. Library, Room 210" %>
+        </div>
+
+        <div>
+        <%= f.label :priority, class: label_classes %>
+        <%= f.text_field :priority, class: input_classes, placeholder: "Rank your event's priority with a number" %>
+        </div>
     </div>
 
     <div>

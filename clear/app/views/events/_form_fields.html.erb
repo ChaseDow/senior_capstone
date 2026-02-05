@@ -25,6 +25,11 @@
   </div>
 
   <div>
+    <%= f.label :priority, class: label_classes %>
+    <%= f.text_field :priority, class: input_classes, placeholder: "rank your event's priority with a number" %>
+  </div>
+
+  <div>
     <%= f.label :description, class: label_classes %>
     <%= f.text_area :description, rows: 3, class: input_classes, placeholder: "Optional notes..." %>
   </div>

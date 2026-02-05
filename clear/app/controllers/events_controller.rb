@@ -174,6 +174,7 @@ class EventsController < ApplicationController
       :starts_at,
       :ends_at,
       :location,
+      :priority,
       :description,
       :color,
       :recurring,
