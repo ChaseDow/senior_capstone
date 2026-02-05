@@ -54,9 +54,9 @@
                   { label: "Courses",   path: "/courses",   icon_name: "course-stroke-rounded" },
                   { label: "Events",    path: "/events",    icon_name: "timeline-event-stroke-rounded" },
                   { label: "Schedule",  path: "/schedule",  icon_name: "timeline-event-stroke-rounded" },
-                  { label: "Syllabus",  path: "/syllabuses",icon_name: "file-01-stroke-rounded" },
-                  { label: "UI",        path: "/ui",        icon_name: "search-01-stroke-rounded" }
-                ],
+                  { label: "Syllabus",  path: "/syllabuses",icon_name: "file-01-stroke-rounded" }
+                ]+ 
+                (current_user&.dev_account? ? [{ label: "UI",        path: "/ui",        icon_name: "search-01-stroke-rounded" }] : []),
                 class_name: "h-full"
               ) %>
         </div>
