@@ -34,4 +34,32 @@
   <template data-agenda-drawer-target="skeleton">
     <%= render "dashboard/agenda_drawer_skeleton" %>
   </template>
+  
+  <div
+    data-drawer-target="overlay"
+    data-action="click->drawer#close"
+    class="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
+  </div>
+  <div class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none px-4">
+    <div
+      data-drawer-target="panel"
+      role="dialog"
+      aria-modal="true"
+      class="pointer-events-auto w-[min(92vw,42rem)]
+             max-h-[85vh] overflow-hidden
+             rounded-2xl border border-zinc-800 bg-zinc-950/90 backdrop-blur shadow-2xl
+             translate-x-[110vw] transition-transform duration-300 ease-in-out"
+    >
+      <%= turbo_frame_tag "event_drawer",
+            class: "block h-full",
+            data: {
+              drawer_target: "frame",
+              action: "turbo:before-fetch-request->drawer#showSkeleton turbo:frame-load->drawer#frameLoaded turbo:submit-end->drawer#submitEnded"
+            } do %>
+      <% end %>
+    </div>
+  </div>
+  <template data-drawer-target="skeleton">
+    <%= render "events/drawer_skeleton" %>
+  </template>
 </div>
