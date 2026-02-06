@@ -24,6 +24,7 @@
     <% user = (helpers.current_user rescue nil) %>
     <% if user&.respond_to?(:email) %>
       <%= link_to profile_path,
+        data: {turbo_frame: "event_drawer", turbo_prefetch: false},
         class: "px-3 py-2 text-xs text-zinc-400 hover:text-zinc-200
             transition block
             group-data-[collapsed=true]/sidebar:hidden 

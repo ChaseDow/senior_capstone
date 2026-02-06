@@ -15,7 +15,7 @@
     <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
   </head>
   <body data-theme="green" class="h-full overflow-hidden bg-zinc-950 text-zinc-100">
-    <div data-controller="sidebar" class="flex h-full min-h-0 overflow-hidden">
+    <div data-controller="sidebar drawer" class="flex h-full min-h-0 overflow-hidden">
       <aside
         data-sidebar-target="sidebar"
         data-collapsed="false"
@@ -48,7 +48,7 @@
         <div class="flex-1 min-h-0 overflow-y-auto">
           <%= render Studs::LeftNavComponent.new(
                 brand: nil,
-                items: [
+                items: ([
                   { label: "Dashboard", path: "/dashboard", icon_name: "dashboard-circle-stroke-rounded" },
                   { label: "Agenda",    path: "/agenda",    icon_name: "view-agenda-stroke-rounded" },
                   { label: "Courses",   path: "/courses",   icon_name: "course-stroke-rounded" },
@@ -56,7 +56,7 @@
                   { label: "Schedule",  path: "/schedule",  icon_name: "timeline-event-stroke-rounded" },
                   { label: "Syllabus",  path: "/syllabuses",icon_name: "file-01-stroke-rounded" }
                 ]+ 
-                (current_user&.dev_account? ? [{ label: "UI",        path: "/ui",        icon_name: "search-01-stroke-rounded" }] : []),
+                (current_user&.dev_account? ? [{ label: "UI",        path: "/ui",        icon_name: "search-01-stroke-rounded" }] : [])),
                 class_name: "h-full"
               ) %>
         </div>
@@ -88,6 +88,38 @@
           </div>
         </main>
       </div>
+      <!-- Event Drawer Overlay -->
+      <div
+        data-drawer-target="overlay"
+        data-action="click->drawer#close"
+        class="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
+      </div>
+
+      <!-- Event Drawer Panel -->
+      <div class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none px-4">
+        <div
+          data-drawer-target="panel"
+          role="dialog"
+          aria-modal="true"
+          class="pointer-events-auto w-[min(92vw,64rem)]
+                max-h-[85vh] overflow-hidden
+                rounded-2xl border border-zinc-800 bg-zinc-950/90 backdrop-blur shadow-2xl
+                translate-x-[110vw] transition-transform duration-300 ease-in-out">
+          <%= turbo_frame_tag "event_drawer",
+                class: "block h-full",
+                data: {
+                  drawer_target: "frame",
+                  action: "turbo:before-fetch-request->drawer#showSkeleton turbo:frame-load->drawer#frameLoaded turbo:submit-end->drawer#submitEnded"
+                } do %>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Event Drawer Skeleton -->
+      <template data-drawer-target="skeleton">
+        <%= render "events/drawer_skeleton" %>
+      </template>
     </div>
+
   </body>
 </html>
