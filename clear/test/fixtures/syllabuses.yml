@@ -5,10 +5,13 @@
 # below each fixture, per the syntax in the comments below
 #
 one:
-  title: Syllabus One
   user: one
+  title: "CSC Capstone Syllabus"
+  course_draft: {}
 
 two:
-  title: Syllabus Two
   user: two
+  title: "Math Syllabus"
+  course_draft: {}
+
 
