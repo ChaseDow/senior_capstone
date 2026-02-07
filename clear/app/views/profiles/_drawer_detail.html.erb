@@ -1,5 +1,10 @@
 <%= turbo_frame_tag "event_drawer" do %>
   <div class="flex max-h-[85vh] flex-col">
+    <% if flash.now[:notice].present? %>
+      <div class="mb-3 rounded-xl border border-emerald-900/40 bg-emerald-950/30 p-3 text-sm text-emerald-200">
+        <%= flash.now[:notice] %>
+      </div>
+    <% end %> 
 
     <!-- Header -->
     <div class="flex items-start justify-between border-b border-zinc-800 bg-zinc-950/50 px-6 py-4">
@@ -102,10 +107,14 @@
                       <span id="icon-show">
                         <%= icon "eye-stroke-rounded", class: "h-5 w-5 text-emerald-500/40" %>
                       </span>
+
+                      <span id="icon-hide" class="hidden">
+                        <%= icon "view-off-slash-stroke-rounded", class: "h-5 w-5 text-emerald-500/40" %>
+                      </span>  
                     </button>
                   </div>
                 <div class="flex flex-wrap gap-2">
-                  <%= link_to edit_profile_path,
+                  <%= link_to edit_password_profile_path,
                         data: { turbo_frame: "event_drawer", turbo_prefetch: false } do %>
                     <%= render Studs::PrimaryButtonComponent.new(label: "Change password", color: :emerald) %>
                   <% end %>
