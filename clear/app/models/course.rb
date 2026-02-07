@@ -142,4 +142,12 @@ class Course < ApplicationRecord
     c = channel / 255.0
     c <= 0.03928 ? (c / 12.92) : (((c + 0.055) / 1.055)**2.4)
   end
+
+  def self.ransackable_attributes(auth_object = nil)
+    ["code", "color", "created_at", "description", "end_date", "end_time", "instructor", "location", "meeting_days", "professor", "recurring", "repeat_days", "repeat_until", "start_date", "start_time", "term", "title", "updated_at"]
+  end
+
+  def self.ransackable_associations(auth_object = nil)
+    []
+  end
 end

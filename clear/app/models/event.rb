@@ -103,4 +103,12 @@ class Event < ApplicationRecord
     c = channel_0_255 / 255.0
     c <= 0.03928 ? (c / 12.92) : (((c + 0.055) / 1.055)**2.4)
   end
+
+  def self.ransackable_attributes(auth_object = nil)
+    ["color", "created_at", "description", "ends_at", "location", "recurring", "repeat_days", "repeat_until", "starts_at", "title", "updated_at"]
+  end
+
+  def self.ransackable_associations(auth_object = nil)
+    []
+  end
 end

@@ -1,20 +1,96 @@
 <% content_for :page_title, "Agenda" %>
-<% content_for :page_subtitle, "Today's Agenda"%>
+<% content_for :page_subtitle, "Upcoming tasks" %>
 
-<div class="mt-4 overflow-hidden rounded-2xl border border-emerald-900/30 bg-emerald-950/10">
-  <aside class="w-wd shrink-0">
-    <%= render Studs::AgendaComponent.new(mode: :panel) do |a| %>
-      <% if @agenda.any? %>
-        <% @agenda.each do |agenda| %>
-          <% if agenda[:type] == "Event" %>
-            <% a.with_item(time: agenda[:time], title: agenda[:item].title, meta: agenda[:item].location, tag: "Event", tag_color: :orange) %>
-          <% elsif agenda[:type] == "Course" %>
-            <% a.with_item(time: agenda[:time], title: agenda[:item].title, meta: agenda[:item].location, tag: "Course", tag_color: :blue) %>
-          <% end %>
-        <% end %>
+<div class="space-y-6">
+  <%= form_with url: agenda_index_path, method: :get, local: true, html: { class: "space-y-3" } do |f| %>
+    <div class="flex items-center gap-3">
+      <div class="flex-1">
+        <%= render Studs::SearchBarComponent.new(
+          name: "q[term]",
+          value: params.dig(:q, :term),
+          placeholder: "Search by description or location…",
+          class_name: "w-full"
+        ) %>
+      </div>
+
+      <div class="w-36">
+        <%= f.select :type,
+          options_for_select(
+            [["All Types", ""], ["Events", "event"], ["Courses", "course"]],
+            params[:type]
+          ),
+          {},
+          class: "w-full rounded-xl border border-zinc-800 bg-zinc-900/50 px-3 py-2 text-sm text-zinc-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-400/40" %>
+      </div>
+
+      <div class="w-40 relative">
+        <%= f.date_field :start_date,
+          value: params[:start_date],
+          class: "w-full h-[38px] rounded-xl border border-zinc-800 bg-zinc-900/50 px-3 py-2 text-sm text-zinc-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-400/40" %>
+        <span class="pointer-events-none absolute left-3 top-2 text-[11px] font-medium text-zinc-400">
+          Starting date
+        </span>
+      </div>
+
+      <div class="w-40 relative">
+        <%= f.date_field :end_date,
+          value: params[:end_date],
+          class: "w-full h-[38px] rounded-xl border border-zinc-800 bg-zinc-900/50 px-3 py-2 text-sm text-zinc-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-400/40" %>
+        <span class="pointer-events-none absolute left-3 top-2 text-[11px] font-medium text-zinc-400">
+          Ending date
+        </span>
+      </div>
+
+      <%= f.submit "Search",
+        class: "rounded-xl bg-green-600 px-5 py-2 text-sm font-medium text-white hover:bg-green-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-400/40 transition" %>
+
+      <% show_clear = params.dig(:q, :term).present? || params[:start_date].present? || params[:end_date].present? || params[:type].present? %>
+      <% if show_clear %>
+        <%= link_to "Clear",
+          agenda_index_path,
+          class: "inline-block rounded-xl border border-zinc-800 bg-zinc-900/50 px-4 py-2 text-sm font-medium text-zinc-300 hover:bg-zinc-800/50 focus:outline-none transition" %>
       <% end %>
+    </div>
+  <% end %>
+
+  <% dates = @date_range.presence || [(@target_date || Date.today)] %>
+
+  <% dates.each do |date| %>
+    <% entries = (@agenda_by_date && @agenda_by_date[date]) || [] %>
+
+    <%= render Studs::AgendaComponent.new(
+      title: "Agenda",
+      subtitle: (date == Date.today) ? "Today, #{date.strftime('%B %d')}" : date.strftime('%A, %B %d, %Y'),
+      mode: :panel,
+      empty_message: "Nothing scheduled for this day."
+    ) do |agenda| %>
+
+      <% entries.each do |entry| %>
+        <%
+          meta_bits = []
+          meta_bits << entry[:location] if entry[:location].present?
+
+          if entry[:type] == "Course"
+            meta_bits << entry[:professor] if entry[:professor].present?
+          end
+
+          meta = meta_bits.any? ? meta_bits.join(" • ") : nil
+
+          is_course = (entry[:type] == "Course")
+          tag_color = is_course ? :emerald : :blue
+          href      = is_course ? course_path(entry[:item]) : event_path(entry[:item])
+        %>
+
+        <% agenda.with_item(
+          time: entry[:time],
+          title: entry[:title],
+          tag: entry[:type],
+          tag_color: tag_color,
+          meta: meta,
+          href: href
+        ) %>
+      <% end %>
+
     <% end %>
-  </aside>
+  <% end %>
 </div>
-
-
