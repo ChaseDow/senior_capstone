@@ -79,7 +79,6 @@
 
           is_course = (entry[:type] == "Course")
           tag_color = is_course ? :emerald : :blue
-          href = polymorphic_path(entry[:item], start_date: params[:start_date])
         %>
 
         <% agenda.with_item(
@@ -88,13 +87,10 @@
           tag: entry[:type],
           tag_color: tag_color,
           meta: meta,
-          href: href,
-          #data: { turbo_frame: "event_drawer", turbo_prefetch: false }
         ) %>
       <% end %>
 
     <% end %>
   <% end %>
 
-  #<%= turbo_frame_tag "event_drawer" %>
 </div>
