@@ -1,6 +1,9 @@
 Rails.application.routes.draw do
   devise_for :users
-  resource :profile, only: [ :show, :edit, :update ]
+  resource :profile, only: [ :show, :edit, :update ] do
+    get :edit_password
+    patch :update_password
+  end
   resources :events
   resources :courses
   resources :agenda
