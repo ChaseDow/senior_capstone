@@ -3,30 +3,15 @@ class AgendaController < ApplicationController
   before_action :authenticate_user!
 
   def index
-    @target_date =
-      begin
-        params[:date].present? ? Date.parse(params[:date]) : Date.current
-      rescue ArgumentError
-        Date.current
-      end
-
-    start_date =
-      begin
-        params[:start_date].present? ? Date.parse(params[:start_date]) : @target_date
-      rescue ArgumentError
-        @target_date
-      end
-
-    end_date =
-      begin
-        params[:end_date].present? ? Date.parse(params[:end_date]) : start_date
-      rescue ArgumentError
-        start_date
-      end
+    @target_date = params[:date].present? ? Date.parse(params[:date]) : Date.current
+   
+    start_date = params[:start_date].present? ? Date.parse(params[:start_date]) : @target_date
+    end_date = params[:end_date].present? ? Date.parse(params[:end_date]) : start_date
 
     if end_date < start_date
       flash.now[:alert] = "End date must be on or after the start date"
       end_date = start_date
+      start_date = end_date
     end
 
     @date_range = start_date..end_date
@@ -74,6 +59,7 @@ class AgendaController < ApplicationController
     event_occurrences + course_occurrences
   end
 
+  # helper function for 
   def agenda_entry_for(occ)
     item =
       if occ.respond_to?(:item)
