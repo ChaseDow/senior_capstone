@@ -28,6 +28,24 @@ class AgendaController < ApplicationController
         .transform_values { |occs| occs.map { |occ| agenda_entry_for(occ) } }
 
     @type_param = params[:type]
+
+    per_page = 10
+
+    @page = params[:page].to_i
+    @page = 1 if @page < 1
+
+    all_entries = @agenda_by_date.values.flatten.sort_by { |e| e[:time_sortable] }
+
+    @total_pages = (all_entries.length.to_f / per_page).ceil
+    @total_pages = 1 if @total_pages < 1
+    @page = @total_pages if @page > @total_pages
+
+    page_entries = all_entries.slice((@page - 1) * per_page, per_page) || []
+
+    @paged_agenda_by_date = page_entries.group_by do |entry|
+      entry[:time_sortable].to_date
+end
+
   end
 
   private
