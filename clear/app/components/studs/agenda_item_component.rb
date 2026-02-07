@@ -10,7 +10,7 @@ module Studs
       red:     "bg-red-500/10 text-red-200 border-red-500/20"
     }.freeze
 
-    def initialize(time:, title:, meta: nil, href: nil, tag: nil, tag_color: :zinc, icon_name: nil, class_name: nil)
+    def initialize(time:, title:, meta: nil, href: nil, tag: nil, tag_color: :zinc, icon_name: nil, class_name: nil, **attrs)
       @time = time
       @title = title
       @meta = meta
@@ -19,6 +19,7 @@ module Studs
       @tag_color = TAG_COLORS.key?(tag_color) ? tag_color : :zinc
       @icon_name = icon_name
       @class_name = class_name
+      @attrs = attrs
     end
 
     def wrapper_tag = @href.present? ? :a : :div
@@ -31,7 +32,7 @@ module Studs
           @href.present? ? "cursor-pointer" : nil,
           @class_name
         ].compact.join(" ")
-      }
+      }.merge(@attrs)
 
       @href.present? ? base.merge(href: @href) : base
     end
