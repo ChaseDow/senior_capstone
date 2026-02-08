@@ -1,17 +1,28 @@
 class AgendaController < ApplicationController
   layout "app_shell"
   before_action :authenticate_user!
+  include Pagy::Method
 
   def index
     @target_date = params[:date].present? ? Date.parse(params[:date]) : Date.current
-   
-    start_date = params[:start_date].present? ? Date.parse(params[:start_date]) : @target_date
-    end_date = params[:end_date].present? ? Date.parse(params[:end_date]) : start_date
+
+    start_date =
+      if params[:start_date].present?
+        Date.parse(params[:start_date])
+      else
+        @target_date
+      end
+
+    end_date =
+      if params[:end_date].present?
+        Date.parse(params[:end_date])
+      else
+        start_date
+      end
 
     if end_date < start_date
       flash.now[:alert] = "End date must be on or after the start date"
       end_date = start_date
-      start_date = end_date
     end
 
     @date_range = start_date..end_date
@@ -21,31 +32,17 @@ class AgendaController < ApplicationController
 
     occurrences = occurrences_for_range(range_start, range_end)
 
-    @agenda_by_date =
-      occurrences
-        .sort_by(&:starts_at)
-        .group_by { |occ| occ.starts_at.to_date }
-        .transform_values { |occs| occs.map { |occ| agenda_entry_for(occ) } }
+    agenda_by_date = occurrences.sort_by(&:starts_at)
+                                .group_by { |occ| occ.starts_at.to_date }
+                                .transform_values { |occs| occs.map { |occ| agenda_entry_for(occ) } }
 
     @type_param = params[:type]
 
-    per_page = 10
+    all_entries = agenda_by_date.values.flatten.sort_by { |e| e[:time_sortable] }
 
-    @page = params[:page].to_i
-    @page = 1 if @page < 1
+    @pagy, page_entries = pagy(:offset, all_entries, limit: 10)
 
-    all_entries = @agenda_by_date.values.flatten.sort_by { |e| e[:time_sortable] }
-
-    @total_pages = (all_entries.length.to_f / per_page).ceil
-    @total_pages = 1 if @total_pages < 1
-    @page = @total_pages if @page > @total_pages
-
-    page_entries = all_entries.slice((@page - 1) * per_page, per_page) || []
-
-    @paged_agenda_by_date = page_entries.group_by do |entry|
-      entry[:time_sortable].to_date
-end
-
+    @paged_agenda_by_date = page_entries.group_by { |entry| entry[:time_sortable].to_date }
   end
 
   private
@@ -54,19 +51,24 @@ end
     term = params.dig(:q, :term).to_s.strip
     type = params[:type].to_s
 
-    events =
-      current_user.events
-        .ransack(term.present? ? { title_or_description_or_location_cont: term } : {})
-        .result
-        .where("starts_at <= ?", range_end)
-        .where("recurring = FALSE OR repeat_until >= ?", range_start.to_date)
+    base_events = current_user.events
+                              .ransack(term.present? ? { title_or_description_or_location_cont: term } : {})
+                              .result
 
-    courses =
-      current_user.courses
-        .ransack(term.present? ? { title_or_description_or_location_cont: term } : {})
-        .result
-        .where("start_date <= ?", range_end.to_date)
-        .where("end_date IS NULL OR end_date >= ?", range_start.to_date)
+    non_recurring_events = base_events.where(recurring: false) 
+                                      .where(starts_at: range_start..range_end)
+
+    recurring_events = base_events.where(recurring: true)
+                                  .where("starts_at <= ?", range_end)
+                                  .where("repeat_until >= ?", range_start.to_date)
+
+    events = non_recurring_events + recurring_events
+
+    courses = current_user.courses
+                          .ransack(term.present? ? { title_or_description_or_location_cont: term } : {})
+                          .result
+                          .where("start_date <= ?", range_end.to_date)
+                          .where("end_date IS NULL OR end_date >= ?", range_start.to_date)
 
     event_occurrences =
       type == "course" ? [] : events.flat_map { |e| e.occurrences_between(range_start, range_end) }
@@ -77,7 +79,6 @@ end
     event_occurrences + course_occurrences
   end
 
-  # helper function for 
   def agenda_entry_for(occ)
     item =
       if occ.respond_to?(:item)
@@ -101,4 +102,5 @@ end
       professor: is_course ? item&.professor : nil,
     }
   end
+
 end

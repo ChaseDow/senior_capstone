@@ -23,22 +23,20 @@
           class: "w-full rounded-xl border border-zinc-800 bg-zinc-900/50 px-3 py-2 text-sm text-zinc-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-400/40" %>
       </div>
 
-      <div class="w-40 relative">
+      <div class="flex items-center gap-2">
         <%= f.date_field :start_date,
           value: params[:start_date],
-          class: "w-full h-[38px] rounded-xl border border-zinc-800 bg-zinc-900/50 px-3 py-2 text-sm text-zinc-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-400/40" %>
-        <span class="pointer-events-none absolute left-3 top-2 text-[11px] font-medium text-zinc-400">
-          Starting date
-        </span>
-      </div>
+          placeholder: "Start",
+          class: "h-[38px] w-36 rounded-xl border border-zinc-800 bg-zinc-900/50 px-3 py-2 text-sm text-zinc-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-400/40" %>
 
-      <div class="w-40 relative">
+        <span class="text-sm text-zinc-500 font-medium select-none">
+          :
+        </span>
+
         <%= f.date_field :end_date,
           value: params[:end_date],
-          class: "w-full h-[38px] rounded-xl border border-zinc-800 bg-zinc-900/50 px-3 py-2 text-sm text-zinc-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-400/40" %>
-        <span class="pointer-events-none absolute left-3 top-2 text-[11px] font-medium text-zinc-400">
-          Ending date
-        </span>
+          placeholder: "End",
+          class: "h-[38px] w-36 rounded-xl border border-zinc-800 bg-zinc-900/50 px-3 py-2 text-sm text-zinc-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-400/40" %>
       </div>
 
       <%= f.submit "Search",
@@ -53,10 +51,10 @@
     </div>
   <% end %>
 
-  <% dates = @date_range.presence || [(@target_date || Date.today)] %>
+  <% dates = (@paged_agenda_by_date || {}).keys.sort %>
 
   <% dates.each do |date| %>
-    <% entries = (@agenda_by_date && @agenda_by_date[date]) || [] %>
+    <% entries = @paged_agenda_by_date[date] || [] %>
     <% next if entries.empty? %>
 
     <%= render Studs::AgendaComponent.new(
@@ -91,6 +89,54 @@
       <% end %>
 
     <% end %>
+  <% end %>
+
+  <% if @pagy&.pages.to_i > 1 %>
+    <% per_chunk = 10 %>
+    <% pages = @pagy.pages %>
+    <% page  = @pagy.page %>
+
+    <% chunk_index = (page - 1) / per_chunk %>
+    <% chunk_start = (chunk_index * per_chunk) + 1 %>
+    <% chunk_end   = [chunk_start + per_chunk - 1, pages].min %>
+
+    <% prev_page  = page > 1 ? page - 1 : nil %>
+    <% next_page  = page < pages ? page + 1 : nil %>
+
+    <% prev_chunk_page = chunk_start > 1 ? (chunk_start - 1) : nil %>
+    <% next_chunk_page = chunk_end < pages ? (chunk_end + 1) : nil %>
+
+    <div class="pt-6 flex items-center justify-center gap-2">
+
+      <%= link_to "Prev",
+        (prev_page ? agenda_page_url(prev_page) : "#"),
+        class: [
+          "rounded-xl border border-zinc-800 bg-zinc-900/50 px-4 py-2 text-sm font-medium transition",
+          prev_page ? "text-zinc-200 hover:bg-zinc-800/50" : "text-zinc-600 cursor-not-allowed pointer-events-none"
+        ].join(" ") %>
+
+      <% (chunk_start..chunk_end).each do |p| %>
+        <% is_current = (p == page) %>
+        <%= link_to p, agenda_page_url(p),
+          class: [
+            "rounded-xl border px-3 py-2 text-sm font-medium transition",
+            is_current ?
+              "border-green-500/40 bg-green-600/20 text-green-200" :
+              "border-zinc-800 bg-zinc-900/50 text-zinc-200 hover:bg-zinc-800/50"
+          ].join(" ") %>
+      <% end %>
+
+      <%= link_to "Next",
+        (next_page ? agenda_page_url(next_page) : "#"),
+        class: [
+          "rounded-xl border border-zinc-800 bg-zinc-900/50 px-4 py-2 text-sm font-medium transition",
+          next_page ? "text-zinc-200 hover:bg-zinc-800/50" : "text-zinc-600 cursor-not-allowed pointer-events-none"
+        ].join(" ") %>
+    </div>
+
+    <div class="pt-2 text-center text-xs text-zinc-500">
+      Pages <%= chunk_start %>–<%= chunk_end %> of <%= pages %>
+    </div>
   <% end %>
 
 </div>
