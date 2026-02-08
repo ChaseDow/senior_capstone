@@ -51,6 +51,7 @@ export default class extends Controller {
     window.setTimeout(() => {
         this.panelTarget.style.width = "0px";
     }, 300);
+    window.dispatchEvent(new CustomEvent("agenda:clear"))
     }
 
 
