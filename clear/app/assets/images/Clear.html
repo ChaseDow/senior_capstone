@@ -1,0 +1,116 @@
+<!-- BEGIN app/views/layouts/application.html.erb
+-->
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8"><style type="text/css">.turbo-progress-bar {
+  position: fixed;
+  display: block;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: #0076ff;
+  z-index: 2147483647;
+  transition:
+    width 300ms ease-out,
+    opacity 150ms 150ms ease-in;
+  transform: translate3d(0, 0, 0);
+}
+</style>
+    <title>Clear</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Clear">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="csrf-param" content="authenticity_token">
+<meta name="csrf-token" content="_rFI28tVWEIGhlLI_e5LNEa4eLQ2zfcW1mpDZeJCA_LEiClGQvOv7iSlR3HSJJTUxuXBYY-un767Ka-5y_7gbQ">
+    
+
+    
+    
+    <link rel="icon" type="image/png" href="http://127.0.0.1:3000/assets/logo-favicon-53b6bbd0.png">
+
+    <link rel="stylesheet" href="Clear_files/tailwind-b761b4ef.css" data-turbo-track="reload">
+    <link rel="stylesheet" href="Clear_files/application-78c077b9.css" data-turbo-track="reload">
+    <script src="Clear_files/application-37c08717.js" data-turbo-track="reload" type="module"></script>
+  </head>
+
+
+
+  <body class="min-h-screen bg-zinc-950 text-zinc-100">
+
+      <!-- Public aurora background -->
+      <div class="aurora pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+        <div class="aurora__gradient"></div>
+        <div class="aurora__orb aurora__orb--1"></div>
+        <div class="aurora__orb aurora__orb--2"></div>
+        <div class="aurora__orb aurora__orb--3"></div>
+        <div class="aurora__vignette"></div>
+      </div>
+
+      <header class="border-b border-zinc-800/80 bg-zinc-950/60 backdrop-blur">
+        
+        <div class="flex w-full items-center justify-between px-4 py-5">
+          <a class="flex items-center gap-2" href="http://127.0.0.1:3000/">
+            <img alt="Clear" class="h-6 w-auto" src="Clear_files/Logo-618ec5e1.png">
+            <span class="text-sm font-semibold tracking-wide text-zinc-100">Clear</span>
+</a>          
+        </div>
+      </header>
+
+
+    <!-- BEGIN app/views/home/index.html.erb
+--><div class="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-6xl items-center px-6 py-12">
+  <div class="grid w-full grid-cols-1 gap-10 md:grid-cols-2">
+    <div class="space-y-6">
+      <div class="inline-flex items-center gap-2 rounded-full border border-zinc-800 bg-zinc-900/40 px-3 py-1 text-xs text-zinc-300">
+        <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
+        Planner + dashboard foundation
+      </div>
+
+      <h1 class="text-4xl font-semibold tracking-tight text-zinc-50 sm:text-5xl">
+        Clear
+      </h1>
+
+      <p class="text-base leading-relaxed text-zinc-300">
+        A clean, fast dashboard for your schedule, events, and life. Sign in to continue or create an account in seconds.
+      </p>
+
+      <div class="flex flex-wrap items-center gap-3">
+          <a data-turbo="false" class="rounded-xl bg-emerald-500 px-4 py-2 text-sm font-medium text-zinc-950 hover:bg-emerald-400" href="http://127.0.0.1:3000/users/sign_up">Create account</a>
+
+          <a data-turbo="false" class="rounded-xl border border-zinc-800 bg-zinc-900/40 px-4 py-2 text-sm text-zinc-100 hover:bg-zinc-900" href="http://127.0.0.1:3000/users/sign_in">Sign in</a>
+      </div>
+
+      <div class="grid grid-cols-1 gap-3 pt-4 sm:grid-cols-2">
+        <div class="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-4">
+          <div class="text-sm font-medium text-zinc-100">Simple</div>
+          <div class="mt-1 text-sm text-zinc-400">No clutter. Just what you need.</div>
+        </div>
+        <div class="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-4">
+          <div class="text-sm font-medium text-zinc-100">Secure</div>
+          <div class="mt-1 text-sm text-zinc-400">Devise auth + reset flow.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hidden md:block">
+      <div class="rounded-3xl border border-zinc-800 bg-gradient-to-b from-zinc-900/40 to-zinc-950 p-6">
+        <div class="rounded-2xl border border-zinc-800 bg-zinc-950/60 p-6">
+          <div class="text-sm font-medium text-zinc-100">Preview</div>
+
+          <div class="mt-2 space-y-3">
+            <img alt="Description of the GIF" src="Clear_files/Preview-1817b2aa.gif">
+          </div>
+          <div class="mt-4 text-xs text-zinc-500">
+            Your real dashboard lives behind login.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- END app/views/home/index.html.erb -->
+  
+
+</body></html>
+<!-- END app/views/layouts/application.html.erb -->
