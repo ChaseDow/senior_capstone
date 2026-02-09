@@ -1,5 +1,28 @@
 <% occs = Array(occurrences) %>
-<div class="h-full w-full flex flex-col" data-agenda-count="<%= occs.size %>">
+
+<style>
+  [data-agenda-item-card] {
+    background-color: var(--bg-normal);
+    transition:
+      background-color 0.15s ease,
+      box-shadow 0.15s ease,
+      transform 0.15s ease;
+  }
+
+  [data-agenda-item-card]:hover {
+    background-color: var(--bg-hover);
+  }
+
+  [data-agenda-item-card].is-selected {
+    background-color: var(--bg-hover);
+    transform: translateX(10px);
+  }
+</style>
+
+<div class="h-full w-full flex flex-col"
+     data-controller="agenda-highlight"
+     data-agenda-count="<%= occs.size %>">
+
   <div class="bg-[#233a2a]/92 border-b border-emerald-900/35 px-4 py-3">
     <div class="flex items-center justify-between">
       <div class="min-w-0">
@@ -11,15 +34,17 @@
           <% end %>
         </div>
       </div>
+
       <button
         type="button"
         class="inline-flex items-center rounded-xl border border-emerald-500/25 bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-100 hover:bg-emerald-500/15"
-        data-action="click->agenda-drawer#close"
-        >
+        data-action="click->agenda-highlight#clear click->agenda-drawer#close"
+      >
         Close
       </button>
     </div>
   </div>
+
   <div class="flex-1 min-h-0 bg-zinc-950/95">
     <div class="h-full overflow-auto px-3 py-3">
       <% if occs.empty? %>
@@ -30,44 +55,59 @@
         <div class="space-y-2">
           <% occs.each do |o| %>
             <% record =
-                if o.respond_to?(:event) && o.event.present?
-                  o.event
-                elsif o.respond_to?(:course) && o.course.present?
-                  o.course
-                else
-                  o
-                end
+              if o.respond_to?(:event) && o.event.present?
+                o.event
+              elsif o.respond_to?(:course) && o.course.present?
+                o.course
+              else
+                o
+              end
             %>
+
             <% start_at = o.starts_at.in_time_zone %>
             <% end_at =
-                if o.respond_to?(:ends_at) && o.ends_at.present?
-                  o.ends_at.in_time_zone
-                else
-                  start_at + 1.hour
-                end
+              if o.respond_to?(:ends_at) && o.ends_at.present?
+                o.ends_at.in_time_zone
+              else
+                start_at + 1.hour
+              end
             %>
+
             <% is_course = record.respond_to?(:model_name) && record.model_name.singular == "course" %>
             <% base_bg   = record.respond_to?(:color) && record.color.present? ? record.color : "#34D399" %>
             <% tint_bg     = rgba(base_bg, 0.14) %>
             <% tint_hover  = rgba(base_bg, 0.20) %>
             <% tint_border = rgba(base_bg, 0.35) %>
             <% tint_bar    = rgba(base_bg, 0.90) %>
+
             <% meta =
-                if is_course && record.respond_to?(:professor) && record.professor.present?
-                  record.professor
-                elsif record.respond_to?(:location) && record.location.present?
-                  record.location
-                end
+              if is_course && record.respond_to?(:professor) && record.professor.present?
+                record.professor
+              elsif record.respond_to?(:location) && record.location.present?
+                record.location
+              end
             %>
+
+            <% highlight_id =
+              if record.respond_to?(:model_name) && record.id.present?
+                "#{record.model_name.singular}-#{record.id}-#{start_at.to_date.iso8601}"
+              else
+                "occ-#{o.object_id}-#{start_at.to_date.iso8601}"
+              end
+            %>
+
             <div
-              class="rounded-2xl border p-3 transition"
+              id="agenda-item-<%= highlight_id %>"
+              data-agenda-item-card
+              class="rounded-2xl border p-3 transition cursor-pointer"
+              data-action="click->agenda-highlight#selectFromAgenda"
+              data-agenda-id="<%= highlight_id %>"
               style="
-                background-color: <%= tint_bg %>;
+                --bg-normal: <%= tint_bg %>;
+                --bg-hover: <%= tint_hover %>;
                 border-color: <%= tint_border %>;
                 border-left: 6px solid <%= tint_bar %>;
               "
-              onmouseenter="this.style.backgroundColor='<%= tint_hover %>'"
-              onmouseleave="this.style.backgroundColor='<%= tint_bg %>'"
             >
               <div class="flex items-start justify-between gap-3">
                 <div class="min-w-0">
@@ -77,24 +117,27 @@
                       <%= record.respond_to?(:title) ? (record.title.presence || "(Untitled)") : "(Untitled)" %>
                     </div>
                   </div>
+
                   <div class="mt-1 text-xs font-medium text-zinc-200/90">
                     <%= start_at.strftime("%-I:%M %p") %> – <%= end_at.strftime("%-I:%M %p") %>
                     <span class="mx-1 text-zinc-300/60">•</span>
                     <%= is_course ? "Course" : "Event" %>
                   </div>
+
                   <% if meta.present? %>
                     <div class="mt-1 truncate text-xs text-zinc-300/80"><%= meta %></div>
                   <% end %>
                 </div>
+
                 <%= link_to "Open",
-                      polymorphic_path(record),
-                      class: "shrink-0 rounded-xl border px-3 py-1.5 text-xs font-semibold text-zinc-50 transition hover:brightness-110",
-                      style: "border-color: #{tint_border}; background-color: #{rgba(base_bg, 0.18)};",
-                      data: {
-                        turbo_frame: "event_drawer",
-                        action: "click->drawer#start click->agenda-drawer#close",
-                        turbo_prefetch: false
-                      } %>
+                  polymorphic_path(record),
+                  class: "shrink-0 rounded-xl border px-3 py-1.5 text-xs font-semibold text-zinc-50 transition hover:brightness-110",
+                  style: "border-color: #{tint_border}; background-color: #{rgba(base_bg, 0.18)};",
+                  data: {
+                    turbo_frame: "event_drawer",
+                    action: "click->drawer#start click->agenda-drawer#close",
+                    turbo_prefetch: false
+                  } %>
               </div>
             </div>
           <% end %>

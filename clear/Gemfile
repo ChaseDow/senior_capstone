@@ -83,3 +83,6 @@ end
 gem "view_component", "~> 4.1"
 
 gem "htmlbeautifier", "~> 1.4", group: :development
+gem "ransack"
+
+gem "pagy", "~> 43.2"

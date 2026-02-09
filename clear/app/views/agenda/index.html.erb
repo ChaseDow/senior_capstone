@@ -1,19 +1,142 @@
 <% content_for :page_title, "Agenda" %>
-<% content_for :page_subtitle, "Today's Agenda"%>
+<% content_for :page_subtitle, "Upcoming tasks" %>
 
-<div class="mt-4 overflow-hidden rounded-2xl border border-emerald-900/30 bg-emerald-950/10">
-  <aside class="w-wd shrink-0">
-    <%= render Studs::AgendaComponent.new(mode: :panel) do |a| %>
-      <% if @agenda.any? %>
-        <% @agenda.each do |agenda| %>
-          <% if agenda[:type] == "Event" %>
-            <% a.with_item(time: agenda[:time], title: agenda[:item].title, meta: agenda[:item].location, tag: "Event", tag_color: :orange) %>
-          <% elsif agenda[:type] == "Course" %>
-            <% a.with_item(time: agenda[:time], title: agenda[:item].title, meta: agenda[:item].location, tag: "Course", tag_color: :blue) %>
-          <% end %>
-        <% end %>
+<div class="space-y-6">
+  <%= form_with url: agenda_index_path, method: :get, local: true, html: { class: "space-y-3" } do |f| %>
+    <div class="flex items-center gap-3">
+      <div class="flex-1">
+        <%= render Studs::SearchBarComponent.new(
+          name: "q[term]",
+          value: params.dig(:q, :term),
+          placeholder: "Search by description or location…",
+          class_name: "w-full"
+        ) %>
+      </div>
+
+      <div class="w-36">
+        <%= f.select :type,
+          options_for_select(
+            [["All Types", ""], ["Events", "event"], ["Courses", "course"]],
+            params[:type]
+          ),
+          {},
+          class: "w-full rounded-xl border border-zinc-800 bg-zinc-900/50 px-3 py-2 text-sm text-zinc-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-400/40" %>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <%= f.date_field :start_date,
+          value: params[:start_date],
+          placeholder: "Start",
+          class: "h-[38px] w-36 rounded-xl border border-zinc-800 bg-zinc-900/50 px-3 py-2 text-sm text-zinc-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-400/40" %>
+
+        <span class="text-sm text-zinc-500 font-medium select-none">
+          :
+        </span>
+
+        <%= f.date_field :end_date,
+          value: params[:end_date],
+          placeholder: "End",
+          class: "h-[38px] w-36 rounded-xl border border-zinc-800 bg-zinc-900/50 px-3 py-2 text-sm text-zinc-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-400/40" %>
+      </div>
+
+      <%= f.submit "Search",
+        class: "rounded-xl bg-green-600 px-5 py-2 text-sm font-medium text-white hover:bg-green-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-400/40 transition" %>
+
+      <% show_clear = params.dig(:q, :term).present? || params[:start_date].present? || params[:end_date].present? || params[:type].present? %>
+      <% if show_clear %>
+        <%= link_to "Clear",
+          agenda_index_path,
+          class: "inline-block rounded-xl border border-zinc-800 bg-zinc-900/50 px-4 py-2 text-sm font-medium text-zinc-300 hover:bg-zinc-800/50 focus:outline-none transition" %>
       <% end %>
-    <% end %>
-  </aside>
-</div>
+    </div>
+  <% end %>
 
+  <% dates = (@paged_agenda_by_date || {}).keys.sort %>
+
+  <% dates.each do |date| %>
+    <% entries = @paged_agenda_by_date[date] || [] %>
+    <% next if entries.empty? %>
+
+    <%= render Studs::AgendaComponent.new(
+      title: (date == Date.today ? "Today" : date.strftime("%A")),
+      subtitle: date.strftime("%B %d, %Y"),
+      mode: :panel,
+      empty_message: "Nothing scheduled for this day."
+    ) do |agenda| %>
+
+      <% entries.each do |entry| %>
+        <%
+          meta_bits = []
+          meta_bits << entry[:location] if entry[:location].present?
+
+          if entry[:type] == "Course"
+            meta_bits << entry[:professor] if entry[:professor].present?
+          end
+
+          meta = meta_bits.any? ? meta_bits.join(" • ") : nil
+
+          is_course = (entry[:type] == "Course")
+          tag_color = is_course ? :emerald : :blue
+        %>
+
+        <% agenda.with_item(
+          time: entry[:time],
+          title: entry[:title],
+          tag: entry[:type],
+          tag_color: tag_color,
+          meta: meta,
+        ) %>
+      <% end %>
+
+    <% end %>
+  <% end %>
+
+  <% if @pagy&.pages.to_i > 1 %>
+    <% per_chunk = 10 %>
+    <% pages = @pagy.pages %>
+    <% page  = @pagy.page %>
+
+    <% chunk_index = (page - 1) / per_chunk %>
+    <% chunk_start = (chunk_index * per_chunk) + 1 %>
+    <% chunk_end   = [chunk_start + per_chunk - 1, pages].min %>
+
+    <% prev_page  = page > 1 ? page - 1 : nil %>
+    <% next_page  = page < pages ? page + 1 : nil %>
+
+    <% prev_chunk_page = chunk_start > 1 ? (chunk_start - 1) : nil %>
+    <% next_chunk_page = chunk_end < pages ? (chunk_end + 1) : nil %>
+
+    <div class="pt-6 flex items-center justify-center gap-2">
+
+      <%= link_to "Prev",
+        (prev_page ? agenda_page_url(prev_page) : "#"),
+        class: [
+          "rounded-xl border border-zinc-800 bg-zinc-900/50 px-4 py-2 text-sm font-medium transition",
+          prev_page ? "text-zinc-200 hover:bg-zinc-800/50" : "text-zinc-600 cursor-not-allowed pointer-events-none"
+        ].join(" ") %>
+
+      <% (chunk_start..chunk_end).each do |p| %>
+        <% is_current = (p == page) %>
+        <%= link_to p, agenda_page_url(p),
+          class: [
+            "rounded-xl border px-3 py-2 text-sm font-medium transition",
+            is_current ?
+              "border-green-500/40 bg-green-600/20 text-green-200" :
+              "border-zinc-800 bg-zinc-900/50 text-zinc-200 hover:bg-zinc-800/50"
+          ].join(" ") %>
+      <% end %>
+
+      <%= link_to "Next",
+        (next_page ? agenda_page_url(next_page) : "#"),
+        class: [
+          "rounded-xl border border-zinc-800 bg-zinc-900/50 px-4 py-2 text-sm font-medium transition",
+          next_page ? "text-zinc-200 hover:bg-zinc-800/50" : "text-zinc-600 cursor-not-allowed pointer-events-none"
+        ].join(" ") %>
+    </div>
+
+    <div class="pt-2 text-center text-xs text-zinc-500">
+      Pages <%= chunk_start %>–<%= chunk_end %> of <%= pages %>
+    </div>
+  <% end %>
+
+</div>

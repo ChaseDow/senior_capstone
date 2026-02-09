@@ -8,6 +8,7 @@
 <% prev_start  = week_start_date - 7.days %>
 <% next_start  = week_start_date + 7.days %>
 <% today_start = Date.current.beginning_of_week %>
+
 <%# --- Theme helpers --- %>
 <% camo_bg      = "bg-[#233a2a]/85" %>
 <% camo_bg_soft = "bg-[#233a2a]/60" %>
@@ -22,26 +23,53 @@
   "hover:brightness-110 hover:saturate-110 transition"
 %>
 <% events_by_day = events.group_by { |e| e.starts_at.in_time_zone.to_date } %>
-<div class="flex h-full min-h-0 flex-col">
+
+<style>
+  [data-calendar-event] {
+    transition:
+      box-shadow 0.15s ease,
+      transform 0.15s ease,
+      filter 0.15s ease;
+  }
+
+  [data-calendar-event]:hover {
+    filter: brightness(1.08) saturate(1.15);
+    z-index: 30;
+  }
+
+  [data-calendar-event].is-selected {
+    z-index: 40;
+    transform: scale(1.04);
+    box-shadow:
+      0 0 0 4px rgba(255,255,255,0.85),
+      0 16px 40px rgba(0,0,0,0.55);
+  }
+</style>
+
+<div class="flex h-full min-h-0 flex-col" data-controller="agenda-highlight">
   <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
     <div class="text-lg font-semibold text-zinc-100">
       <%= week_start_date.strftime("%B %Y") %>
     </div>
+
     <nav class="flex items-center gap-2">
       <%= link_to "Previous", url_for(start_date: prev_start), class: nav_btn %>
       <%= link_to "Today",    url_for(start_date: today_start), class: nav_btn %>
       <%= link_to "Next",     url_for(start_date: next_start), class: nav_btn %>
+
       <span class="mx-1 h-6 w-px bg-emerald-500/20"></span>
+
       <button
-    type="button"
-    class="<%= nav_btn %>"
-    data-action="click->agenda-drawer#open"
+        type="button"
+        class="<%= nav_btn %>"
+        data-action="click->agenda-drawer#open"
         data-agenda-drawer-date-param="<%= Date.current.iso8601 %>"
-        >
+      >
         Agenda
       </button>
     </nav>
   </div>
+
   <!-- Calendar shell -->
   <div class="min-h-0 flex-1 overflow-auto rounded-2xl border border-emerald-900/40 bg-emerald-950/10 shadow-[inset_0_0_0_1px_rgba(16,185,129,0.08)]">
     <!-- Sticky header -->
@@ -51,16 +79,16 @@
     >
       <div class="grid h-full" style="grid-template-columns: <%= time_col_px %>px repeat(7, minmax(0, 1fr));">
         <div class="<%= camo_bg %> border-r <%= vline %>"></div>
+
         <% days.each do |day| %>
           <% is_today = (day == Date.current) %>
           <div class="<%= camo_bg %> border-r <%= vline %> px-4 py-2">
             <div class="flex items-center justify-between">
               <div class="min-w-0">
-                <!-- weekday -->
                 <div class="text-[11px] font-semibold tracking-wide text-emerald-100/85">
                   <%= day.strftime("%a").upcase %>
                 </div>
-                <!-- day number -->
+
                 <div class="mt-0.5 flex items-center gap-2">
                   <% if is_today %>
                     <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-emerald-400/25 text-emerald-100 font-semibold">
@@ -79,6 +107,7 @@
         <% end %>
       </div>
     </div>
+
     <!-- Body grid -->
     <div class="grid" style="grid-template-columns: <%= time_col_px %>px repeat(7, minmax(0, 1fr));">
       <!-- Hours gutter -->
@@ -103,38 +132,41 @@
           </div>
         <% end %>
       </div>
+
       <!-- Day columns -->
       <% days.each do |day| %>
         <% day_start = Time.zone.local(day.year, day.month, day.day, 0, 0, 0) %>
         <% day_end   = day_start.end_of_day %>
         <% is_today   = (day == Date.current) %>
         <% is_weekend = day.saturday? || day.sunday? %>
+
         <div class="relative border-r <%= vline %> <%= is_weekend ? "bg-white/0" : "" %> <%= is_today ? "bg-emerald-500/10" : "" %>">
           <!-- Clickable time slots (30 min) -->
           <div class="absolute inset-0 z-[1]">
             <% 48.times do |i| %>
               <% slot_time = day_start + (i * 30).minutes %>
               <%= link_to new_event_path(start_time: slot_time.iso8601),
-                    class: "timeslot absolute left-0 w-full hover:bg-emerald-500/10 transition-colors cursor-pointer",
-                    style: "top: #{i * (hour_height_px / 2.0)}px; height: #{hour_height_px / 2.0}px;",
-                    data: { turbo: false } do %>
+                class: "timeslot absolute left-0 w-full hover:bg-emerald-500/10 transition-colors cursor-pointer",
+                style: "top: #{i * (hour_height_px / 2.0)}px; height: #{hour_height_px / 2.0}px;",
+                data: { turbo: false } do %>
               <% end %>
             <% end %>
           </div>
+
           <!-- Grid lines -->
           <div class="absolute inset-0 pointer-events-none">
             <% 24.times do %>
               <div class="relative" style="height: <%= hour_height_px %>px;">
-                <!-- major hour line -->
                 <div class="absolute top-0 left-0 w-full border-b border-emerald-300/25"></div>
-                <!-- minor half-hour line -->
                 <div class="absolute top-1/2 left-0 w-full border-b border-dashed border-emerald-200/18"></div>
               </div>
             <% end %>
           </div>
+
           <!-- Event layer -->
           <div class="relative" style="height: <%= day_height_px %>px;">
             <% day_events = events_by_day.fetch(day, []) %>
+
             <% segments =
               day_events.map do |e|
                 record = e.respond_to?(:event) ? e.event : e
@@ -164,8 +196,10 @@
                 }
               end.compact.sort_by { |s| s[:seg_start] }
             %>
+
             <% active = [] %>
             <% max_cols = 1 %>
+
             <% segments.each do |seg| %>
               <% active.reject! { |a| a[:seg_end] <= seg[:seg_start] } %>
               <% used = active.map { |a| a[:col] } %>
@@ -175,19 +209,20 @@
               <% active << seg %>
               <% max_cols = [max_cols, (active.map { |a| a[:col] }.max.to_i + 1)].max %>
             <% end %>
-            <% width_pct = (100.0 / max_cols) %>
-            <% # Courses: textured but readable
-               course_css =
-                 "background-image:" \
-                 " linear-gradient(to right, rgba(255,255,255,0.60) 0px, rgba(255,255,255,0.60) 6px, rgba(255,255,255,0.0) 6px)," \
-                 " repeating-linear-gradient(135deg, rgba(255,255,255,0.20) 0px, rgba(255,255,255,0.20) 10px, rgba(255,255,255,0.0) 10px, rgba(255,255,255,0.0) 20px);" \
-                 " background-blend-mode: overlay;" \
-                 " border-left-style: solid;" \
-                 " border-left-width: 6px;" \
-                 " border-left-color: rgba(255,255,255,0.70);"
 
-               event_css = ""
+            <% width_pct = (100.0 / max_cols) %>
+
+            <% course_css =
+              "background-image:" \
+              " linear-gradient(to right, rgba(255,255,255,0.60) 0px, rgba(255,255,255,0.60) 6px, rgba(255,255,255,0.0) 6px)," \
+              " repeating-linear-gradient(135deg, rgba(255,255,255,0.20) 0px, rgba(255,255,255,0.20) 10px, rgba(255,255,255,0.0) 10px, rgba(255,255,255,0.0) 20px);" \
+              " background-blend-mode: overlay;" \
+              " border-left-style: solid;" \
+              " border-left-width: 6px;" \
+              " border-left-color: rgba(255,255,255,0.70);"
             %>
+            <% event_css = "" %>
+
             <% segments.each do |seg| %>
               <% record = seg[:record] %>
               <% left_pct = seg[:col] * width_pct %>
@@ -196,6 +231,7 @@
               <% is_course = record.model_name.singular == "course" %>
               <% base_bg   = record.color.presence || "#34D399" %>
               <% base_text = record.respond_to?(:contrast_text_color) ? record.contrast_text_color : "#F9FAFB" %>
+
               <% badge_class =
                 if is_course
                   "bg-white/40 text-black/90"
@@ -203,7 +239,9 @@
                   "bg-black/25 text-white/95"
                 end
               %>
+
               <% type_label = is_course ? "COURSE" : "EVENT" %>
+
               <% style_str =
                 "top: #{seg[:top]}px; " \
                 "height: #{seg[:height]}px; " \
@@ -214,14 +252,20 @@
                 "border-color: rgba(0,0,0,0.22); " \
                 "#{is_course ? course_css : event_css}"
               %>
+
+              <% highlight_id = "#{record.model_name.singular}-#{record.id}-#{seg[:seg_start].to_date.iso8601}" %>
+
               <%= link_to polymorphic_path(record, start_date: start_date.to_date),
+                id: highlight_id,
                 class: event_classes,
                 style: style_str,
                 data: {
+                  calendar_event: true,
                   turbo_frame: "event_drawer",
-                  action: "click->drawer#start",
+                  action: "click->agenda-highlight#clear click->drawer#start",
                   turbo_prefetch: false
                 } do %>
+
                 <div class="mb-1 flex items-center justify-between gap-2">
                   <div class="min-w-0">
                     <div class="font-semibold truncate text-[13px]">
@@ -232,11 +276,13 @@
                     <%= type_label %>
                   </span>
                 </div>
+
                 <% if is_course && record.respond_to?(:professor) && record.professor.present? %>
                   <div class="opacity-90 truncate"><%= record.professor %></div>
                 <% elsif record.respond_to?(:location) && record.location.present? %>
                   <div class="opacity-90 truncate"><%= record.location %></div>
                 <% end %>
+
                 <div class="opacity-90 font-medium"><%= start_label %> – <%= end_label %></div>
               <% end %>
             <% end %>
