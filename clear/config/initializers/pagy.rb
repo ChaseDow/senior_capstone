@@ -4,4 +4,3 @@
 # Docs: https://ddnexus.github.io/pagy/
 
 require "pagy"
-

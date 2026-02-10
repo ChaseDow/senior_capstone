@@ -144,7 +144,7 @@ class Course < ApplicationRecord
   end
 
   def self.ransackable_attributes(auth_object = nil)
-    ["code", "color", "created_at", "description", "end_date", "end_time", "instructor", "location", "meeting_days", "professor", "recurring", "repeat_days", "repeat_until", "start_date", "start_time", "term", "title", "updated_at"]
+    [ "code", "color", "created_at", "description", "end_date", "end_time", "instructor", "location", "meeting_days", "professor", "recurring", "repeat_days", "repeat_until", "start_date", "start_time", "term", "title", "updated_at" ]
   end
 
   def self.ransackable_associations(auth_object = nil)
