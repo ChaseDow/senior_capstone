@@ -9,10 +9,9 @@ class ScheduleController < ApplicationController
 
         items = Event.where(starts_at: @week_start..(@week_start + 6.days).end_of_day)
         @items_by_day = items.group_by { |item| item.starts_at.to_date }
-        @items_by_day.transform_values! do |item| 
-            item.sort_by(&:starts_at) 
+        @items_by_day.transform_values! do |item|
+            item.sort_by(&:starts_at)
         end
-
     end
 
     def show; end

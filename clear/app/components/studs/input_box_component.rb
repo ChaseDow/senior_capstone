@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Studs
   class InputBoxComponent < ::ViewComponent::Base
     COLORS = {
@@ -10,27 +11,27 @@ module Studs
     }.freeze
 
     SIZES = {
-      xs: { classes: "px-2.5 py-1 text-xs rounded-lg"},
-      sm: { classes: "px-3 py-1.5 text-sm rounded-xl"},
-      md: { classes: "px-4 py-2 text-sm rounded-xl"},
-      lg: { classes: "px-5 py-2.5 text-base rounded-2xl"}
+      xs: { classes: "px-2.5 py-1 text-xs rounded-lg" },
+      sm: { classes: "px-3 py-1.5 text-sm rounded-xl" },
+      md: { classes: "px-4 py-2 text-sm rounded-xl" },
+      lg: { classes: "px-5 py-2.5 text-base rounded-2xl" }
     }.freeze
-    
+
     def initialize(name:, value: nil, placeholder: nil, type: "text", color: :zinc, size: :md, class_name: nil, **attrs)
       @name = name
       @value = value
       @placeholder = placeholder
       @type = type
-      @color = COLORS.key?(color) ? color : :zinc  
+      @color = COLORS.key?(color) ? color : :zinc
       @size = SIZES.key?(size) ? size : :md
       @class_name = class_name
       @attrs = attrs
     end
-    
+
     def input_classes
       c = COLORS.fetch(@color)
       s = SIZES.fetch(@size)
-      
+
       [
         "w-full font-medium",
         "border bg-transparent",

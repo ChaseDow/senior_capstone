@@ -2,7 +2,7 @@
 
 module Studs
   class AgendaComponent < ::ViewComponent::Base
-    protected 
+    protected
     renders_many :items, "Studs::AgendaItemComponent"
 
     def initialize(title: "Agenda", subtitle: nil, mode: :panel, empty_message: "All of your scheduled events for today appear here`.", class_name: nil)
@@ -10,7 +10,7 @@ module Studs
       @subtitle = subtitle
       @mode = mode
       @empty_message = empty_message
-      @class_name = class_name 
+      @class_name = class_name
     end
 
     def wrapper_classes
