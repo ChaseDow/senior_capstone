@@ -50,11 +50,14 @@ jobs:
           ruby-version: '3.4.7'
           bundler-cache: true
 
+      - name: Make binstubs executable
+        run: chmod +x bin/* || true
+
       - name: Set up database schema
-        run: bin/rails db:schema:load
+        run: bundle exec rails db:schema:load
 
       - name: Run tests
-        run: bin/rake
+        run: bundle exec rake
 
   lint:
     runs-on: ubuntu-latest
@@ -74,15 +77,15 @@ jobs:
           ruby-version: '3.4.7'
           bundler-cache: true
 
-      - name: Generate binstubs
-        run: bundle binstubs bundler-audit brakeman rubocop
+      - name: Make binstubs executable
+        run: chmod +x bin/* || true
 
       - name: Security audit dependencies
-        run: bin/bundler-audit --update
+        run: bundle exec bundler-audit --update
 
       - name: Security audit application code
-        run: bin/brakeman -q -w2
+        run: bundle exec brakeman -q -w2
 
       - name: Lint Ruby files
-        run: bin/rubocop --parallel
+        run: bundle exec rubocop --parallel
 
