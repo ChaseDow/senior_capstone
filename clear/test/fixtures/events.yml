@@ -1,15 +1,17 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  title: MyString
-  starts_at: 2026-01-05 18:25:02
-  ends_at: 2026-01-05 18:25:02
-  location: MyString
-  description: MyText
+  user: one
+  title: "Existing event"
+  starts_at: <%= Time.zone.parse("2026-01-05 18:25:02") %>
 
 two:
-  title: MyString
-  starts_at: 2026-01-05 18:25:02
-  ends_at: 2026-01-05 18:25:02
-  location: MyString
-  description: MyText
+  user: one
+  title: "Second event"
+  starts_at: <%= Time.zone.parse("2026-01-06 18:25:02") %>
+  ends_at: <%= Time.zone.parse("2026-01-06 19:25:02") %>
+  location: "Library"
+  description: "Bring notes"
+  color: "#34D399"
+
+

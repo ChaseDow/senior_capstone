@@ -1,11 +1,13 @@
 require "test_helper"
 
 class EventsControllerTest < ActionDispatch::IntegrationTest
+  include Devise::Test::IntegrationHelpers
+  fixtures :users
+
   setup do
-    @event = Event.create!(
-      title: "Existing event",
-      starts_at: Time.current
-    )
+    @user = users(:one)
+    sign_in @user
+    @event = Event.create!(user: @user, title: "Existing event", starts_at: Time.current)
   end
 
   test "should get index" do
@@ -31,7 +33,8 @@ class EventsControllerTest < ActionDispatch::IntegrationTest
       }
     end
 
-    assert_redirected_to event_url(Event.last)
+    created = Event.order(:id).last
+    assert_redirected_to event_url(created)
   end
 
   test "should show event" do
@@ -45,12 +48,7 @@ class EventsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should update event" do
-    patch event_url(@event), params: {
-      event: {
-        title: "Updated title"
-      }
-    }
-
+    patch event_url(@event), params: { event: { title: "Updated title" } }
     assert_redirected_to event_url(@event)
     @event.reload
     assert_equal "Updated title", @event.title
