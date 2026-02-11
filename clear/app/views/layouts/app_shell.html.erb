@@ -121,5 +121,28 @@
       </template>
     </div>
 
+    <script>
+      function bindPasswordToggles() {
+        document.querySelectorAll('[data-password-toggle]').forEach((button) => {
+          if (button.dataset.bound === "true") return; // prevent double binding
+          button.dataset.bound = "true";
+
+          button.addEventListener("click", () => {
+            const input = document.getElementById(button.dataset.target);
+            const showIcon = button.querySelector("[data-show]");
+            const hideIcon = button.querySelector("[data-hide]");
+
+            const isHidden = input.type === "password";
+            input.type = isHidden ? "text" : "password";
+
+            showIcon.classList.toggle("hidden", isHidden);
+            hideIcon.classList.toggle("hidden", !isHidden);
+          });
+        });
+      }
+
+      document.addEventListener("turbo:load", bindPasswordToggles);
+      document.addEventListener("turbo:frame-load", bindPasswordToggles);
+    </script>
   </body>
 </html>
