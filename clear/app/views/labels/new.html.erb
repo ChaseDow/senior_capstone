@@ -1,0 +1,10 @@
+<% frame_id = params[:turbo_frame].presence || "event_label_area" %>
+
+<%= turbo_frame_tag frame_id do %>
+  <div class="mt-1 rounded-2xl border border-zinc-800 bg-zinc-950/40 p-4">
+    <div class="text-sm font-medium text-zinc-200">New label</div>
+    <div class="text-xs text-zinc-400">Pick a name and a color.</div>
+
+    <%= render "form", label: @label, turbo_frame: frame_id %>
+  </div>
+<% end %>

@@ -1,0 +1,5 @@
+<%= turbo_stream.replace "event_label_picker",
+      partial: "labels/event_picker",
+      locals: { labels: current_user.labels.order(:name), selected_id: @label.id } %>
+
+<%= turbo_stream.update "event_label_modal", "" %>

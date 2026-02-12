@@ -1,0 +1,35 @@
+<% input_classes = "mt-1 w-full rounded-xl border border-zinc-800 bg-zinc-950/40 px-3 py-1.5 text-sm text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-emerald-300/40" %>
+<% label_classes = "block text-sm font-medium text-zinc-200" %>
+
+<% labels ||= [] %>
+<% selected_id ||= nil %>
+<% picked = labels.find { |l| l.id == selected_id } %>
+
+<div class="flex items-start justify-between gap-3">
+  <div class="flex-1">
+    <div class="text-sm font-medium text-zinc-200">Label</div>
+    <div class="text-xs text-zinc-400">Used for color + grouping in the calendar.</div>
+
+    <div class="mt-3">
+      <label class="<%= label_classes %>" for="event_label_id">Choose label</label>
+      <select name="event[label_id]" id="event_label_id" class="<%= input_classes %>">
+        <option value="">None</option>
+        <% labels.each do |lbl| %>
+          <option value="<%= lbl.id %>" <%= "selected" if lbl.id == selected_id %>><%= lbl.name %></option>
+        <% end %>
+      </select>
+    </div>
+
+    <div class="mt-3 text-xs text-zinc-400">
+      Don’t see it?
+      <%= link_to "Create a label",
+            new_label_path(turbo_frame: "event_label_area"),
+            data: { turbo_frame: "event_label_area" },
+            class: "text-emerald-200 hover:text-emerald-100 underline underline-offset-2" %>
+    </div>
+  </div>
+
+  <% if picked&.color.present? %>
+    <div class="mt-7 h-10 w-14 rounded-xl border border-zinc-800" style="background:<%= picked.color %>"></div>
+  <% end %>
+</div>
