@@ -4,6 +4,7 @@ Rails.application.routes.draw do
   resources :events
   resources :courses
   resources :agenda
+  resources :labels, only: %i[index new create edit update destroy]
 
   resources :syllabuses do
     member do

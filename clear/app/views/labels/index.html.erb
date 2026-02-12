@@ -1,0 +1,51 @@
+<div class="mx-auto w-full max-w-5xl p-6">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-xl font-semibold text-zinc-100">Labels</h1>
+      <p class="mt-1 text-sm text-zinc-400">Manage your labels (name + color). Events and courses can use these.</p>
+    </div>
+
+    <%= link_to "New label",
+          new_label_path,
+          class: "inline-flex items-center rounded-xl border border-zinc-800 bg-zinc-950/40 px-4 py-2 text-sm text-zinc-200 hover:bg-zinc-800/40 transition" %>
+  </div>
+
+  <div class="mt-6 overflow-hidden rounded-2xl border border-zinc-800">
+    <div class="grid grid-cols-12 bg-zinc-950/40 px-4 py-3 text-xs font-medium text-zinc-400">
+      <div class="col-span-6">Name</div>
+      <div class="col-span-3">Color</div>
+      <div class="col-span-3 text-right">Actions</div>
+    </div>
+
+    <div class="divide-y divide-zinc-800">
+      <% @labels.each do |label| %>
+        <div class="grid grid-cols-12 items-center px-4 py-3">
+          <div class="col-span-6 text-sm text-zinc-100"><%= label.name %></div>
+
+          <div class="col-span-3">
+            <div class="flex items-center gap-3">
+              <div class="h-6 w-10 rounded-lg border border-zinc-800" style="background:<%= label.color %>"></div>
+              <div class="text-xs text-zinc-400"><%= label.color %></div>
+            </div>
+          </div>
+
+          <div class="col-span-3 flex justify-end gap-2">
+            <%= link_to "Edit",
+                  edit_label_path(label),
+                  class: "inline-flex items-center rounded-xl border border-zinc-800 bg-zinc-950/40 px-3 py-1.5 text-xs text-zinc-200 hover:bg-zinc-800/40 transition" %>
+
+            <%= button_to "Delete",
+                  label_path(label),
+                  method: :delete,
+                  form: { data: { turbo_confirm: "Delete '#{label.name}'? This will remove it from events/courses." } },
+                  class: "inline-flex items-center rounded-xl border border-red-900/40 bg-red-950/30 px-3 py-1.5 text-xs text-red-200 hover:bg-red-900/30 transition" %>
+          </div>
+        </div>
+      <% end %>
+
+      <% if @labels.empty? %>
+        <div class="px-4 py-8 text-sm text-zinc-400">No labels yet. Create one to start organizing your calendar.</div>
+      <% end %>
+    </div>
+  </div>
+</div>

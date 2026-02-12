@@ -5,6 +5,7 @@ class EventsController < ApplicationController
 
   before_action :authenticate_user!
   before_action :set_event, only: %i[show edit update destroy]
+  before_action :load_labels, only: %i[new edit create update]
 
   def index
     @events = current_user.events.order(starts_at: :asc)
@@ -19,7 +20,6 @@ class EventsController < ApplicationController
 
   def new
     start_time = params[:start_time].present? ? Time.zone.parse(params[:start_time]) : nil
-
     @event = current_user.events.new(starts_at: start_time)
   end
 
@@ -147,6 +147,10 @@ class EventsController < ApplicationController
     @event = current_user.events.find(params[:id])
   end
 
+  def load_labels
+    @labels = current_user.labels.order(:name)
+  end
+
   def parse_start_date(raw)
     raw.present? ? Date.parse(raw) : Date.current
   rescue ArgumentError
@@ -176,9 +180,9 @@ class EventsController < ApplicationController
       :location,
       :priority,
       :description,
-      :color,
       :recurring,
       :repeat_until,
+      :label_id,
       repeat_days: []
     )
   end
