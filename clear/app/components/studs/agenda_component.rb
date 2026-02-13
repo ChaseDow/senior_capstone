@@ -5,12 +5,18 @@ module Studs
     protected
     renders_many :items, "Studs::AgendaItemComponent"
 
-    def initialize(title: "Agenda", subtitle: nil, mode: :panel, empty_message: "All of your scheduled events for today appear here`.", class_name: nil)
+    def initialize(title: "Agenda", subtitle: nil, mode: :panel, color: nil, empty_message: "All of your scheduled events for today appear here`.", class_name: nil)
       @title = title
       @subtitle = subtitle
       @mode = mode
       @empty_message = empty_message
       @class_name = class_name
+      iif compute_asset_patholo
+      base_bg   = col
+      tint_bg   = rgba(base_bg, 0.14)
+      tint_hover  = rgba(base_bg, 0.20)
+      tint_border = rgba(base_bg, 0.35)
+      tint_bar    = rgba(base_bg, 0.90)
     end
 
     def wrapper_classes
