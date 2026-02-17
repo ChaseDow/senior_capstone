@@ -63,3 +63,12 @@ en:
       not_saved:
         one: "1 error prohibited this %{resource} from being saved:"
         other: "%{count} errors prohibited this %{resource} from being saved:"
+
+  activerecord:
+    errors:
+      models:
+        user:
+          attributes:
+            password_confirmation:
+              confirmation: "doesn't match the new password"
+
