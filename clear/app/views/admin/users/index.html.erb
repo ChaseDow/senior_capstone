@@ -1,0 +1,35 @@
+<h1 class="text-xl font-semibold text-zinc-100">Users</h1>
+
+<div class="mt-4 overflow-x-auto rounded-2xl border border-zinc-800 bg-zinc-950/40">
+  <table class="min-w-full table-auto text-left text-sm text-zinc-200">
+    <thead class="border-b border-zinc-800 text-xs uppercase tracking-wide text-zinc-400">
+      <tr>
+        <th scope="col" class="px-4 py-3">Email</th>
+        <th scope="col" class="px-4 py-3">Role</th>
+        <th scope="col" class="px-4 py-3">Created</th>
+        <th scope="col" class="px-4 py-3 text-right">Actions</th>
+      </tr>
+    </thead>
+
+    <tbody class="divide-y divide-zinc-900">
+      <% @users.each do |u| %>
+        <tr class="hover:bg-white/5">
+          <td class="px-4 py-3 align-middle whitespace-nowrap"><%= u.email %></td>
+          <td class="px-4 py-3 align-middle whitespace-nowrap"><%= u.role %></td>
+          <td class="px-4 py-3 align-middle whitespace-nowrap"><%= u.created_at.strftime("%Y-%m-%d") %></td>
+
+          <td class="px-4 py-3 align-middle whitespace-nowrap text-right">
+            <% if u == current_user %>
+              <span class="text-xs text-zinc-500">current</span>
+            <% else %>
+              <%= link_to "Delete",
+                    admin_user_path(u),
+                    data: { turbo_method: :delete, turbo_confirm: "Delete #{u.email}? This cannot be undone." },
+                    class: "inline-flex items-center rounded-xl bg-rose-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-rose-500" %>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
