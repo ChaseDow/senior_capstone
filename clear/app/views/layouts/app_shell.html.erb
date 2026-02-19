@@ -46,19 +46,24 @@
         </div>
         <!-- Sidebar content -->
         <div class="flex-1 min-h-0 overflow-y-auto">
-          <%= render Studs::LeftNavComponent.new(
-                brand: nil,
-                items: ([
-                  { label: "Dashboard", path: "/dashboard", icon_name: "dashboard-circle-stroke-rounded" },
-                  { label: "Agenda",    path: "/agenda",    icon_name: "view-agenda-stroke-rounded" },
-                  { label: "Courses",   path: "/courses",   icon_name: "course-stroke-rounded" },
-                  { label: "Events",    path: "/events",    icon_name: "timeline-event-stroke-rounded" },
-                  { label: "Schedule",  path: "/schedule",  icon_name: "timeline-event-stroke-rounded" },
-                  { label: "Syllabus",  path: "/syllabuses",icon_name: "file-01-stroke-rounded" }
-                ]+ 
-                (current_user&.dev_account? ? [{ label: "UI",        path: "/ui",        icon_name: "search-01-stroke-rounded" }] : [])),
-                class_name: "h-full"
-              ) %>
+      <%= render Studs::LeftNavComponent.new(
+            brand: nil,
+            items: (
+              [
+                { label: "Dashboard", path: "/dashboard",  icon_name: "dashboard-circle-stroke-rounded" },
+                { label: "Agenda",    path: "/agenda",     icon_name: "view-agenda-stroke-rounded" },
+                { label: "Courses",   path: "/courses",    icon_name: "course-stroke-rounded" },
+                { label: "Events",    path: "/events",     icon_name: "timeline-event-stroke-rounded" },
+                { label: "Schedule",  path: "/schedule",   icon_name: "timeline-event-stroke-rounded" },
+                { label: "Syllabus",  path: "/syllabuses", icon_name: "file-01-stroke-rounded" }
+              ] +
+              (current_user&.admin? ? [
+                { label: "Users", path: "/admin/users", icon_name: "user-02-stroke-rounded" },
+                { label: "UI",    path: "/ui",          icon_name: "search-01-stroke-rounded" }
+              ] : [])
+            ),
+            class_name: "h-full"
+          ) %>
         </div>
       </aside>
       <!-- RIGHT COLUMN (top bar + page content) -->
