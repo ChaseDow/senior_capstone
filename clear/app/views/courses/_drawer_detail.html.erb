@@ -1,0 +1,102 @@
+<%= turbo_frame_tag "event_drawer" do %>
+    <div class="flex max-h-[85vh] flex-col">
+
+        <!-- Header -->
+        <div class="flex items-start justify-between border-b border-zinc-800 px-6 py-4">
+            <div class="min-w-0">
+                <div class="flex items-center gap-2">
+                    <span class="h-3 w-3 rounded-full" style="background-color: <%= course.color.presence || "#34D399" %>"></span>
+                    <div class="text-sm font-semibold text-zinc-100 truncate">
+                        <%= course.title.presence || "Untitled Course" %>
+                    </div>
+                </div>
+                <div class="mt-1 text-xs text-zinc-500">Course details</div>
+            </div>
+            <button
+                type="button"
+                data-action="drawer#close"
+                class="inline-flex items-center justify-center rounded-xl border border-zinc-800 bg-zinc-950/40 px-3 py-1.5 text-sm text-zinc-200 hover:bg-zinc-800/40 transition">
+                ✕
+            </button>
+        </div>
+
+        <!-- Body -->
+        <div class="scrollbars min-h-0 flex-1 overflow-y-auto px-6 py-6 space-y-4">
+            <div class="rounded-2xl border border-zinc-800 bg-zinc-950/40 p-4">
+                <% if course.professor.present? %>
+                    <div>
+                        <div class="text-xs text-zinc-400">Professor</div>
+                        <div class="mt-1 text-sm text-zinc-100"><%= course.professor %></div>
+                    </div>
+                <% end %>
+            </div>
+
+            <div class="rounded-2xl border border-zinc-800 bg-zinc-950/40 p-4">
+                <% if course.location.present? %>
+                    <div>
+                        <div class="text-xs text-zinc-400">Location</div>
+                        <div class="mt-1 text-sm text-zinc-100"><%= course.location %></div>
+                    </div>
+                <% end %>
+            </div>
+
+            <div class="rounded-2xl border border-zinc-800 bg-zinc-950/40 p-4">
+                <% if course.start_time.present? && course.end_time.present? %>
+                    <div>
+                        <div class="text-xs text-zinc-400">Time</div>
+                        <div class="mt-1 text-sm text-zinc-100">
+                            <%= course.start_time.strftime("%-I:%M %p") %> –
+                            <%= course.end_time.strftime("%-I:%M %p") %>
+                        </div>
+                    </div>
+                <% end %>
+            </div>
+            
+            <div class="rounded-2xl border border-zinc-800 bg-zinc-950/40 p-4">
+                <div class="text-xs text-zinc-400">Meet on</div>
+                <% if course.repeat_days.present? %>
+                    <% day_names = %w[Sun Mon Tue Wed Thu Fri Sat] %>
+                    <% days = Array(course.repeat_days).map { |d| day_names[d.to_i] }.join(", ") %>
+
+                    <div>
+                        <div class="text-xs text-zinc-100">
+                            <%= days.presence || "—" %>
+                            until <%= course.repeat_until.strftime("%b %-d, %Y") %>
+                        </div>
+                    </div>
+                <% else %>
+                    <div class="mt-1 text-sm text-zinc-100">N/A</div>
+                <% end %>
+            </div>
+
+            <% if course.description.present? %>
+                <div>
+                <div class="text-xs text-zinc-400">Description</div>
+                <div class="text-zinc-300 whitespace-pre-line">
+                    <%= course.description %>
+                </div>
+                </div>
+            <% end %>
+
+        </div>
+
+        <!-- Footer -->
+        <div class = "shrink-0 border-t border-zinc-800 bg-zinc-950/60 px-6 py-4">
+            <div class="flex items-center justify-between gap-3">
+                <div class="flex items-center gap-2">
+                    <%= link_to "Edit",
+                            edit_course_path(course),
+                            data: { turbo_frame: "course_drawer", turbo_prefetch: false},
+                            class: "inline-flex items-center rounded-xl border border-zinc-800 bg-zinc-950/40 px-3 py-1.5 text-sm text-zinc-200 hover:bg-zinc-800/40 transition" %>
+
+                    <%= link_to "Delete",
+                            course_path(course),
+                            method: :delete,
+                            class: "inline-flex items-center rounded-xl border border-rose-900/60 bg-rose-950/20 px-3 py-1.5 text-sm text-rose-200 hover:bg-rose-950/35 transition",
+                            form: { data: { turbo_confirm: "Delete this event?", turbo_frame: "event_drawer" } } %>
+                </div>
+            </div>
+        </div>
+
+    </div>
+<% end %>
