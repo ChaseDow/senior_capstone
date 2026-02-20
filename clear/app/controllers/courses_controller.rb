@@ -1,13 +1,19 @@
 class CoursesController < ApplicationController
   layout "app_shell"
 
+  before_action :authenticate_user!
   before_action :set_course, only: %i[show edit update destroy]
 
   def index
     @courses = current_user.courses.order(:title)
   end
 
-  def show; end
+  def show
+    return unless turbo_frame_request?
+
+    render partial: "courses/drawer_detail",
+           locals: { course: @course }
+  end
 
   def new
     @course = current_user.courses.new
