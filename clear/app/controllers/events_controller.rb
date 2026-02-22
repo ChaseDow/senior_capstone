@@ -91,11 +91,7 @@ class EventsController < ApplicationController
               partial: "dashboard/calendar_frame",
               locals: { events: occurrences, start_date: start_date }
             ),
-            turbo_stream.replace(
-              "event_drawer",
-              partial: "events/drawer_detail",
-              locals: { event: @event, start_date: params[:start_date] }
-            )
+            turbo_stream.update("event_drawer", "")
           ]
         end
       end
