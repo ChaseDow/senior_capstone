@@ -166,6 +166,16 @@ class EventsController < ApplicationController
 
     base_events.flat_map { |e| e.occurrences_between(range_start, range_end) }
               .sort_by(&:starts_at)
+
+    base_courses = current_user.courses
+      .where("start_date <= ?", range_end.to_date)
+      .where("end_date >= ?", range_start.to_date)
+      .order(start_date: :asc)
+
+    course_occurrences =
+      base_courses.flat_map { |c| c.occurrences_between(range_start, range_end) }
+
+    (base_events + course_occurrences).sort_by(&:starts_at)
   end
 
   def event_params
