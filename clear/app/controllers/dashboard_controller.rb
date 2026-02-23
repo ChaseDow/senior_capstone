@@ -57,6 +57,14 @@ class DashboardController < ApplicationController
     course_occurrences =
       base_courses.flat_map { |c| c.occurrences_between(range_start, range_end) }
 
-    (event_occurrences + course_occurrences).sort_by(&:starts_at)
+    course_items =
+      CourseItem
+        .joins(:course)
+        .where(courses: { user_id: current_user.id })
+        .where(due_at: range_start..range_end)
+        .includes(:course)
+
+    (event_occurrences + course_occurrences + course_items.to_a)
+      .sort_by(&:starts_at)
   end
 end

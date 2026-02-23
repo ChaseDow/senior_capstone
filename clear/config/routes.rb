@@ -6,7 +6,9 @@ Rails.application.routes.draw do
   end
 
   resources :events
-  resources :courses
+  resources :courses do
+    resources :course_items, except: [ :show ]
+  end
   resources :agenda
 
   resources :syllabuses do

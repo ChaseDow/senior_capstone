@@ -124,8 +124,18 @@ class CoursesController < ApplicationController
         .where("end_date >= ?", range_start.to_date)
         .order(start_date: :asc)
 
-    base_courses.flat_map { |c| c.occurrences_between(range_start, range_end) }
-              .sort_by(&:starts_at)
+    course_occurrences =
+      base_courses.flat_map { |c| c.occurrences_between(range_start, range_end) }
+
+    course_items =
+      CourseItem
+        .joins(:course)
+        .where(courses: { user_id: current_user.id })
+        .where(due_at: range_start..range_end)
+        .includes(:course)
+
+    (course_occurrences + course_items.to_a)
+      .sort_by(&:starts_at)
   end
 
   def course_params
