@@ -46,7 +46,7 @@
         </div>
         <!-- Sidebar content -->
         <div class="flex-1 min-h-0 overflow-y-auto">
-      <%= render Studs::LeftNavComponent.new(
+          <%= render Studs::LeftNavComponent.new(
             brand: nil,
             items: (
               [
@@ -93,13 +93,13 @@
           </div>
         </main>
       </div>
+      <div id="drawer_events" class="hidden"></div>
       <!-- Event Drawer Overlay -->
       <div
         data-drawer-target="overlay"
         data-action="click->drawer#close"
         class="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
       </div>
-
       <!-- Event Drawer Panel -->
       <div class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none px-4">
         <div
@@ -119,13 +119,11 @@
           <% end %>
         </div>
       </div>
-
       <!-- Event Drawer Skeleton -->
       <template data-drawer-target="skeleton">
         <%= render "events/drawer_skeleton" %>
       </template>
     </div>
-
     <script>
       function bindPasswordToggles() {
         document.querySelectorAll('[data-password-toggle]').forEach((button) => {
