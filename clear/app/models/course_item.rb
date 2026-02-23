@@ -19,24 +19,16 @@ class CourseItem < ApplicationRecord
   validates :kind, presence: true
   validates :due_at, presence: true
 
-  def title
-    base = self[:title]
+  def display_title
     course_name = course&.title.presence || "Course"
-    kind_name = self[:kind].present? ? kind.humanize : "Item"
+    kind_name   = kind.present? ? kind.humanize : "Item"
+    base        = self[:title].presence
 
-    if base.present?
-      "#{course_name} — #{kind_name}: #{base}"
-    else
-      "#{course_name} — #{kind_name}"
-    end
+    base ? "#{course_name} — #{kind_name}: #{base}" : "#{course_name} — #{kind_name}"
   end
 
-  def raw_title = self[:title]
-
   def starts_at = due_at
-
   def ends_at = due_at + 30.minutes
-
   def color = course.color
 
   def contrast_text_color

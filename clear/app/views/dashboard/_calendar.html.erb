@@ -24,7 +24,6 @@
   "hover:brightness-110 hover:saturate-110 transition"
 %>
 
-<%# Due chip: single line, fixed height, Canvas-like %>
 <% due_classes =
   "absolute z-20 cursor-pointer rounded-xl border border-black/20 px-3 py-1 text-[12px] leading-tight shadow-md " \
   "overflow-hidden " \
@@ -79,7 +78,7 @@
     </nav>
   </div>
 
-  <!-- Calendar shell (keep normal overflow/scroll behavior) -->
+  <!-- Calendar shell -->
   <div class="min-h-0 flex-1 overflow-auto rounded-2xl border border-emerald-900/40 bg-emerald-950/10 shadow-[inset_0_0_0_1px_rgba(16,185,129,0.08)]">
     <!-- Sticky header -->
     <div
@@ -172,30 +171,24 @@
             <% end %>
           </div>
 
-          <!-- Event layer -->
+          <!-- Unified Event layer (Events + Courses + CourseItems) -->
           <div class="relative" style="height: <%= day_height_px %>px;">
             <% day_events = events_by_day.fetch(day, []) %>
 
-            <%# Split: CourseItems go in bottom due-bar; everything else stays timed %>
-            <% due_items =
-              day_events.map { |e| e.respond_to?(:event) ? e.event : e }
-                        .select { |r| r.model_name.singular == "course_item" }
-                        .sort_by { |r| r.due_at }
-            %>
+            <% due_height_px = 28 %>
+            <% due_min_minutes = 10 %>
 
-            <% timed_events = day_events.reject do |e|
-              r = e.respond_to?(:event) ? e.event : e
-              r.model_name.singular == "course_item"
-            end %>
-
-            <%# -------- Build timed segments (no course_items here) -------- %>
             <% segments =
-              timed_events.map do |e|
+              day_events.map do |e|
                 record = e.respond_to?(:event) ? e.event : e
+                model  = record.model_name.singular
 
                 start_at = e.starts_at.in_time_zone
+
                 finish_at =
-                  if e.respond_to?(:ends_at) && e.ends_at.present?
+                  if model == "course_item"
+                    start_at + due_min_minutes.minutes
+                  elsif e.respond_to?(:ends_at) && e.ends_at.present?
                     e.ends_at.in_time_zone
                   else
                     start_at + 1.hour
@@ -208,19 +201,31 @@
                 minutes_from_midnight = ((seg_start - day_start) / 60.0)
                 duration_minutes      = ((seg_end - seg_start) / 60.0)
 
+                top_px = (minutes_from_midnight * px_per_minute)
+
+                height_px =
+                  if model == "course_item"
+                    due_height_px
+                  else
+                    ([duration_minutes, 15].max * px_per_minute)
+                  end
+
+                max_height_px = day_height_px - top_px
+                height_px = [height_px, max_height_px].min
+
                 {
                   record: record,
+                  model: model,
                   seg_start: seg_start,
                   seg_end: seg_end,
-                  top: (minutes_from_midnight * px_per_minute),
-                  height: ([duration_minutes, 15].max * px_per_minute),
+                  top: top_px,
+                  height: height_px,
                   col: 0,
                   group_cols: 1
                 }
-              end.compact.sort_by { |s| s[:seg_start] }
+              end.compact.sort_by { |s| [s[:seg_start], s[:model] == "course_item" ? 1 : 0] }
             %>
 
-            <%# -------- Overlap handling per cluster (prevents whole-day shrink) -------- %>
             <% groups = [] %>
             <% current_group = [] %>
             <% current_end = nil %>
@@ -267,29 +272,42 @@
               " border-left-color: rgba(255,255,255,0.70);"
             %>
 
+            <% due_css =
+              "border-left-style: solid;" \
+              " border-left-width: 6px;" \
+              " border-left-color: rgba(0,0,0,0.25);" \
+              " box-shadow: 0 10px 24px rgba(0,0,0,0.35);"
+            %>
+
             <% segments.each do |seg| %>
               <% record = seg[:record] %>
-              <% width_pct = (100.0 / seg[:group_cols]) %>
-              <% left_pct = seg[:col] * width_pct %>
-
-              <% start_label = seg[:seg_start].strftime("%-I:%M %p") %>
-              <% end_label   = seg[:seg_end].strftime("%-I:%M %p") %>
-
-              <% model = record.model_name.singular %>
+              <% model  = seg[:model] %>
               <% is_course = (model == "course") %>
+              <% is_due    = (model == "course_item") %>
 
-              <% base_bg   = record.color.presence || "#34D399" %>
+              <% width_pct = (100.0 / seg[:group_cols]) %>
+              <% left_pct  = seg[:col] * width_pct %>
+
+              <% base_bg   = record.respond_to?(:color) && record.color.present? ? record.color : "#34D399" %>
               <% base_text = record.respond_to?(:contrast_text_color) ? record.contrast_text_color : "#F9FAFB" %>
 
               <% badge_class =
-                if is_course
+                if is_course || is_due
                   "bg-white/40 text-black/90"
                 else
                   "bg-black/25 text-white/95"
                 end
               %>
 
-              <% type_label = is_course ? "COURSE" : "EVENT" %>
+              <% type_label =
+                if is_due
+                  "DUE"
+                elsif is_course
+                  "COURSE"
+                else
+                  "EVENT"
+                end
+              %>
 
               <% style_str =
                 "top: #{seg[:top]}px; " \
@@ -299,14 +317,22 @@
                 "background-color: #{base_bg}; " \
                 "color: #{base_text}; " \
                 "border-color: rgba(0,0,0,0.22); " \
-                "#{is_course ? course_css : ""}"
+                "#{is_course ? course_css : (is_due ? due_css : "")}"
               %>
 
               <% highlight_id = "#{model}-#{record.id}-#{seg[:seg_start].to_date.iso8601}" %>
 
-              <%= link_to polymorphic_path(record, start_date: start_date.to_date),
+              <% href =
+                if is_due
+                  edit_course_course_item_path(record.course, record)
+                else
+                  polymorphic_path(record, start_date: start_date.to_date)
+                end
+              %>
+
+              <%= link_to href,
                 id: highlight_id,
-                class: event_classes,
+                class: (is_due ? due_classes : event_classes),
                 style: style_str,
                 data: {
                   calendar_event: true,
@@ -315,82 +341,38 @@
                   turbo_prefetch: false
                 } do %>
 
-                <div class="mb-1 flex items-center justify-between gap-2">
-                  <div class="min-w-0">
-                    <div class="font-semibold truncate text-[13px]">
-                      <%= record.title.presence || "(Untitled)" %>
+                <% if is_due %>
+                  <div class="flex items-center justify-between gap-2">
+                    <div class="min-w-0 font-semibold truncate text-[13px]">
+                      <%= record[:title].presence || "(Untitled)" %> - <%= record.due_at.in_time_zone.strftime("%-I:%M%P") %>
                     </div>
+                    <span class="shrink-0 rounded-md px-2 py-0.5 text-[10px] font-semibold <%= badge_class %>">
+                      DUE
+                    </span>
                   </div>
-                  <span class="shrink-0 rounded-md px-2 py-0.5 text-[10px] font-semibold tracking-wide <%= badge_class %>">
-                    <%= type_label %>
-                  </span>
-                </div>
+                <% else %>
+                  <% start_label = seg[:seg_start].strftime("%-I:%M %p") %>
+                  <% end_label   = seg[:seg_end].strftime("%-I:%M %p") %>
 
-                <% if is_course && record.respond_to?(:professor) && record.professor.present? %>
-                  <div class="opacity-90 truncate"><%= record.professor %></div>
-                <% elsif record.respond_to?(:location) && record.location.present? %>
-                  <div class="opacity-90 truncate"><%= record.location %></div>
+                  <div class="mb-1 flex items-center justify-between gap-2">
+                    <div class="min-w-0">
+                      <div class="font-semibold truncate text-[13px]">
+                        <%= record.title.presence || "(Untitled)" %>
+                      </div>
+                    </div>
+                    <span class="shrink-0 rounded-md px-2 py-0.5 text-[10px] font-semibold tracking-wide <%= badge_class %>">
+                      <%= type_label %>
+                    </span>
+                  </div>
+
+                  <% if is_course && record.respond_to?(:professor) && record.professor.present? %>
+                    <div class="opacity-90 truncate"><%= record.professor %></div>
+                  <% elsif record.respond_to?(:location) && record.location.present? %>
+                    <div class="opacity-90 truncate"><%= record.location %></div>
+                  <% end %>
+
+                  <div class="opacity-90 font-medium"><%= start_label %> – <%= end_label %></div>
                 <% end %>
-
-                <div class="opacity-90 font-medium"><%= start_label %> – <%= end_label %></div>
-              <% end %>
-            <% end %>
-
-            <%# -------- Due bar pinned to the bottom (Canvas style) -------- %>
-            <% due_chip_height = 28 %>
-            <% due_gap = 6 %>
-            <% due_max = 3 %>
-            <% shown = due_items.first(due_max) %>
-            <% remaining = [due_items.length - due_max, 0].max %>
-
-            <% shown.each_with_index do |item, idx| %>
-              <% base_bg   = item.color.presence || "#7C3AED" %>
-              <% base_text = item.respond_to?(:contrast_text_color) ? item.contrast_text_color : "#F9FAFB" %>
-
-              <% y = day_height_px - (idx + 1) * (due_chip_height + due_gap) %>
-
-              <% style_str =
-                "top: #{y}px; " \
-                "height: #{due_chip_height}px; " \
-                "left: 6px; " \
-                "width: calc(100% - 12px); " \
-                "background-color: #{base_bg}; " \
-                "color: #{base_text};"
-              %>
-
-              <%= link_to edit_course_course_item_path(item.course, item),
-                class: due_classes,
-                style: style_str,
-                data: { turbo_prefetch: false } do %>
-                <div class="flex items-center justify-between gap-2">
-                  <div class="min-w-0 font-semibold truncate">
-                    <%= item.title.presence || "(Untitled)" %> - <%= item.due_at.in_time_zone.strftime("%-I:%M%P") %>
-                  </div>
-                  <span class="shrink-0 rounded-md px-2 py-0.5 text-[10px] font-semibold bg-white/40 text-black/90">
-                    DUE
-                  </span>
-                </div>
-              <% end %>
-            <% end %>
-
-            <% if remaining > 0 %>
-              <% y = day_height_px - (due_max + 1) * (due_chip_height + due_gap) %>
-              <% style_str =
-                "top: #{y}px; " \
-                "height: #{due_chip_height}px; " \
-                "left: 6px; " \
-                "width: calc(100% - 12px); " \
-                "background-color: rgba(255,255,255,0.08); " \
-                "color: #E5E7EB;"
-              %>
-
-              <%= link_to courses_path,
-                class: due_classes,
-                style: style_str,
-                data: { turbo_prefetch: false } do %>
-                <div class="font-semibold truncate">
-                  +<%= remaining %> more due items
-                </div>
               <% end %>
             <% end %>
           </div>
