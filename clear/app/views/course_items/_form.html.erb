@@ -1,0 +1,44 @@
+<%= form_with model: [course, course_item] do |f| %>
+  <% if course_item.errors.any? %>
+    <div class="mb-3 rounded-xl border border-red-500/40 bg-red-950/20 p-3 text-sm text-red-200">
+      <ul class="list-disc pl-5">
+        <% course_item.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <div class="grid gap-3 md:grid-cols-6 items-end">
+    <div class="md:col-span-3">
+      <%= f.label :title, class: "block text-xs font-medium text-zinc-300" %>
+      <%= f.text_field :title,
+            placeholder: "HW 3, Midterm, Seminar…",
+            class: "mt-1 w-full rounded-xl border border-zinc-800 bg-zinc-950/40 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-500" %>
+    </div>
+    <div class="md:col-span-1">
+      <%= f.label :kind, class: "block text-xs font-medium text-zinc-300" %>
+      <%= f.select :kind,
+            CourseItem.kinds.keys.map { |k| [k.humanize, k] },
+            {},
+            class: "mt-1 w-full rounded-xl border border-zinc-800 bg-zinc-950/40 px-3 py-2 text-sm text-zinc-100" %>
+    </div>
+    <div class="md:col-span-2">
+      <%= f.label :due_at, "Due", class: "block text-xs font-medium text-zinc-300" %>
+      <%= f.datetime_local_field :due_at,
+            class: "mt-1 w-full rounded-xl border border-zinc-800 bg-zinc-950/40 px-3 py-2 text-sm text-zinc-100" %>
+    </div>
+    <div class="md:col-span-6">
+      <%= f.label :details, class: "block text-xs font-medium text-zinc-300" %>
+      <%= f.text_area :details, rows: 3,
+            class: "mt-1 w-full rounded-xl border border-zinc-800 bg-zinc-950/40 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-500" %>
+    </div>
+    <div class="md:col-span-6 flex justify-end">
+      <button
+        type="submit"
+        class="inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-medium
+               bg-emerald-500/15 text-emerald-100 border border-emerald-400/25 hover:bg-emerald-500/20 transition">
+        <%= course_item.persisted? ? "Save changes" : "Add item" %>
+      </button>
+    </div>
+  </div>
+<% end %>

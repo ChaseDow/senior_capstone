@@ -1,0 +1,19 @@
+<% content_for :page_title, (@course.title.presence || "Course") %>
+<% content_for :page_subtitle, "Edit course item" %>
+<div class="rounded-2xl border border-emerald-900/35 bg-emerald-950/15 backdrop-blur-sm p-6">
+  <div class="flex items-center justify-between gap-3">
+    <div class="text-sm text-zinc-300">
+      Update the item details.
+    </div>
+    <div class="flex gap-2">
+      <%= render Studs::SecondaryButtonComponent.new(
+            path: course_course_items_path(@course),
+            label: "Back to items",
+            size: :sm
+          ) %>
+    </div>
+  </div>
+  <div class="mt-4 rounded-2xl border border-emerald-900/30 bg-emerald-950/10 p-4">
+    <%= render "form", course: @course, course_item: @course_item %>
+  </div>
+</div>

@@ -2,14 +2,14 @@
 
 one:
   title: MyString
-  starts_at: 2026-01-05 18:25:02
-  ends_at: 2026-01-05 18:25:02
-  location: MyString
   description: MyText
+  starts_at: 2026-01-05 18:25:02
+  color: "#34D399"
+  user: one
 
 two:
   title: MyString
-  starts_at: 2026-01-05 18:25:02
-  ends_at: 2026-01-05 18:25:02
-  location: MyString
   description: MyText
+  starts_at: 2026-01-06 18:25:02
+  color: "#34D399"
+  user: one

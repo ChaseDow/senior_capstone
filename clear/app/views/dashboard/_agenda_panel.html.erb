@@ -54,8 +54,15 @@
       <% else %>
         <div class="space-y-2">
           <% occs.each do |o| %>
+            <%# ---- Correct record selection ---- %>
+            <% is_course_item =
+              o.respond_to?(:model_name) && o.model_name.singular == "course_item"
+            %>
+
             <% record =
-              if o.respond_to?(:event) && o.event.present?
+              if is_course_item
+                o
+              elsif o.respond_to?(:event) && o.event.present?
                 o.event
               elsif o.respond_to?(:course) && o.course.present?
                 o.course
@@ -63,6 +70,10 @@
                 o
               end
             %>
+
+            <% model = record.respond_to?(:model_name) ? record.model_name.singular : nil %>
+            <% is_course = (model == "course") %>
+            <% is_due    = (model == "course_item") %>
 
             <% start_at = o.starts_at.in_time_zone %>
             <% end_at =
@@ -73,7 +84,6 @@
               end
             %>
 
-            <% is_course = record.respond_to?(:model_name) && record.model_name.singular == "course" %>
             <% base_bg   = record.respond_to?(:color) && record.color.present? ? record.color : "#34D399" %>
             <% tint_bg     = rgba(base_bg, 0.14) %>
             <% tint_hover  = rgba(base_bg, 0.20) %>
@@ -81,7 +91,9 @@
             <% tint_bar    = rgba(base_bg, 0.90) %>
 
             <% meta =
-              if is_course && record.respond_to?(:professor) && record.professor.present?
+              if is_due && record.respond_to?(:kind) && record.kind.present?
+                record.kind.humanize
+              elsif is_course && record.respond_to?(:professor) && record.professor.present?
                 record.professor
               elsif record.respond_to?(:location) && record.location.present?
                 record.location
@@ -93,6 +105,32 @@
                 "#{record.model_name.singular}-#{record.id}-#{start_at.to_date.iso8601}"
               else
                 "occ-#{o.object_id}-#{start_at.to_date.iso8601}"
+              end
+            %>
+
+            <% time_label =
+              if is_due
+                "Due #{start_at.strftime("%-I:%M %p")}"
+              else
+                "#{start_at.strftime("%-I:%M %p")} – #{end_at.strftime("%-I:%M %p")}"
+              end
+            %>
+
+            <% type_label =
+              if is_due
+                "Due"
+              elsif is_course
+                "Course"
+              else
+                "Event"
+              end
+            %>
+
+            <% open_path =
+              if is_due
+                edit_course_course_item_path(record.course, record)
+              else
+                polymorphic_path(record)
               end
             %>
 
@@ -119,9 +157,9 @@
                   </div>
 
                   <div class="mt-1 text-xs font-medium text-zinc-200/90">
-                    <%= start_at.strftime("%-I:%M %p") %> – <%= end_at.strftime("%-I:%M %p") %>
+                    <%= time_label %>
                     <span class="mx-1 text-zinc-300/60">•</span>
-                    <%= is_course ? "Course" : "Event" %>
+                    <%= type_label %>
                   </div>
 
                   <% if meta.present? %>
@@ -130,7 +168,7 @@
                 </div>
 
                 <%= link_to "Open",
-                  polymorphic_path(record),
+                  open_path,
                   class: "shrink-0 rounded-xl border px-3 py-1.5 text-xs font-semibold text-zinc-50 transition hover:brightness-110",
                   style: "border-color: #{tint_border}; background-color: #{rgba(base_bg, 0.18)};",
                   data: {

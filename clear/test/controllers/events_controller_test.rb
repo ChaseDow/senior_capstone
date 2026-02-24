@@ -1,10 +1,16 @@
 require "test_helper"
 
 class EventsControllerTest < ActionDispatch::IntegrationTest
+  include Devise::Test::IntegrationHelpers
+
   setup do
+    @user = users(:one)
+    sign_in @user
+
     @event = Event.create!(
       title: "Existing event",
-      starts_at: Time.current
+      starts_at: Time.current,
+      user: @user
     )
   end
 
@@ -32,6 +38,9 @@ class EventsControllerTest < ActionDispatch::IntegrationTest
     end
 
     assert_redirected_to event_url(Event.last)
+
+    # Optional but useful: ensure it's owned by the signed-in user
+    assert_equal @user.id, Event.last.user_id
   end
 
   test "should show event" do

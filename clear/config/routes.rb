@@ -6,7 +6,9 @@ Rails.application.routes.draw do
   end
 
   resources :events
-  resources :courses
+  resources :courses do
+    resources :course_items, only: %i[index create edit update destroy]
+  end
   resources :agenda
 
   resources :syllabuses do
