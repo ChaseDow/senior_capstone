@@ -7,7 +7,7 @@ Rails.application.routes.draw do
 
   resources :events
   resources :courses do
-    resources :course_items, except: [ :show ]
+    resources :course_items, only: %i[index create edit update destroy]
   end
   resources :agenda
 
