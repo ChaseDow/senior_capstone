@@ -1,12 +1,10 @@
 <% content_for :page_title, (@course.title.presence || "Course") %>
 <% content_for :page_subtitle, "Course items" %>
-
 <div class="rounded-2xl border border-emerald-900/35 bg-emerald-950/15 backdrop-blur-sm p-6">
   <div class="flex items-center justify-between">
     <div class="text-sm text-zinc-300">
       Add and manage assignments, exams, presentations, seminars, etc.
     </div>
-
     <div class="flex gap-2">
       <%= render Studs::SecondaryButtonComponent.new(
             path: courses_path,
@@ -15,11 +13,9 @@
           ) %>
     </div>
   </div>
-
   <div class="mt-4 rounded-2xl border border-emerald-900/30 bg-emerald-950/10 p-4">
     <%= render "form", course: @course, course_item: @course_item %>
   </div>
-
   <div class="mt-4 overflow-hidden rounded-2xl border border-emerald-900/30 bg-emerald-950/10">
     <% if @course_items.any? %>
       <div class="divide-y divide-emerald-900/25">
@@ -27,25 +23,21 @@
           <div class="flex items-start justify-between gap-4 p-4">
             <div class="min-w-0">
               <p class="truncate font-medium text-zinc-100"><%= item[:title].presence || "(Untitled)" %></p>
-
               <p class="mt-1 text-sm text-zinc-400">
                 <%= item.kind.humanize %>
                 •
                 <%= l(item.due_at) %>
               </p>
-
               <% if item.details.present? %>
                 <p class="mt-1 text-sm text-zinc-500 whitespace-pre-line"><%= item.details %></p>
               <% end %>
             </div>
-
             <div class="flex shrink-0 items-center gap-2">
               <%= render Studs::SecondaryButtonComponent.new(
                     path: edit_course_course_item_path(@course, item),
                     label: "Edit",
                     size: :sm
                   ) %>
-
               <%= button_to "Delete",
                     course_course_item_path(@course, item),
                     method: :delete,
