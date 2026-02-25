@@ -69,6 +69,12 @@
                     size: :sm
                   ) %>
 
+              <%= render Studs::SecondaryButtonComponent.new(
+                    path: course_course_items_path(course),
+                    label: "Items",
+                    size: :sm
+                  ) %>
+
               <%= button_to "Delete",
                             course_path(course),
                             method: :delete,

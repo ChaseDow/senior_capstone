@@ -11,6 +11,10 @@
 # It's strongly recommended that you check this file into your version control system.
 
 ActiveRecord::Schema[8.1].define(version: 2026_02_12_174022) do
+dev@dev-capstone:~/Desktop/testing$ git clone https://github.com/ChaseDow/senior_capstone.git
+Cloning into 'senior_capstone'...
+remote: Enumerating objects: 2151, done.
+remote: Counting objects: 100% (504/504), done.
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -40,6 +44,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_12_174022) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "course_items", force: :cascade do |t|
+    t.bigint "course_id", null: false
+    t.datetime "created_at", null: false
+    t.text "details"
+    t.datetime "due_at", null: false
+    t.integer "kind", default: 0, null: false
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.index ["course_id", "due_at"], name: "index_course_items_on_course_id_and_due_at"
+    t.index ["course_id"], name: "index_course_items_on_course_id"
   end
 
   create_table "courses", force: :cascade do |t|
@@ -135,13 +151,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_12_174022) do
     t.datetime "remember_created_at"
     t.datetime "reset_password_sent_at"
     t.string "reset_password_token"
+    t.integer "role", default: 0, null: false
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
+    t.index ["role"], name: "index_users_on_role"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "course_items", "courses"
   add_foreign_key "courses", "labels"
   add_foreign_key "courses", "users"
   add_foreign_key "events", "labels"

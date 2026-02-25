@@ -33,7 +33,11 @@
                   [&_svg]:text-current
                   [&_svg_*]:stroke-current
                   [&_svg_*]:fill-none"
-            aria-label="Toggle navigation"
+            aria-label="Tdev@dev-capstone:~/Desktop/testing$ git clone https://github.com/ChaseDow/senior_capstone.git
+Cloning into 'senior_capstone'...
+remote: Enumerating objects: 2151, done.
+remote: Counting objects: 100% (504/504), done.
+oggle navigation"
           >
             <span class="[&>svg]:h-6 [&>svg]:w-6">
               <%= icon "menu-01-stroke-rounded" %>
@@ -47,19 +51,23 @@
         <!-- Sidebar content -->
         <div class="flex-1 min-h-0 overflow-y-auto">
           <%= render Studs::LeftNavComponent.new(
-                brand: nil,
-                items: ([
-                  { label: "Dashboard", path: "/dashboard", icon_name: "dashboard-circle-stroke-rounded" },
-                  { label: "Agenda",    path: "/agenda",    icon_name: "view-agenda-stroke-rounded" },
-                  { label: "Courses",   path: "/courses",   icon_name: "course-stroke-rounded" },
-                  { label: "Labels",    path: "/labels",    icon_name: "course-stroke-rounded" },
-                  { label: "Events",    path: "/events",    icon_name: "timeline-event-stroke-rounded" },
-                  { label: "Schedule",  path: "/schedule",  icon_name: "timeline-event-stroke-rounded" },
-                  { label: "Syllabus",  path: "/syllabuses",icon_name: "file-01-stroke-rounded" }
-                ]+ 
-                (current_user&.dev_account? ? [{ label: "UI",        path: "/ui",        icon_name: "search-01-stroke-rounded" }] : [])),
-                class_name: "h-full"
-              ) %>
+            brand: nil,
+            items: (
+              [
+                { label: "Dashboard", path: "/dashboard",  icon_name: "dashboard-circle-stroke-rounded" },
+                { label: "Agenda",    path: "/agenda",     icon_name: "view-agenda-stroke-rounded" },
+                { label: "Courses",   path: "/courses",    icon_name: "course-stroke-rounded" },
+                { label: "Events",    path: "/events",     icon_name: "timeline-event-stroke-rounded" },
+                { label: "Schedule",  path: "/schedule",   icon_name: "timeline-event-stroke-rounded" },
+                { label: "Syllabus",  path: "/syllabuses", icon_name: "file-01-stroke-rounded" }
+              ] +
+              (current_user&.admin? ? [
+                { label: "Users", path: "/admin/users", icon_name: "user-02-stroke-rounded" },
+                { label: "UI",    path: "/ui",          icon_name: "search-01-stroke-rounded" }
+              ] : [])
+            ),
+            class_name: "h-full"
+          ) %>
         </div>
       </aside>
       <!-- RIGHT COLUMN (top bar + page content) -->
@@ -89,13 +97,13 @@
           </div>
         </main>
       </div>
+      <div id="drawer_events" class="hidden"></div>
       <!-- Event Drawer Overlay -->
       <div
         data-drawer-target="overlay"
         data-action="click->drawer#close"
         class="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
       </div>
-
       <!-- Event Drawer Panel -->
       <div class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none px-4">
         <div
@@ -115,12 +123,33 @@
           <% end %>
         </div>
       </div>
-
       <!-- Event Drawer Skeleton -->
       <template data-drawer-target="skeleton">
         <%= render "events/drawer_skeleton" %>
       </template>
     </div>
+    <script>
+      function bindPasswordToggles() {
+        document.querySelectorAll('[data-password-toggle]').forEach((button) => {
+          if (button.dataset.bound === "true") return; // prevent double binding
+          button.dataset.bound = "true";
 
+          button.addEventListener("click", () => {
+            const input = document.getElementById(button.dataset.target);
+            const showIcon = button.querySelector("[data-show]");
+            const hideIcon = button.querySelector("[data-hide]");
+
+            const isHidden = input.type === "password";
+            input.type = isHidden ? "text" : "password";
+
+            showIcon.classList.toggle("hidden", isHidden);
+            hideIcon.classList.toggle("hidden", !isHidden);
+          });
+        });
+      }
+
+      document.addEventListener("turbo:load", bindPasswordToggles);
+      document.addEventListener("turbo:frame-load", bindPasswordToggles);
+    </script>
   </body>
 </html>

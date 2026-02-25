@@ -2,6 +2,7 @@
 
 class Course < ApplicationRecord
   belongs_to :user
+  has_many :course_items, dependent: :destroy
   has_many :syllabuses, dependent: :nullify
 
   # A course must have a title
