@@ -10,6 +10,7 @@ Rails.application.routes.draw do
     resources :course_items, only: %i[index create edit update destroy]
   end
   resources :agenda
+  resources :labels, only: %i[index new create edit update destroy]
 
   resources :syllabuses do
     member do

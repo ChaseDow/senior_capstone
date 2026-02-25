@@ -2,14 +2,18 @@
 
 class Event < ApplicationRecord
   belongs_to :user
+  belongs_to :label, optional: true
 
   validates :title, presence: true
   validates :starts_at, presence: true
   validate :ends_at_after_starts_at, if: -> { starts_at.present? && ends_at.present? }
 
+  # Color behavior:
+  # - If blank/nil, we default it in normalize_color
+  # - If present, it must be a #RRGGBB hex string
   validates :color,
-            format: { with: /\A#[0-9a-fA-F]{6}\z/, message: "must be a hex color like #34D399" },
-            allow_nil: true
+            format: { with: /\A#[0-9A-F]{6}\z/, message: "must be a hex color like #34D399" },
+            allow_blank: true
 
   validates :repeat_until, presence: true, if: :recurring?
   validate :repeat_days_present_if_recurring
@@ -79,9 +83,16 @@ class Event < ApplicationRecord
   end
 
   def normalize_color
-    self.color = color.to_s.strip.upcase
+    self.color =
+      if label.present?
+        label.color.to_s.strip.upcase
+      else
+        color.to_s.strip.upcase
+      end
+
     self.color = "#34D399" if color.blank?
   end
+
 
   def repeat_days_present_if_recurring
     return unless recurring?

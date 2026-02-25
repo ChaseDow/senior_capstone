@@ -15,13 +15,15 @@ class Course < ApplicationRecord
   # Ensure the course end date is not before the start date
   validate :end_date_after_start_date, if: -> { start_date.present? && end_date.present? }
 
-  # This lets us visually distinguish courses later in the UI or calendar.
+  # Color behavior:
+  # - If blank/nil, we default it in normalize_color
+  # - If present, it must be a #RRGGBB hex string (normalized to uppercase)
   validates :color,
             format: {
-              with: /\A#[0-9a-fA-F]{6}\z/,
+              with: /\A#[0-9A-F]{6}\z/,
               message: "must be a hex color like #34D399"
             },
-            allow_nil: true
+            allow_blank: true
 
   # Normalize fields before validation
   before_validation :normalize_color
@@ -62,6 +64,7 @@ class Course < ApplicationRecord
       end
       d += 1.day
     end
+
     out
   end
 

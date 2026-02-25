@@ -149,6 +149,7 @@ class CoursesController < ApplicationController
       :end_time,
       :professor,
       :location,
+      :label_id,
       :description,
       repeat_days: []
     )
