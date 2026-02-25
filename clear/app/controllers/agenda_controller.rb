@@ -55,6 +55,8 @@ class AgendaController < ApplicationController
         occ.event
       elsif occ.respond_to?(:course)
         occ.course
+      elsif occ.respond_to?(:color)
+        occ.course
       end
 
     is_course = item.is_a?(Course)
@@ -67,7 +69,8 @@ class AgendaController < ApplicationController
       title: item&.title.presence || (is_course ? "(Untitled Course)" : "(Untitled Event)"),
       location: item&.location,
       description: item&.description,
-      professor: is_course ? item&.professor : nil
+      professor: is_course ? item&.professor : nil,
+      color: occ.color
     }
   end
 end

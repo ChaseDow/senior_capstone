@@ -10,7 +10,25 @@ module Studs
       red:     "bg-red-500/10 text-red-200 border-red-500/20"
     }.freeze
 
-    def initialize(time:, title:, meta: nil, href: nil, tag: nil, tag_color: :zinc, icon_name: nil, class_name: nil, **attrs)
+    def initialize(
+      time:,
+      title:,
+      meta: nil,
+      href: nil,
+      tag: nil,
+      tag_color: :zinc,
+      icon_name: nil,
+      class_name: nil,
+
+      # NEW (for the colored cards)
+      accent_color: "#34D399",
+      selected: false,
+
+      # NEW (optional line like "9:00 AM – 10:30 AM • Event")
+      subline: nil,
+
+      **attrs
+    )
       @time = time
       @title = title
       @meta = meta
@@ -20,21 +38,53 @@ module Studs
       @icon_name = icon_name
       @class_name = class_name
       @attrs = attrs
+
+      @accent_color = accent_color.presence || "#34D399"
+      @selected = selected
+      @subline = subline
     end
 
     def wrapper_tag = @href.present? ? :a : :div
 
+    def rgba(hex, alpha)
+      h = hex.to_s.delete("#")
+      return "rgba(52,211,153,#{alpha})" unless h.match?(/\A[\da-fA-F]{6}\z/)
+
+      r = h[0..1].to_i(16)
+      g = h[2..3].to_i(16)
+      b = h[4..5].to_i(16)
+      "rgba(#{r},#{g},#{b},#{alpha})"
+    end
+
+    def tint_bg     = rgba(@accent_color, 0.14)
+    def tint_hover  = rgba(@accent_color, 0.20)
+    def tint_border = rgba(@accent_color, 0.35)
+    def tint_bar    = rgba(@accent_color, 0.90)
+    def open_bg     = rgba(@accent_color, 0.18)
+
     def wrapper_attrs
       base = {
         class: [
-          "group flex items-start gap-3 rounded-xl border border-zinc-800 bg-zinc-900/40 px-3 py-3",
-          "transition hover:bg-zinc-900/60",
-          @href.present? ? "cursor-pointer" : nil,
+          "group rounded-2xl border p-3 transition cursor-pointer",  # <- key: p-3
+          (@selected ? "is-selected" : nil),
           @class_name
         ].compact.join(" ")
       }.merge(@attrs)
 
       @href.present? ? base.merge(href: @href) : base
+    end
+
+    def merged_style
+      base_style = [
+        "--bg-normal: #{tint_bg}",
+        "--bg-hover: #{tint_hover}",
+        "background-color: var(--bg-normal)",
+        "border-color: #{tint_border}",
+        "border-left: 6px solid #{tint_bar}"
+      ].join("; ")
+
+      existing = @attrs[:style].to_s.strip
+      existing.present? ? "#{existing}; #{base_style}" : base_style
     end
 
     def tag_classes
