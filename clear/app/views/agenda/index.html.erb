@@ -20,14 +20,14 @@
             params[:type]
           ),
           {},
-          class: "w-full rounded-xl border border-zinc-800 bg-zinc-900/50 px-3 py-2 text-sm text-zinc-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-400/40" %>
+          class: "w-full rounded-xl border border-zinc-800 bg-zinc-900/50 px-3 py-2 text-sm text-emerald-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-400/40" %>
       </div>
 
       <div class="flex items-center gap-2">
         <%= f.date_field :start_date,
           value: params[:start_date],
           placeholder: "Start",
-          class: "h-[38px] w-36 rounded-xl border border-zinc-800 bg-zinc-900/50 px-3 py-2 text-sm text-zinc-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-400/40" %>
+          class: "h-[38px] w-36 rounded-xl border border-zinc-800 bg-zinc-900/50 px-3 py-2 text-sm text-emerald-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-400/40" %>
 
         <span class="text-sm text-zinc-500 font-medium select-none">
           :
@@ -36,7 +36,7 @@
         <%= f.date_field :end_date,
           value: params[:end_date],
           placeholder: "End",
-          class: "h-[38px] w-36 rounded-xl border border-zinc-800 bg-zinc-900/50 px-3 py-2 text-sm text-zinc-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-400/40" %>
+          class: "h-[38px] w-36 rounded-xl border border-zinc-800 bg-zinc-900/50 px-3 py-2 text-sm text-emerald-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-400/40" %>
       </div>
 
       <%= f.submit "Search",
