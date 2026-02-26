@@ -62,17 +62,22 @@ module Studs
     def tint_bar    = rgba(@accent_color, 0.90)
     def open_bg     = rgba(@accent_color, 0.18)
 
-    def wrapper_attrs
-      base = {
-        class: [
-          "group rounded-2xl border p-3 transition cursor-pointer",  # <- key: p-3
-          (@selected ? "is-selected" : nil),
-          @class_name
-        ].compact.join(" ")
-      }.merge(@attrs)
+def wrapper_attrs
+  base_class = [
+    "group block w-full rounded-2xl border p-3 transition cursor-pointer",
+    (@selected ? "is-selected" : nil),
+    @class_name,
+    @attrs[:class]
+  ].compact.join(" ")
 
-      @href.present? ? base.merge(href: @href) : base
-    end
+  attrs = @attrs.dup
+  attrs.delete(:class)
+
+  {
+    class: base_class,
+    data: { agenda_item_card: true }.merge(@attrs.fetch(:data, {}))
+  }.merge(attrs)
+end
 
     def merged_style
       base_style = [

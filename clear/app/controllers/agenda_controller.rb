@@ -109,7 +109,8 @@ class AgendaController < ApplicationController
       location: item&.location,
       description: item&.description,
       professor: is_course ? item&.professor : nil,
-      color: occ.color
+      color: occ.color,
+      href: polymorphic_path(item)
     }
   end
 end

@@ -12,7 +12,8 @@ module Studs
       controller: "agenda-highlight",
       empty_message: "Nothing scheduled.",
       class_name: nil,
-      mode: :panel
+      mode: :panel,
+      href: nil
     )
       @date = date
       @title = title
@@ -21,6 +22,7 @@ module Studs
       @controller = controller
       @empty_message = empty_message
       @class_name = class_name
+      @href = href
     end
 
     def agenda_count
