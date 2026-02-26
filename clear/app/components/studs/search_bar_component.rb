@@ -25,4 +25,3 @@ module Studs
     end
   end
 end
-

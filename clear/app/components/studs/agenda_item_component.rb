@@ -42,7 +42,7 @@ module Studs
     def wrapper_attrs
       base = {
         class: [
-          "group rounded-2xl border p-3 transition cursor-pointer",  
+          "group rounded-2xl border p-3 transition cursor-pointer",
           @class_name
         ].compact.join(" ")
       }.merge(@attrs)
