@@ -1,5 +1,5 @@
-<% content_for :page_title, "Agenda" %>
-<% content_for :page_subtitle, "Upcoming tasks" %>
+<%content_for :page_title, "Agenda"%>
+<%content_for :page_subtitle, "Upcoming tasks"%>
 
 <div class="space-y-6">
   <%= form_with url: agenda_index_path, method: :get, local: true, html: { class: "space-y-3" } do |f| %>
