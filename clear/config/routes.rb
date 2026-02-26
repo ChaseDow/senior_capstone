@@ -3,6 +3,8 @@ Rails.application.routes.draw do
   resource :profile, only: [ :show, :edit, :update ] do
     get :edit_password
     patch :update_password
+    get :edit_avatar
+    patch :update_avatar
   end
 
   resources :events

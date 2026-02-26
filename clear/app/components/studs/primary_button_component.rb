@@ -7,7 +7,7 @@ module Studs
       blue:    { base: "bg-blue-600",   hover: "hover:bg-blue-700",   ring: "focus-visible:ring-blue-300/70" },
       emerald: { base: "bg-emerald-600", hover: "hover:bg-emerald-700", ring: "focus-visible:ring-emerald-300/70" },
       zinc:    { base: "bg-zinc-800",   hover: "hover:bg-zinc-700",   ring: "focus-visible:ring-zinc-300/50" },
-      red:     {base: "bg-red-600",   hover: "hover:bg-red-700",   ring: "focus-visible:ring-red-300/70" }
+      red:     { base: "bg-red-600",   hover: "hover:bg-red-700",   ring: "focus-visible:ring-red-300/70" }
     }.freeze
 
     def initialize(label:, color: :orange, href: nil, type: "button", disabled: false, class_name: nil, **attrs)
