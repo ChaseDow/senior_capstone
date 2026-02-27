@@ -1,5 +1,6 @@
 class ProfilesController < ApplicationController
   before_action :authenticate_user!
+
   def show
     @user = current_user
 
@@ -62,5 +63,33 @@ class ProfilesController < ApplicationController
 
   def password_params
     params.require(:user).permit(:current_password, :password, :password_confirmation)
+  end
+
+  def edit_avatar
+    @user = current_user
+    render partial: "profiles/edit_avatar_form", locals: { user: @user }
+  end
+
+  def update_avatar
+    @user = current_user
+
+    # If user hit Save without selecting a file, just show the drawer again
+    unless params.dig(:user, :avatar).present?
+      flash.now[:notice] = "No changes to save."
+      return render partial: "profiles/drawer_detail", locals: { user: @user }
+    end
+
+    if @user.update(avatar_params)
+      flash.now[:notice] = "Successfully updated."
+      render partial: "profiles/drawer_detail", locals: { user: @user }
+    else
+      render partial: "profiles/edit_avatar_form",
+        locals: { user: @user },
+        status: :unprocessable_entity
+    end
+  end
+
+  def avatar_params
+    params.require(:user).permit(:avatar)
   end
 end

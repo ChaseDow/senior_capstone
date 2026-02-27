@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@hotwired/stimulus": "^3.2.2",
-    "@hotwired/turbo-rails": "^8.0.21"
+    "@hotwired/turbo-rails": "^8.0.21",
+    "cropperjs": "^1.6.2"
   }
 }

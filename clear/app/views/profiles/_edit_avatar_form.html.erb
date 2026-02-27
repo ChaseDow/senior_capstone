@@ -1,0 +1,123 @@
+<%= turbo_frame_tag "event_drawer" do %>
+  <div class="flex max-h-[85vh] flex-col" data-controller="avatar-crop">
+    <!-- Header -->
+    <div class="flex items-start justify-between border-b border-zinc-800 bg-zinc-950/50 px-6 py-4">
+      <div>
+        <div class="text-sm font-semibold text-zinc-100">Change Icon</div>
+        <div class="text-xs text-zinc-500">Upload and crop your new avatar</div>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <div class="h-16 w-16 overflow-hidden rounded-full bg-zinc-900 ring-2 ring-emerald-900/30">
+          <!-- LIVE PREVIEW TARGET (must be inside the controller) -->
+          <div data-avatar-crop-target="preview" class="h-full w-full"></div>
+        </div>
+
+        <div>
+          <div class="text-sm text-zinc-200">Preview</div>
+          <div class="text-xs text-zinc-500">This is how it’ll look as a circle</div>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        data-action="drawer#close"
+        class="inline-flex items-center justify-center rounded-xl border border-zinc-950/40 bg-zinc-950/40 px-3 py-1.5 text-sm text-zinc-300 transition hover:border-zinc-500">
+        ✕
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="min-h-0 flex-1 overflow-y-auto p-6 space-y-4">
+      <div class="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5 space-y-4">
+        <div class="flex items-center justify-between">
+          <div class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Avatar</div>
+
+          <%= link_to "Back",
+                profile_path,
+                data: { turbo_frame: "event_drawer", turbo_prefetch: false },
+                class: "rounded-xl border border-zinc-800 bg-zinc-950/30 px-3 py-1.5 text-xs text-zinc-200 transition hover:bg-white/5" %>
+        </div>
+
+        <%= form_with model: current_user,
+              url: update_avatar_profile_path,
+              method: :patch,
+              html: { multipart: true },
+              data: { avatar_crop_target: "form", action: "submit->avatar-crop#submitCropped" } do |f| %>
+
+          <div class="space-y-3">
+            <div class="text-sm text-zinc-200">Upload image</div>
+
+            <%= f.file_field :avatar,
+                  accept: "image/*",
+                  data: { action: "change->avatar-crop#fileChanged", avatar_crop_target: "file" },
+                  class: "block w-fit text-sm text-zinc-200 file:mr-4 file:rounded-xl file:border-0 file:bg-zinc-800 file:px-4 file:py-2 file:text-sm file:text-zinc-200 hover:file:bg-zinc-700" %>
+
+            <!-- Crop area -->
+            <div class="rounded-2xl border border-zinc-800 bg-zinc-950/30 p-3">
+              <div class="mb-2 flex items-center justify-between">
+                <div class="text-xs text-zinc-500">Crop</div>
+
+                <div class="flex gap-2">
+                  <button type="button"
+                    data-action="avatar-crop#zoomIn"
+                    class="rounded-xl border border-zinc-800 bg-zinc-950/30 px-3 py-1.5 text-xs text-zinc-200 transition hover:bg-white/5">
+                    +
+                  </button>
+
+                  <button type="button"
+                    data-action="avatar-crop#zoomOut"
+                    class="rounded-xl border border-zinc-800 bg-zinc-950/30 px-3 py-1.5 text-xs text-zinc-200 transition hover:bg-white/5">
+                    −
+                  </button>
+
+                  <button type="button"
+                    data-action="avatar-crop#reset"
+                    class="rounded-xl border border-zinc-800 bg-zinc-950/30 px-3 py-1.5 text-xs text-zinc-200 transition hover:bg-white/5">
+                    Reset
+                  </button>
+                </div>
+              </div>
+
+              <div class="relative h-[460px] w-full overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/40">
+                <% if current_user.avatar.attached? %>
+                  <img
+                    data-avatar-crop-target="image"
+                    src=""
+                    class="hidden block max-w-none select-none"
+                    alt="" />
+                <% else %>
+                  <img
+                    data-avatar-crop-target="image"
+                    src=""
+                    class="hidden"
+                    alt="" />
+                  <div class="flex h-full items-center justify-center text-sm text-zinc-500">
+                    Choose an image to begin
+                  </div>
+                <% end %>
+              </div>
+
+              <div class="mt-2 text-[11px] text-zinc-500">
+                Tip: drag to position, resize the square, then Save.
+              </div>
+            </div>
+
+            <div class="flex gap-2 pt-2">
+              <button type="submit"
+                class="rounded-xl bg-emerald-600 px-4 py-2 text-sm text-white transition hover:bg-emerald-500">
+                Save
+              </button>
+
+              <button type="button"
+                data-action="drawer#close"
+                class="rounded-xl border border-zinc-800 bg-zinc-950/30 px-4 py-2 text-sm text-zinc-200 transition hover:bg-white/5">
+                Cancel
+              </button>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>
