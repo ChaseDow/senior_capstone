@@ -1,5 +1,4 @@
 <% occs = Array(occurrences) %>
-
 <style>
   [data-agenda-item-card] {
     background-color: var(--bg-normal);
@@ -18,33 +17,34 @@
     transform: translateX(10px);
   }
 </style>
-
 <div class="h-full w-full flex flex-col"
      data-controller="agenda-highlight"
      data-agenda-count="<%= occs.size %>">
-
   <div class="bg-[#233a2a]/92 border-b border-emerald-900/35 px-4 py-3">
     <div class="flex items-center justify-between">
       <div class="min-w-0">
         <div class="text-sm font-semibold text-emerald-100">Agenda</div>
         <div class="mt-0.5 text-xs text-emerald-100/70">
           <%= date.strftime("%A, %B %-d") %>
-          <% if occs.size.positive? %>
-            • <%= occs.size %> item<%= "s" if occs.size != 1 %>
+          <% todays_occs = occs.select { |o|
+              o.respond_to?(:starts_at) &&
+              o.starts_at.present? &&
+              o.starts_at.in_time_zone.to_date == Time.zone.today
+            } %>
+          <% if todays_occs.any? %>
+            • <%= todays_occs.size %> item<%= "s" if todays_occs.size != 1 %>
           <% end %>
         </div>
       </div>
-
       <button
         type="button"
         class="inline-flex items-center rounded-xl border border-emerald-500/25 bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-100 hover:bg-emerald-500/15"
         data-action="click->agenda-highlight#clear click->agenda-drawer#close"
-      >
+        >
         Close
       </button>
     </div>
   </div>
-
   <div class="flex-1 min-h-0 bg-zinc-950/95">
     <div class="h-full overflow-auto px-3 py-3">
       <% if occs.empty? %>
@@ -58,7 +58,6 @@
             <% is_course_item =
               o.respond_to?(:model_name) && o.model_name.singular == "course_item"
             %>
-
             <% record =
               if is_course_item
                 o
@@ -70,11 +69,12 @@
                 o
               end
             %>
-
+            <% next unless o.respond_to?(:starts_at) &&
+            o.starts_at.present? &&
+            o.starts_at.in_time_zone.to_date == Time.zone.today %>
             <% model = record.respond_to?(:model_name) ? record.model_name.singular : nil %>
             <% is_course = (model == "course") %>
             <% is_due    = (model == "course_item") %>
-
             <% start_at = o.starts_at.in_time_zone %>
             <% end_at =
               if o.respond_to?(:ends_at) && o.ends_at.present?
@@ -83,13 +83,11 @@
                 start_at + 1.hour
               end
             %>
-
             <% base_bg   = record.respond_to?(:color) && record.color.present? ? record.color : "#34D399" %>
             <% tint_bg     = rgba(base_bg, 0.14) %>
             <% tint_hover  = rgba(base_bg, 0.20) %>
             <% tint_border = rgba(base_bg, 0.35) %>
             <% tint_bar    = rgba(base_bg, 0.90) %>
-
             <% meta =
               if is_due && record.respond_to?(:kind) && record.kind.present?
                 record.kind.humanize
@@ -99,7 +97,6 @@
                 record.location
               end
             %>
-
             <% highlight_id =
               if record.respond_to?(:model_name) && record.id.present?
                 "#{record.model_name.singular}-#{record.id}-#{start_at.to_date.iso8601}"
@@ -107,7 +104,6 @@
                 "occ-#{o.object_id}-#{start_at.to_date.iso8601}"
               end
             %>
-
             <% time_label =
               if is_due
                 "Due #{start_at.strftime("%-I:%M %p")}"
@@ -115,7 +111,6 @@
                 "#{start_at.strftime("%-I:%M %p")} – #{end_at.strftime("%-I:%M %p")}"
               end
             %>
-
             <% type_label =
               if is_due
                 "Due"
@@ -125,7 +120,6 @@
                 "Event"
               end
             %>
-
             <% open_path =
               if is_due
                 edit_course_course_item_path(record.course, record)
@@ -133,7 +127,6 @@
                 polymorphic_path(record)
               end
             %>
-
             <div
               id="agenda-item-<%= highlight_id %>"
               data-agenda-item-card
@@ -141,12 +134,12 @@
               data-action="click->agenda-highlight#selectFromAgenda"
               data-agenda-id="<%= highlight_id %>"
               style="
-                --bg-normal: <%= tint_bg %>;
-                --bg-hover: <%= tint_hover %>;
-                border-color: <%= tint_border %>;
-                border-left: 6px solid <%= tint_bar %>;
+              --bg-normal: <%= tint_bg %>;
+              --bg-hover: <%= tint_hover %>;
+              border-color: <%= tint_border %>;
+              border-left: 6px solid <%= tint_bar %>;
               "
-            >
+              >
               <div class="flex items-start justify-between gap-3">
                 <div class="min-w-0">
                   <div class="flex items-center gap-2">
@@ -155,18 +148,15 @@
                       <%= record.respond_to?(:title) ? (record.title.presence || "(Untitled)") : "(Untitled)" %>
                     </div>
                   </div>
-
                   <div class="mt-1 text-xs font-medium text-zinc-200/90">
                     <%= time_label %>
                     <span class="mx-1 text-zinc-300/60">•</span>
                     <%= type_label %>
                   </div>
-
                   <% if meta.present? %>
                     <div class="mt-1 truncate text-xs text-zinc-300/80"><%= meta %></div>
                   <% end %>
                 </div>
-
                 <%= link_to "Open",
                   open_path,
                   class: "shrink-0 rounded-xl border px-3 py-1.5 text-xs font-semibold text-zinc-50 transition hover:brightness-110",
