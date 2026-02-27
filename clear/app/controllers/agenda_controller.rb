@@ -47,38 +47,6 @@ class AgendaController < ApplicationController
 
   private
 
-  def occurrences_for_range(range_start, range_end)
-    term = params.dig(:q, :term).to_s.strip
-    type = params[:type].to_s
-
-    base_events = current_user.events
-                              .ransack(term.present? ? { title_or_description_or_location_cont: term } : {})
-                              .result
-
-    non_recurring_events = base_events.where(recurring: false)
-                                      .where(starts_at: range_start..range_end)
-
-    recurring_events = base_events.where(recurring: true)
-                                  .where("starts_at <= ?", range_end)
-                                  .where("repeat_until >= ?", range_start.to_date)
-
-    events = non_recurring_events + recurring_events
-
-    courses = current_user.courses
-                          .ransack(term.present? ? { title_or_description_or_location_cont: term } : {})
-                          .result
-                          .where("start_date <= ?", range_end.to_date)
-                          .where("end_date IS NULL OR end_date >= ?", range_start.to_date)
-
-    event_occurrences =
-      type == "course" ? [] : events.flat_map { |e| e.occurrences_between(range_start, range_end) }
-
-    course_occurrences =
-      type == "event" ? [] : courses.flat_map { |c| c.occurrences_between(range_start, range_end) }
-
-    event_occurrences + course_occurrences
-  end
-
   def agenda_entry_for(occ)
     item =
       if occ.respond_to?(:item)
