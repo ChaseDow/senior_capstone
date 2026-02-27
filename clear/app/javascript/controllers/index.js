@@ -16,6 +16,9 @@ application.register("agenda-item", AgendaItemController)
 import AvatarCropController from "./avatar_crop_controller"
 application.register("avatar-crop", AvatarCropController)
 
+import ChatController from "./chat_controller"
+application.register("chat", ChatController)
+
 import DrawerController from "./drawer_controller"
 application.register("drawer", DrawerController)
 
@@ -33,3 +36,6 @@ application.register("search", SearchController)
 
 import SidebarController from "./sidebar_controller"
 application.register("sidebar", SidebarController)
+
+import TypewriterController from "./typewriter_controller"
+application.register("typewriter", TypewriterController)
