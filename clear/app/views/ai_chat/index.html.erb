@@ -1,19 +1,23 @@
-<%content_for :page_title, "AI Chat"%>
-<%content_for :page_subtitle, "Consult with an AI"%>
+<% content_for :page_title, "AI Chat" %>
+<% content_for :page_subtitle, "Consult with an AI" %>
 
 <div class="space-y-6">
 
-  <% if flash[:alert].present? %>
-    <div class="rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
-      <%= flash[:alert] %>
-    </div>
-  <% end %>
+  <div id="ai_chat_flash">
+    <% if flash[:alert].present? %>
+      <div class="rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+        <%= flash[:alert] %>
+      </div>
+    <% end %>
+  </div>
 
   <div class="rounded-2xl border border-zinc-800 bg-zinc-950/60 shadow-sm overflow-hidden">
     <div class="flex items-center justify-between px-5 py-4 border-b border-zinc-800">
       <div>
-        <h1 class="text-lg font-semibold text-zinc-100">AI Chat</h1>
-        <p class="text-sm text-zinc-400">Ask questions, explore scenarios, and compare schedule what-ifs.</p>
+        <h1 class="text-lg font-semibold text-zinc-100">Assistant</h1>
+        <p class="text-sm text-zinc-400">
+          Ask questions, explore scenarios, and compare schedule what-ifs.
+        </p>
       </div>
 
       <span class="inline-flex items-center gap-2 rounded-full border border-green-500/20 bg-green-500/10 px-3 py-1 text-xs font-medium text-green-200">
@@ -23,48 +27,43 @@
     </div>
 
     <!-- Messages -->
-    <div class="h-[55vh] overflow-y-auto px-5 py-4 space-y-4">
+    <div
+      class="h-[55vh] overflow-y-auto px-5 py-4 space-y-4"
+      id="ai_chat_messages"
+    >
       <% if @messages.blank? %>
-        <div class="rounded-2xl border border-zinc-800 bg-zinc-900/30 p-6 text-sm text-zinc-400">
-          No messages yet. Try: <span class="text-emerald-200">“What happens if I move my lab to Friday?”</span>
+        <div class="rounded-2xl border border-zinc-800 bg-zinc-900/30 p-6 text-sm text-emerald-200">
+          No messages yet.
         </div>
       <% end %>
 
       <% @messages.each do |m| %>
-        <% is_user = (m["role"].to_s.downcase == "user") %>
-
-        <div class="flex <%= is_user ? "justify-end" : "justify-start" %>">
-          <div
-            class="<%=
-              [
-                "max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed border",
-                (is_user ?
-                  "bg-green-600/15 border-green-500/30 text-emerald-100 shadow-[0_0_20px_rgba(34,197,94,0.08)]" :
-                  "bg-zinc-900/50 border-zinc-800 text-zinc-100")
-              ].join(" ")
-            %>"
-          >
-            <div class="mb-1 flex items-center justify-between gap-3">
-              <span class="<%= is_user ? "text-emerald-200" : "text-zinc-300" %> text-xs font-semibold uppercase tracking-wide">
-                <%= m["role"] %>
-              </span>
-            </div>
-
-            <div class="prose prose-invert prose-sm max-w-none prose-p:my-0 prose-strong:text-zinc-100 prose-a:text-emerald-200">
-              <%= simple_format(h(m["content"])) %>
-            </div>
-          </div>
-        </div>
+        <%= render "ai_chat/message", m: m %>
       <% end %>
     </div>
 
     <!-- Composer -->
     <div class="border-t border-zinc-800 bg-zinc-950/70 px-5 py-4">
-      <%= form_with url: ai_chat_index_path, method: :post, local: true, html: { class: "space-y-3" } do %>
+      <%= form_with url: ai_chat_index_path,
+        method: :post,
+        data: { turbo: true },
+        html: {
+          class: "space-y-3",
+          data: {
+            controller: "chat",
+            action: "turbo:submit-end->chat#reset"
+          }
+        } do %>
+
+        <%= hidden_field_tag :history,
+          (@messages || []).to_json,
+          id: "ai_chat_history" %>
+
         <div class="relative">
           <%= text_area_tag :content, "",
+            id: "ai_chat_input",
             rows: 3,
-            placeholder: "Ask a what-if… e.g., “If I shift my course by 30 minutes, what conflicts?”",
+            placeholder: "Ask a what-if… e.g., “If I postpone my project for a day, what else should change?”",
             class: "w-full resize-none rounded-2xl border border-zinc-800 bg-zinc-900/50 px-4 py-3 text-sm text-emerald-100 placeholder:text-zinc-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-400/40" %>
 
           <div class="pointer-events-none absolute inset-x-0 bottom-0 h-10 rounded-b-2xl bg-gradient-to-t from-zinc-950/40 to-transparent"></div>
@@ -72,14 +71,14 @@
 
         <div class="flex items-center justify-between gap-3">
           <p class="text-xs text-zinc-500">
-            Tip: Use details like dates, locations, and durations for better results.
+            Tip: Use details like dates, locations, and time for better results.
           </p>
 
           <%= submit_tag "Send",
             class: "inline-flex items-center justify-center rounded-2xl bg-green-600 px-5 py-2 text-sm font-medium text-white hover:bg-green-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-400/40 transition" %>
         </div>
+
       <% end %>
     </div>
   </div>
-
 </div>
