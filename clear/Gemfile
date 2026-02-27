@@ -86,3 +86,9 @@ gem "htmlbeautifier", "~> 1.4", group: :development
 gem "ransack"
 
 gem "pagy", "~> 43.2"
+
+gem "ollama", "~> 0.0.1"
+
+gem "ollama-ruby", "~> 1.18"
+
+gem "dotenv-rails", "~> 3.2"
