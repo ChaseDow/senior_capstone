@@ -56,8 +56,8 @@ class CoursesController < ApplicationController
         format.turbo_stream do
           render turbo_stream: turbo_stream.replace(
             "event_drawer",
-            partial: "events/drawer_edit",
-            locals: { event: @course, start_date: params[:start_date] }
+            partial: "courses/drawer_edit",
+            locals: { course: @course, start_date: params[:start_date] }
           ), status: :unprocessable_entity
         end
       end
@@ -104,7 +104,7 @@ class CoursesController < ApplicationController
 
         format.turbo_stream do
           render turbo_stream: turbo_stream.replace(
-            "course_drawer",
+            "event_drawer",
             partial: "courses/drawer_edit",
             locals: { course: @course, start_date: params[:start_date] }
           ), status: :unprocessable_entity
