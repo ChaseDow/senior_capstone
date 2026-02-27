@@ -9,9 +9,18 @@ class ScheduleController < ApplicationController
     @week_start = reference_date.beginning_of_week(:monday)
     @days = (0..6).map { |i| @week_start + i.days }
 
-    items = current_user.events.where(
-      starts_at: @week_start..(@week_start + 6.days).end_of_day
+    range_start = @week_start.beginning_of_day
+    range_end   = (@week_start + 6.days).end_of_day
+
+    events = current_user.events.where(
+      starts_at: range_start..range_end
     )
+
+    course_occurrences = current_user.courses.flat_map do |course|
+      course.occurrences_between(range_start, range_end)
+    end
+
+    items = events.to_a + course_occurrences
 
     @items_by_day = items.group_by { |item| item.starts_at.to_date }
     @items_by_day.transform_values! { |day_items| day_items.sort_by(&:starts_at) }
