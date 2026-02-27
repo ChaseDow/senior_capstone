@@ -3,6 +3,10 @@
     <div class="text-base font-semibold text-zinc-100">Edit event</div>
     <div class="text-sm text-zinc-500">Update details and save.</div>
   </div>
-
-  <%= render "form", event: @event, turbo: false %>
+  <%= render "form",
+    event: event,
+    turbo: false,
+    start_date: local_assigns[:start_date],
+    draft_id: local_assigns[:draft_id]
+  %>
 </div>

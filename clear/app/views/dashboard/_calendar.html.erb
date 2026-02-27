@@ -8,7 +8,8 @@
 <% prev_start  = week_start_date - 7.days %>
 <% next_start  = week_start_date + 7.days %>
 <% today_start = Date.current.beginning_of_week %>
-<%# --- Theme helpers --- %>
+<% draft = local_assigns[:draft] %>
+<% draft_id = draft&.id || params[:draft_id].presence || session[:active_calendar_draft_id].presence %>
 <% camo_bg      = "bg-[#233a2a]/85" %>
 <% camo_bg_soft = "bg-[#233a2a]/60" %>
 <% vline = "border-emerald-300/12" %>
@@ -50,13 +51,29 @@
 </style>
 <div class="flex h-full min-h-0 flex-col" data-controller="agenda-highlight">
   <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
-    <div class="text-lg font-semibold text-zinc-100">
-      <%= week_start_date.strftime("%B %Y") %>
+    <div class="flex items-center gap-3">
+      <div class="text-lg font-semibold text-zinc-100">
+        <%= week_start_date.strftime("%B %Y") %>
+      </div>
+      <% if draft.present? %>
+        <span class="inline-flex items-center rounded-xl border border-emerald-500/25 bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-100">
+          Draft Mode
+        </span>
+      <% end %>
     </div>
-    <nav class="flex items-center gap-2">
-      <%= link_to "Previous", dashboard_path(start_date: prev_start), class: nav_btn, data: { turbo_frame: "dashboard_calendar" } %>
-      <%= link_to "Today",    dashboard_path(start_date: today_start), class: nav_btn, data: { turbo_frame: "dashboard_calendar" } %>
-      <%= link_to "Next",     dashboard_path(start_date: next_start), class: nav_btn, data: { turbo_frame: "dashboard_calendar" } %>
+    <nav class="flex flex-wrap items-center gap-2">
+      <%= link_to "Previous",
+        dashboard_path(start_date: prev_start, draft_id: draft_id),
+        class: nav_btn,
+        data: { turbo_frame: "dashboard_calendar" } %>
+      <%= link_to "Today",
+        dashboard_path(start_date: today_start, draft_id: draft_id),
+        class: nav_btn,
+        data: { turbo_frame: "dashboard_calendar" } %>
+      <%= link_to "Next",
+        dashboard_path(start_date: next_start, draft_id: draft_id),
+        class: nav_btn,
+        data: { turbo_frame: "dashboard_calendar" } %>
       <span class="mx-1 h-6 w-px bg-emerald-500/20"></span>
       <button
         type="button"
@@ -66,11 +83,28 @@
         >
         Agenda
       </button>
+      <span class="mx-1 h-6 w-px bg-emerald-500/20"></span>
+      <% if draft.present? %>
+        <%= button_to "Discard",
+          discard_calendar_draft_path(draft),
+          method: :post,
+          form: { data: { turbo_frame: "dashboard_calendar" } },
+          class: nav_btn %>
+        <%= button_to "Apply",
+          apply_calendar_draft_path(draft),
+          method: :post,
+          form: { data: { turbo_frame: "dashboard_calendar" } },
+          class: nav_btn %>
+      <% else %>
+        <%= button_to "Start Draft",
+          calendar_drafts_path(title: "What-if Draft", start_date: start_date.to_date),
+          method: :post,
+          form: { data: { turbo_frame: "dashboard_calendar" } },
+          class: nav_btn %>
+      <% end %>
     </nav>
   </div>
-  <!-- Calendar shell -->
   <div class="min-h-0 flex-1 overflow-auto rounded-2xl border border-emerald-900/40 bg-emerald-950/10 shadow-[inset_0_0_0_1px_rgba(16,185,129,0.08)]">
-    <!-- Sticky header -->
     <div
       class="sticky top-0 z-20 border-b border-emerald-900/35 backdrop-blur"
       style="height: <%= header_height_px %>px;"
@@ -103,9 +137,7 @@
         <% end %>
       </div>
     </div>
-    <!-- Body grid -->
     <div class="grid" style="grid-template-columns: <%= time_col_px %>px repeat(7, minmax(0, 1fr));">
-      <!-- Hours gutter -->
       <div class="<%= camo_bg_soft %> border-r <%= vline %>">
         <% 24.times do |h| %>
           <div
@@ -127,25 +159,22 @@
           </div>
         <% end %>
       </div>
-      <!-- Day columns -->
       <% days.each do |day| %>
         <% day_start = Time.zone.local(day.year, day.month, day.day, 0, 0, 0) %>
         <% day_end   = day_start.end_of_day %>
         <% is_today   = (day == Date.current) %>
         <% is_weekend = day.saturday? || day.sunday? %>
         <div class="relative border-r <%= vline %> <%= is_weekend ? "bg-white/0" : "" %> <%= is_today ? "bg-emerald-500/10" : "" %>">
-          <!-- Clickable time slots (30 min) -->
           <div class="absolute inset-0 z-[1]">
             <% 48.times do |i| %>
               <% slot_time = day_start + (i * 30).minutes %>
-              <%= link_to new_event_path(start_time: slot_time.iso8601),
+              <%= link_to new_event_path(start_time: slot_time.iso8601, draft_id: draft_id),
                 class: "timeslot absolute left-0 w-full hover:bg-emerald-500/10 transition-colors cursor-pointer",
                 style: "top: #{i * (hour_height_px / 2.0)}px; height: #{hour_height_px / 2.0}px;",
                 data: { turbo: false } do %>
               <% end %>
             <% end %>
           </div>
-          <!-- Grid lines -->
           <div class="absolute inset-0 pointer-events-none">
             <% 24.times do %>
               <div class="relative" style="height: <%= hour_height_px %>px;">
@@ -154,7 +183,6 @@
               </div>
             <% end %>
           </div>
-          <!-- Unified Event layer (Events + Courses + CourseItems) -->
           <div class="relative" style="height: <%= day_height_px %>px;">
             <% day_events = events_by_day.fetch(day, []) %>
             <% due_height_px = 28 %>
@@ -290,14 +318,15 @@
               <% highlight_id = "#{model}-#{record.id}-#{seg[:seg_start].to_date.iso8601}" %>
               <% href =
                 if is_due
-                  edit_course_course_item_path(record.course, record)
+                  edit_course_course_item_path(record.course, record, start_date: start_date.to_date, draft_id: draft_id)
                 else
-                  polymorphic_path(record, start_date: start_date.to_date)
+                  polymorphic_path(record, start_date: start_date.to_date, draft_id: draft_id)
                 end
               %>
+              <% is_drafty = record.respond_to?(:draft_meta) %>
               <%= link_to href,
                 id: highlight_id,
-                class: (is_due ? due_classes : event_classes),
+                class: "#{is_due ? due_classes : event_classes} #{is_drafty ? "ring-2 ring-emerald-200/60" : ""}",
                 style: style_str,
                 data: {
                   calendar_event: true,

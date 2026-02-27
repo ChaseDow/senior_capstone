@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class DashboardController < ApplicationController
   layout "app_shell"
   before_action :authenticate_user!
@@ -10,16 +12,13 @@ class DashboardController < ApplicationController
         Date.current
       end
 
-    week_start  = @start_date.beginning_of_week
-    range_start = week_start.beginning_of_day
-    range_end   = (week_start + 6.days).end_of_day
-
-    @occurrences = occurrences_for_range(range_start, range_end)
+    @draft = current_calendar_draft
+    @occurrences = dashboard_week_occurrences_for(@start_date, draft: @draft)
 
     return unless turbo_frame_request?
 
     render partial: "dashboard/calendar_frame",
-           locals: { events: @occurrences, start_date: @start_date }
+           locals: { events: @occurrences, start_date: @start_date, draft: @draft }
   end
 
   def agenda
@@ -30,45 +29,13 @@ class DashboardController < ApplicationController
         Date.current
       end
 
-    range_start = @date.beginning_of_day
-    range_end   = @date.end_of_day
+    @draft = current_calendar_draft
 
-    @occurrences = occurrences_for_range(range_start, range_end)
+    # If you want agenda to also show draft overlay for the day:
+    start_date = @date.beginning_of_week.to_date
+    week_occurrences = dashboard_week_occurrences_for(start_date, draft: @draft)
+    @occurrences = week_occurrences.select { |o| o.starts_at.in_time_zone.to_date == @date }
 
     render "dashboard/agenda"
-  end
-
-  private
-
-  def occurrences_for_range(range_start, range_end)
-    base_events = current_user.events
-
-    non_recurring_events = base_events.where(recurring: false)
-                                      .where(starts_at: range_start..range_end)
-
-    recurring_events = base_events.where(recurring: true)
-                                  .where("starts_at <= ?", range_end)
-                                  .where("repeat_until >= ?", range_start.to_date)
-
-
-    event_occurrences = (non_recurring_events + recurring_events).flat_map { |e| e.occurrences_between(range_start, range_end) }
-
-    base_courses = current_user.courses
-      .where("start_date <= ?", range_end.to_date)
-      .where("end_date >= ?", range_start.to_date)
-      .order(start_date: :asc)
-
-    course_occurrences =
-      base_courses.flat_map { |c| c.occurrences_between(range_start, range_end) }
-
-    course_items =
-      CourseItem
-        .joins(:course)
-        .where(courses: { user_id: current_user.id })
-        .where(due_at: range_start..range_end)
-        .includes(:course)
-
-    (event_occurrences + course_occurrences + course_items.to_a)
-      .sort_by(&:starts_at)
   end
 end

@@ -14,16 +14,47 @@ class EventsController < ApplicationController
     return unless turbo_frame_request?
 
     render partial: "events/drawer_detail",
-           locals: { event: @event, start_date: params[:start_date] }
+           locals: { event: @event, start_date: params[:start_date], draft_id: current_calendar_draft&.id }
   end
 
   def new
     start_time = params[:start_time].present? ? Time.zone.parse(params[:start_time]) : nil
-
     @event = current_user.events.new(starts_at: start_time)
   end
 
   def create
+    if current_calendar_draft.present?
+      create_draft_op!(
+        op_type: :add,
+        target_type: "Event",
+        target_id: nil,
+        patch: event_params.to_h
+      )
+
+      start_date = parse_start_date(params[:start_date])
+      occurrences = dashboard_week_occurrences_for(start_date)
+
+      respond_to do |format|
+        format.html do
+          redirect_to dashboard_path(start_date: start_date, draft_id: current_calendar_draft.id),
+                      notice: "Draft event added."
+        end
+
+        format.turbo_stream do
+          render turbo_stream: [
+            turbo_stream.replace(
+              "dashboard_calendar",
+              partial: "dashboard/calendar_frame",
+              locals: { events: occurrences, start_date: start_date, draft: current_calendar_draft }
+            ),
+            turbo_stream.update("event_drawer", "")
+          ]
+        end
+      end
+
+      return
+    end
+
     @event = current_user.events.new(event_params)
 
     if @event.save
@@ -31,19 +62,14 @@ class EventsController < ApplicationController
         format.html { redirect_to event_path(@event), notice: "Event created." }
 
         format.turbo_stream do
-          unless turbo_frame_request?
-            redirect_to event_path(@event), status: :see_other
-            next
-          end
-
           start_date = parse_start_date(params[:start_date])
-          occurrences = dashboard_occurrences_for(start_date)
+          occurrences = dashboard_week_occurrences_for(start_date, draft: nil)
 
           render turbo_stream: [
             turbo_stream.replace(
               "dashboard_calendar",
               partial: "dashboard/calendar_frame",
-              locals: { events: occurrences, start_date: start_date }
+              locals: { events: occurrences, start_date: start_date, draft: nil }
             ),
             turbo_stream.update("event_drawer", "")
           ]
@@ -52,12 +78,11 @@ class EventsController < ApplicationController
     else
       respond_to do |format|
         format.html { render :new, status: :unprocessable_entity }
-
         format.turbo_stream do
           render turbo_stream: turbo_stream.replace(
             "event_drawer",
             partial: "events/drawer_edit",
-            locals: { event: @event, start_date: params[:start_date] }
+            locals: { event: @event, start_date: params[:start_date], draft_id: current_calendar_draft&.id }
           ), status: :unprocessable_entity
         end
       end
@@ -68,28 +93,55 @@ class EventsController < ApplicationController
     return unless turbo_frame_request?
 
     render partial: "events/drawer_edit",
-           locals: { event: @event, start_date: params[:start_date] }
+           locals: { event: @event, start_date: params[:start_date], draft_id: current_calendar_draft&.id }
   end
 
   def update
+    if current_calendar_draft.present?
+      create_draft_op!(
+        op_type: :change,
+        target_type: "Event",
+        target_id: @event.id,
+        patch: event_params.to_h
+      )
+
+      start_date = parse_start_date(params[:start_date])
+      occurrences = dashboard_week_occurrences_for(start_date)
+
+      respond_to do |format|
+        format.html do
+          redirect_to dashboard_path(start_date: start_date, draft_id: current_calendar_draft.id),
+                      notice: "Draft change recorded."
+        end
+
+        format.turbo_stream do
+          render turbo_stream: [
+            turbo_stream.replace(
+              "dashboard_calendar",
+              partial: "dashboard/calendar_frame",
+              locals: { events: occurrences, start_date: start_date, draft: current_calendar_draft }
+            ),
+            turbo_stream.update("event_drawer", "")
+          ]
+        end
+      end
+
+      return
+    end
+
     if @event.update(event_params)
       respond_to do |format|
         format.html { redirect_to event_path(@event), notice: "Event updated." }
 
         format.turbo_stream do
-          unless turbo_frame_request?
-            redirect_to event_path(@event), status: :see_other
-            next
-          end
-
           start_date = parse_start_date(params[:start_date])
-          occurrences = dashboard_occurrences_for(start_date)
+          occurrences = dashboard_week_occurrences_for(start_date, draft: nil)
 
           render turbo_stream: [
             turbo_stream.replace(
               "dashboard_calendar",
               partial: "dashboard/calendar_frame",
-              locals: { events: occurrences, start_date: start_date }
+              locals: { events: occurrences, start_date: start_date, draft: nil }
             ),
             turbo_stream.update("event_drawer", "")
           ]
@@ -98,12 +150,11 @@ class EventsController < ApplicationController
     else
       respond_to do |format|
         format.html { render :edit, status: :unprocessable_entity }
-
         format.turbo_stream do
           render turbo_stream: turbo_stream.replace(
             "event_drawer",
             partial: "events/drawer_edit",
-            locals: { event: @event, start_date: params[:start_date] }
+            locals: { event: @event, start_date: params[:start_date], draft_id: current_calendar_draft&.id }
           ), status: :unprocessable_entity
         end
       end
@@ -111,25 +162,52 @@ class EventsController < ApplicationController
   end
 
   def destroy
+    if current_calendar_draft.present?
+      create_draft_op!(
+        op_type: :remove,
+        target_type: "Event",
+        target_id: @event.id,
+        patch: {}
+      )
+
+      start_date = parse_start_date(params[:start_date])
+      occurrences = dashboard_week_occurrences_for(start_date)
+
+      respond_to do |format|
+        format.html do
+          redirect_to dashboard_path(start_date: start_date, draft_id: current_calendar_draft.id),
+                      notice: "Draft delete recorded."
+        end
+
+        format.turbo_stream do
+          render turbo_stream: [
+            turbo_stream.replace(
+              "dashboard_calendar",
+              partial: "dashboard/calendar_frame",
+              locals: { events: occurrences, start_date: start_date, draft: current_calendar_draft }
+            ),
+            turbo_stream.update("event_drawer", "")
+          ]
+        end
+      end
+
+      return
+    end
+
     @event.destroy!
 
     respond_to do |format|
       format.html { redirect_to events_path, notice: "Event deleted." }
 
       format.turbo_stream do
-        unless turbo_frame_request?
-          redirect_to events_path, status: :see_other
-          next
-        end
-
         start_date = parse_start_date(params[:start_date])
-        occurrences = dashboard_occurrences_for(start_date)
+        occurrences = dashboard_week_occurrences_for(start_date, draft: nil)
 
         render turbo_stream: [
           turbo_stream.replace(
             "dashboard_calendar",
             partial: "dashboard/calendar_frame",
-            locals: { events: occurrences, start_date: start_date }
+            locals: { events: occurrences, start_date: start_date, draft: nil }
           ),
           turbo_stream.update("event_drawer", "")
         ]
@@ -149,29 +227,18 @@ class EventsController < ApplicationController
     Date.current
   end
 
-  def dashboard_occurrences_for(start_date)
-    week_start  = start_date.beginning_of_week
-    range_start = week_start.beginning_of_day
-    range_end   = (week_start + 6.days).end_of_day
+  def create_draft_op!(op_type:, target_type:, target_id:, patch:)
+    draft = current_calendar_draft
+    raise ActiveRecord::RecordNotFound, "Draft not found" unless draft
 
-    base_events =
-      current_user.events
-                  .where("starts_at <= ?", range_end)
-                  .where("recurring = FALSE OR repeat_until >= ?", range_start.to_date)
-                  .order(starts_at: :asc)
-
-    base_events.flat_map { |e| e.occurrences_between(range_start, range_end) }
-              .sort_by(&:starts_at)
-
-    base_courses = current_user.courses
-      .where("start_date <= ?", range_end.to_date)
-      .where("end_date >= ?", range_start.to_date)
-      .order(start_date: :asc)
-
-    course_occurrences =
-      base_courses.flat_map { |c| c.occurrences_between(range_start, range_end) }
-
-    (base_events + course_occurrences).sort_by(&:starts_at)
+    draft.operations.create!(
+      op_type: op_type,
+      target_type: target_type,
+      target_id: target_id,
+      status: :pending,
+      position: (draft.operations.maximum(:position) || -1) + 1,
+      payload: { "patch" => patch }
+    )
   end
 
   def event_params

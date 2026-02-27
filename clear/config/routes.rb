@@ -13,6 +13,27 @@ Rails.application.routes.draw do
   end
   resources :agenda
 
+  # Drafts for "what-if" simulation / bulk edits
+  resources :calendar_drafts, only: %i[create index] do
+    member do
+      post :apply
+      post :discard
+    end
+
+    resources :calendar_draft_operations, only: %i[update destroy] do
+      member do
+        post :accept
+        post :reject
+      end
+    end
+  end
+
+  # Draft-mode write endpoints (used when viewing a draft)
+  namespace :draft_mode do
+    resources :events, only: %i[create update destroy]
+    resources :course_items, only: %i[create update destroy]
+  end
+
   resources :syllabuses do
     member do
       post :create_course
@@ -23,7 +44,6 @@ Rails.application.routes.draw do
     end
   end
 
-  # Admin-only pages (guarded in controllers via current_user.admin?)
   namespace :admin do
     resources :users, only: [ :index, :destroy ]
   end
@@ -47,7 +67,6 @@ Rails.application.routes.draw do
   get "/dashboard", to: "dashboard#show"
   get "dashboard/agenda", to: "dashboard#agenda", as: :dashboard_agenda
 
-  # Admin-only UI preview page (guarded in UiController)
   get "/ui", to: "ui#show"
 
   get "/schedule", to: "schedule#week"
