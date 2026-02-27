@@ -1,3 +1,7 @@
 <%= turbo_frame_tag "dashboard_calendar", class: "block h-full min-h-0" do %>
-  <%= render "dashboard/calendar", events: events, start_date: start_date %>
+  <%= render "dashboard/calendar",
+    events: events,
+    start_date: start_date,
+    draft: local_assigns[:draft]
+  %>
 <% end %>

@@ -2,6 +2,7 @@ class User < ApplicationRecord
   has_many :events, dependent: :destroy
   has_many :courses, dependent: :destroy
   has_many :syllabuses, dependent: :destroy
+  has_many :calendar_drafts, dependent: :destroy
 
   devise :database_authenticatable, :registerable,
         :recoverable, :rememberable, :validatable

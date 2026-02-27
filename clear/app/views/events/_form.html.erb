@@ -1,17 +1,22 @@
 <% start_date_param = local_assigns[:start_date].presence || params[:start_date].presence %>
+<% draft_id_param  = local_assigns[:draft_id].presence || params[:draft_id].presence || session[:active_calendar_draft_id].presence %>
 <% turbo_enabled = local_assigns.key?(:turbo) ? local_assigns[:turbo] : true %>
+<% url_opts = {} %>
+<% url_opts[:start_date] = start_date_param if start_date_param.present? %>
+<% url_opts[:draft_id]   = draft_id_param if draft_id_param.present? %>
 <% form_url =
-    if event.persisted?
-      start_date_param ? event_path(event, start_date: start_date_param) : event_path(event)
-    else
-      start_date_param ? events_path(start_date: start_date_param) : events_path
-    end
+  if event.persisted?
+    event_path(event, **url_opts)
+  else
+    events_path(**url_opts)
+  end
 %>
 <%= form_with model: event,
               url: form_url,
               class: "space-y-4",
-              data: { drawer_close_on_success: "false", turbo: turbo_enabled } do |f| %>
+              data: { turbo: turbo_enabled } do |f| %>
   <%= hidden_field_tag :start_date, start_date_param if start_date_param.present? %>
+  <%= hidden_field_tag :draft_id, draft_id_param if draft_id_param.present? %>
   <% if event.errors.any? %>
     <div class="rounded-2xl border border-red-900 bg-red-950/40 p-4 text-red-200">
       <p class="font-medium">Please fix the following:</p>
@@ -32,24 +37,20 @@
     <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
       <div>
         <%= f.label :starts_at, "Start time", class: label_classes %>
-        <%= f.datetime_local_field :starts_at,
-      value: @event.starts_at&.strftime("%Y-%m-%dT%H:%M"),
-      class: input_classes %>
+        <%= f.datetime_local_field :starts_at, class: input_classes %>
       </div>
       <div>
         <%= f.label :ends_at, "End time (optional)", class: label_classes %>
         <%= f.datetime_local_field :ends_at, class: input_classes %>
       </div>
     </div>
-    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-      <div>
-        <%= f.label :location, class: label_classes %>
-        <%= f.text_field :location, class: input_classes, placeholder: "e.g. Library, Room 210" %>
-      </div>
-      <div>
-        <%= f.label :priority, class: label_classes %>
-        <%= f.text_field :priority, class: input_classes, placeholder: "Rank your event's priority with a number" %>
-      </div>
+    <div>
+      <%= f.label :location, class: label_classes %>
+      <%= f.text_field :location, class: input_classes, placeholder: "e.g. Library, Room 210" %>
+    </div>
+    <div>
+      <%= f.label :priority, class: label_classes %>
+      <%= f.text_field :priority, class: input_classes, placeholder: "rank your event's priority with a number" %>
     </div>
     <div>
       <%= f.label :description, class: label_classes %>
@@ -79,9 +80,6 @@
                             peer-checked:ring-2 peer-checked:ring-emerald-200/70">
                   <%= lbl %>
                 </div>
-                <span class="pointer-events-none absolute right-2 top-1/2 hidden -translate-y-1/2 text-[10px] text-white peer-checked:inline">
-                  ✓
-                </span>
               </label>
             <% end %>
           </div>
