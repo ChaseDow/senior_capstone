@@ -51,7 +51,7 @@
             <%= f.file_field :avatar,
                   accept: "image/*",
                   data: { action: "change->avatar-crop#fileChanged", avatar_crop_target: "file" },
-                  class: "block w-full text-sm text-zinc-200 file:mr-4 file:rounded-xl file:border-0 file:bg-zinc-800 file:px-4 file:py-2 file:text-sm file:text-zinc-200 hover:file:bg-zinc-700" %>
+                  class: "block w-fit text-sm text-zinc-200 file:mr-4 file:rounded-xl file:border-0 file:bg-zinc-800 file:px-4 file:py-2 file:text-sm file:text-zinc-200 hover:file:bg-zinc-700" %>
 
             <!-- Crop area -->
             <div class="rounded-2xl border border-zinc-800 bg-zinc-950/30 p-3">
