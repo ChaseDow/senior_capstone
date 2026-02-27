@@ -1,0 +1,24 @@
+<h1>AI Chat</h1>
+
+<% if flash[:alert].present? %>
+    <p style="color:red;">
+        <%= flash[:alert] %>
+    </p>
+    <% end %>
+
+        <div style="border:1px solid #ccc; padding:12px; height:50vh; overflow-y:auto; margin-bottom:12px;">
+            <% @messages.each do |m| %>
+                <p><strong>
+                        <%= m["role"] %>:
+                    </strong>
+                    <%= simple_format(h(m["content"])) %>
+                </p>
+                <% end %>
+        </div>
+
+        <%= form_with url: ai_chat_index_path, method: :post do %>
+            <%= text_area_tag :content, "" , rows: 3, style: "width: 100%;" %>
+                <div style="margin-top: 8px;">
+                    <%= submit_tag "Send" %>
+                </div>
+                <% end %>
