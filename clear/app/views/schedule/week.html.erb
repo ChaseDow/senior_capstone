@@ -2,10 +2,11 @@
 <% content_for :page_subtitle, "A week at a glance"%>
 <div class="mb-6 flex items-center justify-center">
   <div class="flex items-center gap-155">
-    <%= link_to schedule_week_path(date: @week_start - 7.days),
-          class: "inline-flex items-center rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-2 text-sm font-medium text-zinc-100 hover:bg-zinc-800 transition" do %>
-      ← Prev
-    <% end %>
+    <%= render Studs::PrimaryButtonComponent.new(
+          label: "← Prev",
+          href: schedule_week_path(date: @week_start - 7.days),
+          color: :emerald
+        ) %>
     <div class="text-center">
       <h1 class="text-xl font-semibold text-zinc-100">
         Schedule
@@ -16,16 +17,17 @@
         </span>
       </p>
     </div>
-    <%= link_to schedule_week_path(date: @week_start + 7.days),
-          class: "inline-flex items-center rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-2 text-sm font-medium text-zinc-100 hover:bg-zinc-800 transition" do %>
-      Next →
-    <% end %>
+    <%= render Studs::PrimaryButtonComponent.new(
+          label: "Next →",
+          href: schedule_week_path(date: @week_start + 7.days),
+          color: :emerald
+        ) %>
   </div>
 </div>
 <%# ================== Week Grid ================== %>
 <div class="grid grid-cols-7 gap-4 h-170">
   <% @days.each do |day| %>
-    <div class="flex flex-col rounded-2xl border border-zinc-800 bg-zinc-950 p-3 min-h-0">
+    <div class="flex flex-col rounded-2xl border border-zinc-800 bg-emerald-950/40 p-3 min-h-0">
       <%# Day header %>
       <div class="mb-3">
         <div class="text-sm font-semibold text-zinc-200">
@@ -39,19 +41,19 @@
       <div class="flex-1 space-y-2 overflow-y-auto">
         <% if @items_by_day[day].present? %>
           <% @items_by_day[day].each do |item| %>
-            <div class="rounded-xl bg-zinc-900 p-3 text-sm">
-              <div class="font-medium text-zinc-100">
+            <div class="rounded-xl p-3 text-sm" style="background-color: <%= item.color %>;">
+              <div class="font-medium text-zinc-200">
                 <%= item.title %>
               </div>
               <% if item.starts_at.present? %>
-                <div class="text-xs text-zinc-500">
+                <div class="text-xs text-zinc-200">
                   <%= item.starts_at.strftime("%I:%M %p") %>
                 </div>
               <% end %>
             </div>
           <% end %>
         <% else %>
-          <div class="mt-6 text-center text-xs text-zinc-600 italic">
+          <div class="mt-6 text-center text-xs text-zinc-200 italic">
             Nothing scheduled for this day.
           </div>
         <% end %>
