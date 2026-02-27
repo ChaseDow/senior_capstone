@@ -1,4 +1,17 @@
-<%= form_with model: course, class: "space-y-5" do |f| %>
+<% start_date_param = local_assigns[:start_date].presence || params[:start_date].presence %>
+<% turbo_enabled = local_assigns.key?(:turbo) ? local_assigns[:turbo] : true %>
+<% form_url =
+    if course.persisted?
+      start_date_param ? course_path(course, start_date: start_date_param) : course_path(course)
+    else
+      start_date_param ? courses_path(start_date: start_date_param) : courses_path
+    end
+%>
+<%= form_with model: course,
+              url: form_url,
+              class: "space-y-5",
+              data: { turbo: turbo_enabled, turbo_frame: "event_drawer", drawer_close_on_success: "false" } do |f| %>
+  <%= hidden_field_tag :start_date, start_date_param if start_date_param.present? %>
   <% if course.errors.any? %>
     <div class="rounded-2xl border border-red-900 bg-red-950/40 p-4 text-red-200">
       <p class="font-medium">Please fix the following:</p>
@@ -18,7 +31,7 @@
     </div>
     <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
       <div>
-        <%= f.label :start_time, "Start time", class: label_classes %>
+        <%= f.label :start_time, "Start time *", class: label_classes %>
         <%= f.time_field :start_time, class: input_classes %>
       </div>
       <div>
@@ -26,11 +39,11 @@
         <%= f.time_field :end_time, class: input_classes %>
       </div>
       <div>
-        <%= f.label :start_date, "Start date", class: label_classes %>
+        <%= f.label :start_date, "Start date *", class: label_classes %>
         <%= f.date_field :start_date, class: input_classes %>
       </div>
       <div>
-        <%= f.label :end_date, "End date", class: label_classes %>
+        <%= f.label :end_date, "End date *", class: label_classes %>
         <%= f.date_field :end_date, class: input_classes %>
       </div>
     </div>

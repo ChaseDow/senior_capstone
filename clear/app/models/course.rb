@@ -5,8 +5,9 @@ class Course < ApplicationRecord
   has_many :course_items, dependent: :destroy
   has_many :syllabuses, dependent: :nullify
 
-  # A course must have a title
   validates :title, presence: true
+  validates :start_time, presence: true
+  validates :start_date, presence: true
   validates :end_date, presence: true
 
   # Ensure the meeting time window makes sense

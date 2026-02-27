@@ -33,9 +33,11 @@ export default class extends Controller {
   start() {
     this._suppressSync = true
 
-    this.clearFrame()
-    this.showSkeleton()
-    this.open()
+    window.clearTimeout(this._skeletonTimer)
+    this._skeletonTimer = window.setTimeout(() => {
+      const empty = this.hasFrameTarget && this.frameTarget.innerHTML.trim() === ""
+      if (empty) this.showSkeleton()
+    }, 120)
 
     queueMicrotask(() => { this._suppressSync = false })
   }
@@ -60,6 +62,7 @@ export default class extends Controller {
   }
 
   frameLoaded() {
+    window.clearTimeout(this._skeletonTimer)
     this.open()
   }
 

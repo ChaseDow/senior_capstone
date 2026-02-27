@@ -114,7 +114,7 @@
                 class: "block h-full",
                 data: {
                   drawer_target: "frame",
-                  action: "turbo:before-fetch-request->drawer#showSkeleton turbo:frame-load->drawer#frameLoaded turbo:submit-end->drawer#submitEnded"
+                  action: "turbo:frame-load->drawer#frameLoaded turbo:submit-end->drawer#submitEnded"
                 } do %>
           <% end %>
         </div>

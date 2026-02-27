@@ -36,8 +36,12 @@ class EventsController < ApplicationController
             next
           end
 
-          start_date = parse_start_date(params[:start_date])
-          occurrences = dashboard_occurrences_for(start_date)
+          start_date  = parse_start_date(params[:start_date])
+          week_start  = start_date.beginning_of_week
+          range_start = week_start.beginning_of_day
+          range_end   = (week_start + 6.days).end_of_day
+
+          occurrences = calendar_occurrences_for_range(range_start, range_end)
 
           render turbo_stream: [
             turbo_stream.replace(
@@ -82,8 +86,12 @@ class EventsController < ApplicationController
             next
           end
 
-          start_date = parse_start_date(params[:start_date])
-          occurrences = dashboard_occurrences_for(start_date)
+          start_date  = parse_start_date(params[:start_date])
+          week_start  = start_date.beginning_of_week
+          range_start = week_start.beginning_of_day
+          range_end   = (week_start + 6.days).end_of_day
+
+          occurrences = calendar_occurrences_for_range(range_start, range_end)
 
           render turbo_stream: [
             turbo_stream.replace(
@@ -122,8 +130,12 @@ class EventsController < ApplicationController
           next
         end
 
-        start_date = parse_start_date(params[:start_date])
-        occurrences = dashboard_occurrences_for(start_date)
+        start_date  = parse_start_date(params[:start_date])
+        week_start  = start_date.beginning_of_week
+        range_start = week_start.beginning_of_day
+        range_end   = (week_start + 6.days).end_of_day
+
+        occurrences = calendar_occurrences_for_range(range_start, range_end)
 
         render turbo_stream: [
           turbo_stream.replace(
@@ -147,31 +159,6 @@ class EventsController < ApplicationController
     raw.present? ? Date.parse(raw) : Date.current
   rescue ArgumentError
     Date.current
-  end
-
-  def dashboard_occurrences_for(start_date)
-    week_start  = start_date.beginning_of_week
-    range_start = week_start.beginning_of_day
-    range_end   = (week_start + 6.days).end_of_day
-
-    base_events =
-      current_user.events
-                  .where("starts_at <= ?", range_end)
-                  .where("recurring = FALSE OR repeat_until >= ?", range_start.to_date)
-                  .order(starts_at: :asc)
-
-    base_events.flat_map { |e| e.occurrences_between(range_start, range_end) }
-              .sort_by(&:starts_at)
-
-    base_courses = current_user.courses
-      .where("start_date <= ?", range_end.to_date)
-      .where("end_date >= ?", range_start.to_date)
-      .order(start_date: :asc)
-
-    course_occurrences =
-      base_courses.flat_map { |c| c.occurrences_between(range_start, range_end) }
-
-    (base_events + course_occurrences).sort_by(&:starts_at)
   end
 
   def event_params
