@@ -1,5 +1,5 @@
-<% content_for :page_title, "Agenda" %>
-<% content_for :page_subtitle, "Upcoming tasks" %>
+<%content_for :page_title, "Agenda"%>
+<%content_for :page_subtitle, "Upcoming tasks"%>
 
 <div class="space-y-6">
   <%= form_with url: agenda_index_path, method: :get, local: true, html: { class: "space-y-3" } do |f| %>
@@ -20,14 +20,14 @@
             params[:type]
           ),
           {},
-          class: "w-full rounded-xl border border-zinc-800 bg-zinc-900/50 px-3 py-2 text-sm text-zinc-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-400/40" %>
+          class: "w-full rounded-xl border border-zinc-800 bg-zinc-900/50 px-3 py-2 text-sm text-emerald-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-400/40" %>
       </div>
 
       <div class="flex items-center gap-2">
         <%= f.date_field :start_date,
           value: params[:start_date],
           placeholder: "Start",
-          class: "h-[38px] w-36 rounded-xl border border-zinc-800 bg-zinc-900/50 px-3 py-2 text-sm text-zinc-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-400/40" %>
+          class: "h-[38px] w-36 rounded-xl border border-zinc-800 bg-zinc-900/50 px-3 py-2 text-sm text-emerald-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-400/40" %>
 
         <span class="text-sm text-zinc-500 font-medium select-none">
           :
@@ -36,7 +36,7 @@
         <%= f.date_field :end_date,
           value: params[:end_date],
           placeholder: "End",
-          class: "h-[38px] w-36 rounded-xl border border-zinc-800 bg-zinc-900/50 px-3 py-2 text-sm text-zinc-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-400/40" %>
+          class: "h-[38px] w-36 rounded-xl border border-zinc-800 bg-zinc-900/50 px-3 py-2 text-sm text-emerald-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-400/40" %>
       </div>
 
       <%= f.submit "Search",
@@ -46,7 +46,7 @@
       <% if show_clear %>
         <%= link_to "Clear",
           agenda_index_path,
-          class: "inline-block rounded-xl border border-zinc-800 bg-zinc-900/50 px-4 py-2 text-sm font-medium text-zinc-300 hover:bg-zinc-800/50 focus:outline-none transition" %>
+          class: "inline-block rounded-xl border border-zinc-800 bg-zinc-900/50 px-4 py-2 text-sm font-medium text-emerald-100 hover:bg-zinc-800/50 focus:outline-none transition" %>
       <% end %>
     </div>
   <% end %>
@@ -85,6 +85,8 @@
           tag: entry[:type],
           tag_color: tag_color,
           meta: meta,
+          color: entry[:color],
+          href: entry[:href]
         ) %>
       <% end %>
 
@@ -122,7 +124,7 @@
             "rounded-xl border px-3 py-2 text-sm font-medium transition",
             is_current ?
               "border-green-500/40 bg-green-600/20 text-green-200" :
-              "border-zinc-800 bg-zinc-900/50 text-zinc-200 hover:bg-zinc-800/50"
+              "border-zinc-800 bg-zinc-900/50 text-emerald-200 hover:bg-zinc-800/50"
           ].join(" ") %>
       <% end %>
 
@@ -130,7 +132,7 @@
         (next_page ? agenda_page_url(next_page) : "#"),
         class: [
           "rounded-xl border border-zinc-800 bg-zinc-900/50 px-4 py-2 text-sm font-medium transition",
-          next_page ? "text-zinc-200 hover:bg-zinc-800/50" : "text-zinc-600 cursor-not-allowed pointer-events-none"
+          next_page ? "text-emerald-200 hover:bg-zinc-800/50" : "text-zinc-600 cursor-not-allowed pointer-events-none"
         ].join(" ") %>
     </div>
 

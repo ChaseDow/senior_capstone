@@ -18,7 +18,7 @@ module Studs
     def input_classes
       [
         "w-full rounded-xl border border-zinc-800 bg-zinc-900/50",
-        "pl-10 pr-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-500",
+        "pl-10 pr-3 py-2 text-sm text-zinc-100 placeholder:text-emerald-100",
         "focus:outline-none focus-visible:ring-2 focus-visible:ring-green-400/40",
         @input_class_name
       ].compact.join(" ")

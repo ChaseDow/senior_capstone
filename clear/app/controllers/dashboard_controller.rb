@@ -37,4 +37,38 @@ class DashboardController < ApplicationController
 
     render "dashboard/agenda"
   end
+
+  private
+
+  def occurrences_for_range(range_start, range_end)
+    base_events = current_user.events
+
+    non_recurring_events = base_events.where(recurring: false)
+                                      .where(starts_at: range_start..range_end)
+
+    recurring_events = base_events.where(recurring: true)
+                                  .where("starts_at <= ?", range_end)
+                                  .where("repeat_until >= ?", range_start.to_date)
+
+
+    event_occurrences = (non_recurring_events + recurring_events).flat_map { |e| e.occurrences_between(range_start, range_end) }
+
+    base_courses = current_user.courses
+      .where("start_date <= ?", range_end.to_date)
+      .where("end_date >= ?", range_start.to_date)
+      .order(start_date: :asc)
+
+    course_occurrences =
+      base_courses.flat_map { |c| c.occurrences_between(range_start, range_end) }
+
+    course_items =
+      CourseItem
+        .joins(:course)
+        .where(courses: { user_id: current_user.id })
+        .where(due_at: range_start..range_end)
+        .includes(:course)
+
+    (event_occurrences + course_occurrences + course_items.to_a)
+      .sort_by(&:starts_at)
+  end
 end

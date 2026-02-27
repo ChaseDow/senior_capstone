@@ -2,25 +2,30 @@
 
 module Studs
   class AgendaComponent < ::ViewComponent::Base
-    protected
     renders_many :items, "Studs::AgendaItemComponent"
 
-    def initialize(title: "Agenda", subtitle: nil, mode: :panel, empty_message: "All of your scheduled events for today appear here`.", class_name: nil)
+    def initialize(date: nil, title: "Agenda", subtitle: nil, count: nil, empty_message: "Nothing scheduled.", class_name: nil, mode: :panel, href: nil)
+      @date = date
       @title = title
       @subtitle = subtitle
-      @mode = mode
+      @count = count
       @empty_message = empty_message
       @class_name = class_name
+      @href = href
     end
 
-    def wrapper_classes
-      base = [
-        "w-full rounded-2xl border border-zinc-800 bg-zinc-950/40",
-        @mode.to_sym == :panel ? "h-full" : nil,
-        @class_name
-      ].compact.join(" ")
+    # currently not being used
+    def agenda_count
+      @count.presence || items.size
+    end
 
-      base
+    def subtitle_text
+      return @subtitle if @subtitle.present?
+      text = @date.strftime("%A, %B %-d")
+      if agenda_count.positive?
+        text += " • #{agenda_count} item#{"s" if agenda_count != 1}"
+      end
+      text
     end
   end
 end
