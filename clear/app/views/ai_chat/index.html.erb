@@ -31,11 +31,6 @@
       class="h-[55vh] overflow-y-auto px-5 py-4 space-y-4"
       id="ai_chat_messages"
     >
-      <% if @messages.blank? %>
-        <div class="rounded-2xl border border-zinc-800 bg-zinc-900/30 p-6 text-sm text-emerald-200">
-          No messages yet.
-        </div>
-      <% end %>
 
       <% @messages.each do |m| %>
         <%= render "ai_chat/message", m: m %>
