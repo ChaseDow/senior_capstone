@@ -11,7 +11,7 @@ class ApplicationController < ActionController::Base
 
   private
 
-  def occurrences_for_range(range_start, range_end)
+  def calendar_occurrences_for_range(range_start, range_end)
     base_events = current_user.events
       .where("starts_at <= ?", range_end)
       .where("recurring = FALSE OR repeat_until >= ?", range_start.to_date)

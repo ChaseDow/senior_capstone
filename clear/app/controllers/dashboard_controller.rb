@@ -14,7 +14,7 @@ class DashboardController < ApplicationController
     range_start = week_start.beginning_of_day
     range_end   = (week_start + 6.days).end_of_day
 
-    @occurrences = occurrences_for_range(range_start, range_end)
+    @occurrences = calendar_occurrences_for_range(range_start, range_end)
 
     return unless turbo_frame_request?
 
@@ -33,7 +33,7 @@ class DashboardController < ApplicationController
     range_start = @date.beginning_of_day
     range_end   = @date.end_of_day
 
-    @occurrences = occurrences_for_range(range_start, range_end)
+    @occurrences = calendar_occurrences_for_range(range_start, range_end)
 
     render "dashboard/agenda"
   end
