@@ -23,9 +23,44 @@ class CoursesController < ApplicationController
     @course = current_user.courses.new(course_params)
 
     if @course.save
-      redirect_to course_path(@course), notice: "Course created."
+      respond_to do |format|
+        format.html { redirect_to course_path(@course), notice: "Course created." }
+
+        format.turbo_stream do
+          unless turbo_frame_request?
+            redirect_to course_path(@course), status: :see_other
+            next
+          end
+
+          start_date  = parse_start_date(params[:start_date])
+          week_start  = start_date.beginning_of_week
+          range_start = week_start.beginning_of_day
+          range_end   = (week_start + 6.days).end_of_day
+
+          occurrences = calendar_occurrences_for_range(range_start, range_end)
+
+          render turbo_stream: [
+            turbo_stream.replace(
+              "dashboard_calendar",
+              partial: "dashboard/calendar_frame",
+              locals: { events: occurrences, start_date: start_date }
+            ),
+            turbo_stream.update("event_drawer", "")
+          ]
+        end
+      end
     else
-      render :new, status: :unprocessable_entity
+      respond_to do |format|
+        format.html { render :new, status: :unprocessable_entity }
+
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.replace(
+            "event_drawer",
+            partial: "events/drawer_edit",
+            locals: { event: @course, start_date: params[:start_date] }
+          ), status: :unprocessable_entity
+        end
+      end
     end
   end
 
@@ -46,8 +81,12 @@ class CoursesController < ApplicationController
             next
           end
 
-          start_date = parse_start_date(params[:start_date])
-          occurrences = dashboard_occurrences_for(start_date)
+          start_date  = parse_start_date(params[:start_date])
+          week_start  = start_date.beginning_of_week
+          range_start = week_start.beginning_of_day
+          range_end   = (week_start + 6.days).end_of_day
+
+          occurrences = calendar_occurrences_for_range(range_start, range_end)
 
           render turbo_stream: [
             turbo_stream.replace(
@@ -86,8 +125,12 @@ class CoursesController < ApplicationController
           next
         end
 
-        start_date = parse_start_date(params[:start_date])
-        occurrences = dashboard_occurrences_for(start_date)
+        start_date  = parse_start_date(params[:start_date])
+        week_start  = start_date.beginning_of_week
+        range_start = week_start.beginning_of_day
+        range_end   = (week_start + 6.days).end_of_day
+
+        occurrences = calendar_occurrences_for_range(range_start, range_end)
 
         render turbo_stream: [
           turbo_stream.replace(
@@ -111,31 +154,6 @@ class CoursesController < ApplicationController
     raw.present? ? Date.parse(raw) : Date.current
   rescue ArgumentError
     Date.current
-  end
-
-  def dashboard_occurrences_for(start_date)
-    week_start  = start_date.beginning_of_week
-    range_start = week_start.beginning_of_day
-    range_end   = (week_start + 6.days).end_of_day
-
-    base_courses =
-      current_user.courses
-        .where("start_date <= ?", range_end)
-        .where("end_date >= ?", range_start.to_date)
-        .order(start_date: :asc)
-
-    course_occurrences =
-      base_courses.flat_map { |c| c.occurrences_between(range_start, range_end) }
-
-    course_items =
-      CourseItem
-        .joins(:course)
-        .where(courses: { user_id: current_user.id })
-        .where(due_at: range_start..range_end)
-        .includes(:course)
-
-    (course_occurrences + course_items.to_a)
-      .sort_by(&:starts_at)
   end
 
   def course_params
