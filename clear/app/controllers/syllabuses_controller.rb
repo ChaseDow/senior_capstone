@@ -7,6 +7,10 @@ class SyllabusesController < ApplicationController
     show destroy create_course status course_preview course_preview_frame confirm_course
   ]
 
+  PREVIEW_FIELDS = %i[
+    title code term professor meeting_days location start_time end_time start_date end_date
+  ].freeze
+
   def index
     @syllabuses = current_user.syllabuses.order(created_at: :desc)
   end
@@ -27,7 +31,6 @@ class SyllabusesController < ApplicationController
     end
   end
 
-  # POST /syllabuses/:id/create_course
   def create_course
     unless @syllabus.parse_status.in?(%w[queued processing])
       @syllabus.update!(parse_status: "queued", parse_error: nil, course_draft: {})
@@ -37,31 +40,26 @@ class SyllabusesController < ApplicationController
     redirect_to course_preview_syllabus_path(@syllabus), notice: "Parsing started…"
   end
 
-# GET /syllabuses/:id/status
-def status
-  render :status, layout: false
-end
+  def status
+    render :status, layout: false
+  end
 
-
-  # GET /syllabuses/:id/course_preview
   def course_preview
     @draft  = normalized_draft_for_form(@syllabus.course_draft || {})
     @course = current_user.courses.new(remap_preview_attrs(@draft))
+    @missing_fields = missing_preview_fields(@course)
   end
 
-  # GET /syllabuses/:id/course_preview_frame
   def course_preview_frame
     @draft  = normalized_draft_for_form(@syllabus.course_draft || {})
-    @course = current_user.courses.new(@draft)
+    @course = current_user.courses.new(remap_preview_attrs(@draft))
+    @missing_fields = missing_preview_fields(@course)
 
     render :course_preview_frame, layout: false
   end
 
-
-  # POST /syllabuses/:id/confirm_course
   def confirm_course
     attrs = remap_form_attrs(course_params.to_h)
-
     @course = current_user.courses.new(attrs)
 
     if @course.save
@@ -69,6 +67,7 @@ end
       redirect_to course_path(@course), notice: "Course created."
     else
       @draft = normalized_draft_for_form(@syllabus.course_draft || {})
+      @missing_fields = missing_preview_fields(@course)
       render :course_preview, status: :unprocessable_entity
     end
   end
@@ -101,6 +100,10 @@ end
     )
   end
 
+  def missing_preview_fields(course)
+    PREVIEW_FIELDS.select { |attr| course.public_send(attr).blank? }
+  end
+
   def normalized_draft_for_form(draft)
     d = draft.deep_dup
     d["start_time"] = normalize_time_for_input(d["start_time"])
@@ -112,7 +115,7 @@ end
 
   def normalize_time_for_input(v)
     return nil if v.blank?
-    v.to_s.split(":").first(2).join(":") # "08:00:00" -> "08:00"
+    v.to_s.split(":").first(2).join(":")
   end
 
   def remap_preview_attrs(draft)
