@@ -30,6 +30,9 @@ export default class extends Controller {
   }
 
   selectFromCalendar(event) {
+    // Stop bubbling to day column's clear handler
+    event.stopPropagation()
+
     const id = event.currentTarget.id
     if (!id) return
 
@@ -45,13 +48,17 @@ export default class extends Controller {
 
     this.selectedId = id
 
-    document
-      .querySelectorAll("[data-calendar-event].is-selected")
-      .forEach((el) => el.classList.remove("is-selected"))
+    // Deselect all and reset any manually boosted z-index
+    document.querySelectorAll("[data-calendar-event]").forEach((el) => {
+      el.classList.remove("is-selected")
+      el.style.removeProperty("z-index")
+    })
 
     const cal = document.getElementById(id)
     if (cal) {
       cal.classList.add("is-selected")
+      // Force above all siblings without changing position
+      cal.style.zIndex = "50"
       cal.scrollIntoView({ block: "center", behavior: "smooth" })
     }
 
@@ -61,8 +68,13 @@ export default class extends Controller {
   clear() {
     this.selectedId = null
 
+    document.querySelectorAll("[data-calendar-event]").forEach((el) => {
+      el.classList.remove("is-selected")
+      el.style.removeProperty("z-index")
+    })
+
     document
-      .querySelectorAll(".is-selected")
+      .querySelectorAll("[data-agenda-item-card].is-selected")
       .forEach((el) => el.classList.remove("is-selected"))
   }
 

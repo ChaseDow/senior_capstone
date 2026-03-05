@@ -15,9 +15,9 @@ module Studs
 
       state =
         if @active
-          "#{base} bg-zinc-800 text-emerald-200"
+          "#{base} bg-white/10 studs-nav-link--active"
         else
-          "#{base} text-zinc-200 hover:bg-zinc-900 hover:text-zinc-50"
+          "#{base} text-zinc-200 hover:bg-white/5 hover:text-zinc-50"
         end
 
       [ state, @class_name ].compact.join(" ")
@@ -31,12 +31,7 @@ module Studs
         "[&>svg]:fill-none [&>svg]:stroke-current"
       ].join(" ")
 
-      color =
-        if @active
-          "text-emerald-200"
-        else
-          "text-emerald-300 group-hover:text-zinc-50"
-        end
+      color = @active ? "studs-icon--active" : "studs-icon--inactive group-hover:text-zinc-50"
 
       "#{svg_base} #{color}"
     end

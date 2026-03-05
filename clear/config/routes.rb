@@ -1,10 +1,16 @@
 Rails.application.routes.draw do
   devise_for :users
+
   resource :profile, only: [ :show, :edit, :update ] do
     get :edit_password
     patch :update_password
     get :edit_avatar
     patch :update_avatar
+  end
+
+  # Theme
+  resource :theme, only: [ :update ] do
+    delete :reset, on: :member
   end
 
   resources :events
@@ -23,7 +29,6 @@ Rails.application.routes.draw do
     end
   end
 
-  # Admin-only pages (guarded in controllers via current_user.admin?)
   namespace :admin do
     resources :users, only: [ :index, :destroy ]
   end
@@ -44,14 +49,12 @@ Rails.application.routes.draw do
     root "home#index"
   end
 
-  get "/dashboard", to: "dashboard#show"
+  get "/dashboard",       to: "dashboard#show"
   get "dashboard/agenda", to: "dashboard#agenda", as: :dashboard_agenda
 
-  # Admin-only UI preview page (guarded in UiController)
-  get "/ui", to: "ui#show"
-
-  get "/schedule", to: "schedule#week"
-  get "/schedule/week", to: "schedule#week"
+  get "/ui",             to: "ui#show"
+  get "/schedule",       to: "schedule#week"
+  get "/schedule/week",  to: "schedule#week"
 
   get "up" => "rails/health#show", as: :rails_health_check
 end

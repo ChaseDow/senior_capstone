@@ -2,16 +2,14 @@
   <% if @icon_name.present? %>
     <% icon_wrap_classes =
       if @active
-        "shrink-0 [&>svg]:h-5 [&>svg]:w-5 [&>svg]:opacity-90 [&_*]:fill-none [&_*]:stroke-emerald-200"
+        "shrink-0 [&>svg]:h-5 [&>svg]:w-5 [&>svg]:opacity-90 [&_*]:fill-none studs-icon--active"
       else
-        "shrink-0 [&>svg]:h-5 [&>svg]:w-5 [&>svg]:opacity-90 [&_*]:fill-none [&_*]:stroke-emerald-300 group-hover:[&_*]:stroke-zinc-50"
+        "shrink-0 [&>svg]:h-5 [&>svg]:w-5 [&>svg]:opacity-90 [&_*]:fill-none studs-icon--inactive group-hover:[&_*]:stroke-zinc-50"
       end
     %>
-
     <span class="<%= icon_wrap_classes %>">
       <%= helpers.icon @icon_name, library: "huge_icons" %>
     </span>
   <% end %>
-
   <span class="truncate"><%= @label %></span>
 <% end %>

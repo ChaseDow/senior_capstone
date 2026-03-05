@@ -14,25 +14,25 @@
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
   </head>
-  <body data-theme="green" class="h-full overflow-hidden bg-zinc-950 text-zinc-100">
+  <body data-theme="<%= user_signed_in? ? current_user.theme : 'green' %>" class="h-full overflow-hidden bg-zinc-950 text-zinc-100">
     <div data-controller="sidebar drawer" class="flex h-full min-h-0 overflow-hidden">
       <aside
         data-sidebar-target="sidebar"
         data-collapsed="false"
+        style="background-color: var(--studs-sidebar-bg); border-right: 1px solid var(--studs-border);"
         class="group/sidebar flex h-full flex-col overflow-hidden
-               w-64 data-[collapsed=true]:w-16 transition-[width] duration-200
-               border-r border-emerald-900/30 bg-[#15261d]"
+               w-64 data-[collapsed=true]:w-16 transition-[width] duration-200"
       >
         <div class="shrink-0 flex items-center gap-3 px-3 py-3">
           <button
             type="button"
             data-action="sidebar#toggle"
             class="inline-flex h-10 w-10 items-center justify-center rounded-xl
-                  border border-white/10 bg-zinc-950/30 hover:bg-white/5 transition
-                 text-zinc-200 hover:text-zinc-50
-                  [&_svg]:text-current
-                  [&_svg_*]:stroke-current
-                  [&_svg_*]:fill-none"
+                   border border-white/10 bg-zinc-950/30 hover:bg-white/5 transition
+                   text-zinc-200 hover:text-zinc-50
+                   [&_svg]:text-current
+                   [&_svg_*]:stroke-current
+                   [&_svg_*]:fill-none"
             aria-label="Toggle navigation"
           >
             <span class="[&>svg]:h-6 [&>svg]:w-6">
@@ -80,7 +80,8 @@
         <main class="min-w-0 min-h-0 flex-1 overflow-y-auto scrollbars">
           <div class="px-6 py-6">
             <% if notice.present? %>
-              <div class="mb-4 rounded-2xl border border-emerald-900 bg-emerald-950/40 px-4 py-3 text-sm text-emerald-200">
+              <div class="mb-4 rounded-2xl border px-4 py-3 text-sm text-zinc-100"
+                   style="border-color: var(--studs-border); background-color: var(--studs-panel-header);">
                 <%= notice %>
               </div>
             <% end %>
@@ -107,9 +108,10 @@
           role="dialog"
           aria-modal="true"
           class="pointer-events-auto w-[min(92vw,64rem)]
-                max-h-[85vh] overflow-hidden
-                rounded-2xl border border-zinc-800 bg-zinc-950/90 backdrop-blur shadow-2xl
-                translate-x-[110vw] transition-transform duration-300 ease-in-out">
+                 max-h-[85vh] overflow-hidden
+                 rounded-2xl backdrop-blur shadow-2xl
+                 translate-x-[110vw] transition-transform duration-300 ease-in-out"
+          style="border: 1px solid var(--studs-border); background-color: var(--studs-sidebar-bg);">
           <%= turbo_frame_tag "event_drawer",
                 class: "block h-full",
                 data: {
@@ -127,7 +129,7 @@
     <script>
       function bindPasswordToggles() {
         document.querySelectorAll('[data-password-toggle]').forEach((button) => {
-          if (button.dataset.bound === "true") return; // prevent double binding
+          if (button.dataset.bound === "true") return;
           button.dataset.bound = "true";
 
           button.addEventListener("click", () => {
