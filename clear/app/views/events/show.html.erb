@@ -1,68 +1,101 @@
-<% content_for :page_title, "Events" %>
-<% content_for :page_subtitle, "Upcoming and past events"%>
-<div class="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6 space-y-6">
-  <% if notice.present? %>
-    <div class="rounded-2xl border border-emerald-900 bg-emerald-950/40 px-4 py-3 text-sm text-emerald-200">
-      <%= notice %>
-    </div>
-  <% end %>
-
-  <div class="flex items-start justify-between gap-4">
-    <div class="min-w-0">
-      <h1 class="text-2xl font-semibold text-zinc-100 truncate">
-        <%= @event.title.presence || "(Untitled)" %>
-      </h1>
-
-      <p class="mt-2 text-sm text-zinc-400">
-        <%= @event.starts_at&.strftime("%b %d, %Y • %I:%M %p") %>
-        <% if @event.ends_at.present? %>
-          – <%= @event.ends_at.strftime("%I:%M %p") %>
+<% content_for :page_title, @event.title.presence || "Event" %>
+<% content_for :page_subtitle, "Event details" %>
+<div class="space-y-4">
+  <!-- Header card -->
+  <div class="rounded-2xl p-6"
+       style="border: 1px solid var(--studs-border);
+              background-color: var(--studs-panel-bg);
+              border-left: 4px solid <%= @event.color.presence || '#34D399' %>;">
+    <div class="flex items-start justify-between gap-4">
+      <div class="min-w-0 flex-1">
+        <h1 class="text-2xl font-bold text-zinc-100">
+          <%= @event.title.presence || "(Untitled)" %>
+        </h1>
+        <div class="mt-3 flex flex-wrap gap-4 text-sm text-zinc-400">
+          <span class="flex items-center gap-1.5">
+            <svg class="h-4 w-4 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            <%= @event.starts_at&.strftime("%B %d, %Y") %>
+          </span>
+          <span class="flex items-center gap-1.5">
+            <svg class="h-4 w-4 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <%= @event.starts_at&.strftime("%I:%M %p") %>
+            <% if @event.ends_at.present? %>
+              <span class="text-zinc-600">–</span>
+              <%= @event.ends_at.strftime("%I:%M %p") %>
+            <% end %>
+          </span>
+          <% if @event.location.present? %>
+            <span class="flex items-center gap-1.5">
+              <svg class="h-4 w-4 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+              </svg>
+              <%= @event.location %>
+            </span>
+          <% end %>
+          <% if @event.priority.present? %>
+            <span class="flex items-center gap-1.5">
+              <svg class="h-4 w-4 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 3l14 9-14 9V3z"/>
+              </svg>
+              Priority <%= @event.priority %>
+            </span>
+          <% end %>
+        </div>
+        <% if @event.recurring? %>
+          <div class="mt-3 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold"
+               style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-hover); color: var(--studs-accent);">
+            ↻ Repeats
+            <% if @event.repeat_until.present? %>
+              until <%= @event.repeat_until.strftime("%b %d, %Y") %>
+            <% end %>
+          </div>
         <% end %>
-      </p>
-
-      <% if @event.location.present? %>
-        <p class="mt-1 text-sm text-zinc-400"><%= @event.location %></p>
-      <% end %>
-    </div>
-
-    <div class="flex shrink-0 items-center gap-2">
-      <%= render Studs::SecondaryButtonComponent.new(
-            label: "Edit",
-            path: edit_event_path(@event),
-            size: :sm
-          ) %>
-
-      <%= button_to event_path(@event),
-                    method: :delete,
-                    form: { data: { turbo_confirm: "Delete this event?" } },
-                    class: "inline-block" do %>
+      </div>
+      <div class="flex shrink-0 items-center gap-2">
         <%= render Studs::SecondaryButtonComponent.new(
-              label: "Delete",
-              color: :red,
-              type: "submit"
+              label: "Edit",
+              path: edit_event_path(@event),
+              size: :sm
             ) %>
-      <% end %>
+        <%= button_to event_path(@event),
+              method: :delete,
+              form: { data: { turbo_confirm: "Delete this event?" } },
+              class: "inline-block" do %>
+          <%= render Studs::SecondaryButtonComponent.new(
+                label: "Delete",
+                color: :red,
+                type: "submit"
+              ) %>
+        <% end %>
+      </div>
     </div>
   </div>
-
-  <div class="rounded-2xl border border-zinc-800 bg-zinc-950/40 p-5">
+  <!-- Description card -->
+  <div class="rounded-2xl p-5"
+       style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg);">
+    <div class="mb-2 text-xs font-semibold uppercase tracking-widest"
+         style="color: var(--studs-accent);">Description</div>
     <% if @event.description.present? %>
-      <p class="whitespace-pre-wrap text-zinc-200"><%= @event.description %></p>
+      <p class="whitespace-pre-wrap text-sm text-zinc-200 leading-relaxed"><%= @event.description %></p>
     <% else %>
-      <p class="text-sm text-zinc-400">No description.</p>
+      <p class="text-sm text-zinc-500 italic">No description provided.</p>
     <% end %>
   </div>
-
+  <!-- Footer actions -->
   <div class="flex items-center gap-2">
     <%= render Studs::SecondaryButtonComponent.new(
-          label: "Back to events",
+          label: "← Back to events",
           href: events_path
         ) %>
-
     <%= render Studs::PrimaryButtonComponent.new(
           label: "New event",
           href: new_event_path,
-          color: :orange
+          color: :emerald
         ) %>
   </div>
 </div>
