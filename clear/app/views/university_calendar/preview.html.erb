@@ -1,0 +1,66 @@
+<% content_for :page_title, "University Calendar" %>
+<% content_for :page_subtitle, "Preview events from Louisiana Tech Academic Calendar" %>
+
+<div class="rounded-2xl border border-emerald-900/35 bg-emerald-950/15 backdrop-blur-sm p-6">
+  <div class="flex items-center justify-between mb-4">
+    <p class="text-sm text-zinc-400">
+      <%= @items.size %> event(s) found. Events already in your calendar are marked as duplicates.
+    </p>
+
+    <div class="flex items-center gap-3">
+      <%= link_to "Cancel", events_path,
+            class: "inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-medium
+                    border border-zinc-700 text-zinc-300 hover:bg-zinc-800/50 transition" %>
+
+      <%= button_to "Import All New Events", university_calendar_import_path,
+            method: :post,
+            class: "inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-medium
+                    bg-blue-600 text-white hover:bg-blue-500 transition" %>
+    </div>
+  </div>
+
+  <div class="overflow-hidden rounded-2xl border border-emerald-900/30 bg-emerald-950/10">
+    <% if @items.any? %>
+      <div class="divide-y divide-emerald-900/25">
+        <% @items.each do |item| %>
+          <% key = "#{item[:title].to_s.downcase.strip}|#{item[:starts_at]&.to_date}" %>
+          <% duplicate = @existing_keys.include?(key) %>
+
+          <div class="flex items-start justify-between gap-4 p-4 <%= duplicate ? 'opacity-50' : 'bg-emerald-950/10' %>">
+            <div class="min-w-0">
+              <p class="truncate font-medium text-zinc-100 flex items-center gap-2">
+                <%= item[:title] %>
+                <% if duplicate %>
+                  <span class="rounded-full border border-zinc-700 bg-zinc-800/50 px-2 py-0.5 text-[11px] text-zinc-400">
+                    Already imported
+                  </span>
+                <% end %>
+              </p>
+
+              <p class="mt-1 text-sm text-zinc-400">
+                <%= item[:starts_at]&.strftime("%b %d, %Y") %>
+                <% if item[:ends_at].present? %>
+                  &ndash; <%= item[:ends_at].strftime("%b %d, %Y") %>
+                <% end %>
+              </p>
+
+              <% if item[:location].present? %>
+                <p class="text-sm text-zinc-400"><%= item[:location] %></p>
+              <% end %>
+
+              <% if item[:description].present? %>
+                <p class="mt-1 text-xs text-zinc-500 line-clamp-2"><%= item[:description] %></p>
+              <% end %>
+            </div>
+
+            <div class="shrink-0">
+              <span class="inline-block w-3 h-3 rounded-full" style="background-color: #60A5FA;"></span>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="p-6 text-sm text-zinc-400">No events found in the university calendar feed.</div>
+    <% end %>
+  </div>
+</div>
