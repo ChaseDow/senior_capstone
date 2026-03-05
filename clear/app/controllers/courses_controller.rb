@@ -46,7 +46,7 @@ class CoursesController < ApplicationController
             turbo_stream.replace(
               "dashboard_calendar",
               partial: "dashboard/calendar_frame",
-              locals: { events: occurrences, start_date: start_date }
+              locals: { events: occurrences, start_date: start_date, draft: current_user_draft }
             ),
             turbo_stream.update("event_drawer", "")
           ]
@@ -95,7 +95,7 @@ class CoursesController < ApplicationController
             turbo_stream.replace(
               "dashboard_calendar",
               partial: "dashboard/calendar_frame",
-              locals: { events: occurrences, start_date: start_date }
+              locals: { events: occurrences, start_date: start_date, draft: current_user_draft }
             ),
             turbo_stream.update("event_drawer", "")
           ]
@@ -139,7 +139,7 @@ class CoursesController < ApplicationController
           turbo_stream.replace(
             "dashboard_calendar",
             partial: "dashboard/calendar_frame",
-            locals: { events: occurrences, start_date: start_date }
+            locals: { events: occurrences, start_date: start_date, draft: current_user_draft }
           ),
           turbo_stream.update("event_drawer", "")
         ]
