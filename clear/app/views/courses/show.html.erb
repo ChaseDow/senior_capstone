@@ -1,88 +1,94 @@
 <% content_for :page_title, "Courses" %>
-<% content_for :page_subtitle, "Current enrolled courses"%>
-<div class="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6 space-y-6">
+<% content_for :page_subtitle, "Current enrolled courses" %>
+<% color = @course.try(:color).presence || "#34D399" %>
+<% day_labels = { 0 => "Sun", 1 => "Mon", 2 => "Tue", 3 => "Wed", 4 => "Thu", 5 => "Fri", 6 => "Sat" } %>
+<% selected_days = Array(@course.repeat_days).sort.map { |d| day_labels[d] }.compact %>
+<div class="rounded-2xl p-6 space-y-6" style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg);">
   <% if notice.present? %>
-    <div class="rounded-2xl border border-emerald-900 bg-emerald-950/40 px-4 py-3 text-sm text-emerald-200">
+    <div class="rounded-2xl px-4 py-3 text-sm text-emerald-200"
+         style="border: 1px solid rgba(52,211,153,0.2); background-color: rgba(6,78,59,0.3);">
       <%= notice %>
     </div>
   <% end %>
-  <div class="flex items-start justify-between gap-4">
+  <!-- Header -->
+  <div class="flex items-start justify-between gap-4"
+       style="border-left: 4px solid <%= color %>; padding-left: 1rem;">
     <div class="min-w-0">
       <h1 class="text-2xl font-semibold text-zinc-100 truncate">
         <%= @course.title.presence || "(Untitled)" %>
       </h1>
-      <div class="mt-1 text-sm text-zinc-300">
-        <% details = [] %>
-        <% details << @course.term if @course.term.present? %>
-        <% details << @course.professor if @course.professor.present? %>
-        <% details << @course.location if @course.location.present? %>
-        <%= details.join(" • ") %>
-      </div>
-      <div class="mt-2 text-sm text-zinc-400">
-        <% if @course.start_time.present? && @course.end_time.present? %>
-          <% day_labels = [["Sun", 0], ["Mon", 1], ["Tue", 2], ["Wed", 3], ["Thu", 4], ["Fri", 5], ["Sat", 6]] %>
-          <% day_map = day_labels.map { |lbl, wday| [wday, lbl] }.to_h %>
-          <% selected_days =
-            Array(@course.repeat_days)
-              .sort
-              .map { |d| day_map[d] }
-              .compact
-              .join("|")
-          %>
-          <%= selected_days %>
-          •
-          <%= @course.start_time.strftime("%-I:%M%P") %> – <%= @course.end_time.strftime("%-I:%M%P") %>
-        <% end %>
-      </div>
-      <div class="mt-2 text-sm text-zinc-400">
-        <% if @course.start_date.present? && @course.end_date.present? %>
-          <%= @course.start_date.strftime("%b %-d, %Y") %> – <%= @course.end_date.strftime("%b %-d, %Y") %>
-        <% elsif @course.start_date.present? %>
-          Starts <%= @course.start_date.strftime("%b %-d, %Y") %>
-        <% elsif @course.end_date.present? %>
-          Ends <%= @course.end_date.strftime("%b %-d, %Y") %>
-        <% end %>
-      </div>
-      <% if @course.end_date.present? %>
-        <p class="mt-1 text-xs text-zinc-500">
-          Until <%= @course.end_date.strftime("%b %d, %Y") %>
+      <% details = [@course.term.presence, @course.professor.presence, @course.location.presence].compact %>
+      <% if details.any? %>
+        <p class="mt-1 text-sm text-zinc-400"><%= details.join(" • ") %></p>
+      <% end %>
+      <% if @course.start_time.present? && @course.end_time.present? %>
+        <div class="mt-2 flex items-center gap-1.5 flex-wrap">
+          <% selected_days.each do |day| %>
+            <span class="inline-block rounded px-1.5 py-0.5 text-[10px] font-semibold"
+                  style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-hover); color: var(--studs-accent);">
+              <%= day %>
+            </span>
+          <% end %>
+          <span class="text-sm text-zinc-400">
+            <%= @course.start_time.strftime("%-I:%M%P") %> – <%= @course.end_time.strftime("%-I:%M%P") %>
+          </span>
+        </div>
+      <% end %>
+      <% if @course.start_date.present? || @course.end_date.present? %>
+        <p class="mt-1 text-sm text-zinc-500">
+          <% if @course.start_date.present? && @course.end_date.present? %>
+            <%= @course.start_date.strftime("%b %-d, %Y") %> – <%= @course.end_date.strftime("%b %-d, %Y") %>
+          <% elsif @course.start_date.present? %>
+            Starts <%= @course.start_date.strftime("%b %-d, %Y") %>
+          <% elsif @course.end_date.present? %>
+            Ends <%= @course.end_date.strftime("%b %-d, %Y") %>
+          <% end %>
         </p>
       <% end %>
     </div>
-    <div class="flex shrink-0 items-center gap-2">
-      <%= render Studs::SecondaryButtonComponent.new(
-            label: "Edit",
-            path: edit_course_path(@course),
-            size: :sm
-          ) %>
+    <div class="flex shrink-0 items-center gap-1.5">
+      <%= link_to edit_course_path(@course), class: "studs-nav-btn" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+        </svg>
+        Edit
+      <% end %>
       <%= button_to course_path(@course),
-                    method: :delete,
-                    form: { data: { turbo_confirm: "Delete this course?" } },
-                    class: "inline-block" do %>
-        <%= render Studs::SecondaryButtonComponent.new(
-              label: "Delete",
-              color: :red,
-              type: "submit"
-            ) %>
+            method: :delete,
+            form: { data: { turbo_confirm: "Delete this course?" } },
+            class: "studs-nav-btn",
+            style: "border-color: rgba(239,68,68,0.4); color: #fca5a5;" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+        </svg>
+        Delete
       <% end %>
     </div>
   </div>
-  <div class="rounded-2xl border border-zinc-800 bg-zinc-950/40 p-5">
+  <!-- Description -->
+  <div class="rounded-2xl p-5"
+       style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg-2);">
+    <div class="text-[10px] font-bold uppercase tracking-widest mb-3"
+         style="color: var(--studs-accent); opacity: 0.8;">Description</div>
     <% if @course.description.present? %>
-      <p class="whitespace-pre-wrap text-zinc-200"><%= @course.description %></p>
+      <p class="whitespace-pre-wrap text-sm text-zinc-200"><%= @course.description %></p>
     <% else %>
-      <p class="text-sm text-zinc-400">No description.</p>
+      <p class="text-sm text-zinc-500">No description provided.</p>
     <% end %>
   </div>
-  <div class="flex items-center gap-2">
-    <%= render Studs::SecondaryButtonComponent.new(
-          label: "Back to courses",
-          href: courses_path
-        ) %>
-    <%= render Studs::PrimaryButtonComponent.new(
-          label: "New course",
-          href: new_course_path,
-          color: :emerald
-        ) %>
+  <!-- Footer actions -->
+  <div class="flex items-center gap-1.5 pt-2" style="border-top: 1px solid var(--studs-divider);">
+    <%= link_to courses_path, class: "studs-nav-btn" do %>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+      </svg>
+      Back to courses
+    <% end %>
+    <%= link_to course_course_items_path(@course), class: "studs-nav-btn" do %>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+      </svg>
+      View items
+    <% end %>
   </div>
 </div>

@@ -1,44 +1,58 @@
+<% label_classes = "block text-[10px] font-bold uppercase tracking-widest mb-1.5" %>
+<% label_style   = "color: var(--studs-accent); opacity: 0.8;" %>
+<% input_classes = "w-full rounded-2xl px-4 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-600 " \
+                   "bg-zinc-950/60 focus:outline-none focus:ring-2 transition-all duration-150 border" %>
+<% input_style   = "border-color: var(--studs-border); --tw-ring-color: var(--studs-accent);" %>
 <%= form_with model: [course, course_item] do |f| %>
   <% if course_item.errors.any? %>
-    <div class="mb-3 rounded-xl border border-red-500/40 bg-red-950/20 p-3 text-sm text-red-200">
-      <ul class="list-disc pl-5">
+    <div class="rounded-2xl p-4 text-red-300 mb-4"
+         style="border: 1px solid rgba(239,68,68,0.3); background-color: rgba(127,29,29,0.2);">
+      <p class="text-sm font-semibold mb-1">Please fix the following:</p>
+      <ul class="list-disc pl-5 text-sm space-y-0.5">
         <% course_item.errors.full_messages.each do |msg| %>
           <li><%= msg %></li>
         <% end %>
       </ul>
     </div>
   <% end %>
-  <div class="grid gap-3 md:grid-cols-6 items-end">
+  <div class="grid gap-4 md:grid-cols-6 items-end">
     <div class="md:col-span-3">
-      <%= f.label :title, class: "block text-xs font-medium text-zinc-300" %>
+      <%= f.label :title, "Title", class: label_classes, style: label_style %>
       <%= f.text_field :title,
             placeholder: "HW 3, Midterm, Seminar…",
-            class: "mt-1 w-full rounded-xl border border-zinc-800 bg-zinc-950/40 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-500" %>
+            class: input_classes,
+            style: input_style %>
     </div>
     <div class="md:col-span-1">
-      <%= f.label :kind, class: "block text-xs font-medium text-zinc-300" %>
+      <%= f.label :kind, "Type", class: label_classes, style: label_style %>
       <%= f.select :kind,
             CourseItem.kinds.keys.map { |k| [k.humanize, k] },
             {},
-            class: "mt-1 w-full rounded-xl border border-zinc-800 bg-zinc-950/40 px-3 py-2 text-sm text-zinc-100" %>
+            class: input_classes,
+            style: input_style %>
     </div>
     <div class="md:col-span-2">
-      <%= f.label :due_at, "Due", class: "block text-xs font-medium text-zinc-300" %>
+      <%= f.label :due_at, "Due", class: label_classes, style: label_style %>
       <%= f.datetime_local_field :due_at,
-            class: "mt-1 w-full rounded-xl border border-zinc-800 bg-zinc-950/40 px-3 py-2 text-sm text-zinc-100" %>
+            class: input_classes,
+            style: input_style %>
     </div>
     <div class="md:col-span-6">
-      <%= f.label :details, class: "block text-xs font-medium text-zinc-300" %>
+      <%= f.label :details, "Details", class: label_classes, style: label_style %>
       <%= f.text_area :details, rows: 3,
-            class: "mt-1 w-full rounded-xl border border-zinc-800 bg-zinc-950/40 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-500" %>
+            class: input_classes,
+            style: "#{input_style} resize: vertical;" %>
     </div>
-    <div class="md:col-span-6 flex justify-end">
-      <button
-        type="submit"
-        class="inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-medium
-               bg-emerald-500/15 text-emerald-100 border border-emerald-400/25 hover:bg-emerald-500/20 transition">
+    <div class="md:col-span-6 flex items-center gap-3 pt-2" style="border-top: 1px solid var(--studs-divider);">
+      <button type="submit" class="studs-btn-accent">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+        </svg>
         <%= course_item.persisted? ? "Save changes" : "Add item" %>
       </button>
+      <% if course_item.persisted? %>
+        <%= link_to "Cancel", course_course_items_path(course), class: "studs-nav-btn" %>
+      <% end %>
     </div>
   </div>
 <% end %>
