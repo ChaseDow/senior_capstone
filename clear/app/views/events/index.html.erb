@@ -26,7 +26,7 @@
               }
             ) %>
         <div class="mx-1 h-5 w-px rounded-full" style="background-color: var(--studs-border);"></div>
-        <%= link_to new_event_path, class: "studs-nav-btn" do %>
+        <%= link_to new_event_path, class: "studs-nav-btn", data: { turbo_frame: "_top" } do %>
           <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
           </svg>
@@ -52,7 +52,8 @@
             <div class="min-w-0 flex-1">
               <p class="font-medium text-zinc-100 flex items-center gap-2 flex-wrap">
                 <%= link_to event.title.presence || "(Untitled)", event_path(event),
-                      class: "hover:underline underline-offset-2" %>
+                      class: "hover:underline underline-offset-2",
+                      data: { turbo_frame: "_top" } %>
                 <% if event.recurring? %>
                   <span class="rounded-full px-2 py-0.5 text-[10px] font-semibold"
                         style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-hover); color: var(--studs-accent);">
@@ -81,7 +82,9 @@
               <% end %>
             </div>
             <div class="flex shrink-0 items-center gap-1.5">
-              <%= link_to edit_event_path(event), class: "studs-nav-btn" do %>
+              <%= link_to edit_event_path(event),
+                    class: "studs-nav-btn",
+                    data: { turbo_frame: "_top" } do %>
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                 </svg>
@@ -89,7 +92,7 @@
               <% end %>
               <%= button_to event_path(event),
                     method: :delete,
-                    form: { data: { turbo_confirm: "Delete this event?" } },
+                    form: { data: { turbo_confirm: "Delete this event?", turbo_frame: "_top" } },
                     class: "studs-nav-btn",
                     style: "border-color: rgba(239,68,68,0.4); color: #fca5a5;" do %>
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
@@ -110,7 +113,7 @@
             <p class="text-sm font-medium text-zinc-300">No events yet</p>
             <p class="mt-1 text-xs text-zinc-500">Create your first event to get started</p>
             <div class="mt-4">
-              <%= link_to new_event_path, class: "studs-nav-btn" do %>
+              <%= link_to new_event_path, class: "studs-nav-btn", data: { turbo_frame: "_top" } do %>
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
                 </svg>
