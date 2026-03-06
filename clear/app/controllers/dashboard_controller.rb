@@ -16,6 +16,10 @@ class DashboardController < ApplicationController
 
     @occurrences = calendar_occurrences_for_range(range_start, range_end)
 
+    now = Time.current
+    next_occurrences = calendar_occurrences_for_range(now, now + 7.days)
+    @next_occurrence = next_occurrences.find { |o| o.starts_at > now }
+
     return unless turbo_frame_request?
 
     render partial: "dashboard/calendar_frame",

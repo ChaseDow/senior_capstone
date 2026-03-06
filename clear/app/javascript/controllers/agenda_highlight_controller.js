@@ -30,9 +30,6 @@ export default class extends Controller {
   }
 
   selectFromCalendar(event) {
-    // Stop bubbling to day column's clear handler
-    event.stopPropagation()
-
     const id = event.currentTarget.id
     if (!id) return
 
@@ -41,6 +38,11 @@ export default class extends Controller {
     } else {
       window.dispatchEvent(new CustomEvent("agenda:select", { detail: { id } }))
     }
+  }
+
+  clearFromDay(event) {
+    if (event.target.closest("[data-calendar-event]")) return
+    this.clear()
   }
 
   highlight(id) {
