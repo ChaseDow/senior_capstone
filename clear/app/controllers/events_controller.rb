@@ -25,6 +25,11 @@ class EventsController < ApplicationController
   end
 
   def create
+    if in_draft_mode?
+      current_user_draft.add_create("event", event_params.to_h)
+      return render_draft_calendar_update
+    end
+
     @event = current_user.events.new(event_params)
 
     if @event.save
@@ -47,7 +52,7 @@ class EventsController < ApplicationController
             turbo_stream.replace(
               "dashboard_calendar",
               partial: "dashboard/calendar_frame",
-              locals: { events: occurrences, start_date: start_date }
+              locals: { events: occurrences, start_date: start_date, draft: nil }
             ),
             turbo_stream.update("event_drawer", "")
           ]
@@ -76,6 +81,11 @@ class EventsController < ApplicationController
   end
 
   def update
+    if in_draft_mode?
+      current_user_draft.add_update("event", @event.id, event_params.to_h)
+      return render_draft_calendar_update
+    end
+
     if @event.update(event_params)
       respond_to do |format|
         format.html { redirect_to event_path(@event), notice: "Event updated." }
@@ -96,7 +106,7 @@ class EventsController < ApplicationController
             turbo_stream.replace(
               "dashboard_calendar",
               partial: "dashboard/calendar_frame",
-              locals: { events: occurrences, start_date: start_date }
+              locals: { events: occurrences, start_date: start_date, draft: nil }
             ),
             turbo_stream.update("event_drawer", "")
           ]
@@ -118,6 +128,11 @@ class EventsController < ApplicationController
   end
 
   def destroy
+    if in_draft_mode?
+      current_user_draft.add_delete("event", @event.id)
+      return render_draft_calendar_update
+    end
+
     @event.destroy!
 
     respond_to do |format|
@@ -139,7 +154,7 @@ class EventsController < ApplicationController
           turbo_stream.replace(
             "dashboard_calendar",
             partial: "dashboard/calendar_frame",
-            locals: { events: occurrences, start_date: start_date }
+            locals: { events: occurrences, start_date: start_date, draft: nil }
           ),
           turbo_stream.update("event_drawer", "")
         ]
@@ -151,6 +166,29 @@ class EventsController < ApplicationController
 
   def set_event
     @event = current_user.events.find(params[:id])
+  end
+
+  def in_draft_mode?
+    session[:calendar_draft_mode] && current_user_draft.present?
+  end
+
+  def render_draft_calendar_update
+    draft       = current_user_draft
+    start_date  = parse_start_date(params[:start_date])
+    week_start  = start_date.beginning_of_week
+    range_start = week_start.beginning_of_day
+    range_end   = (week_start + 6.days).end_of_day
+
+    occurrences = calendar_occurrences_for_range(range_start, range_end, draft: draft)
+
+    render turbo_stream: [
+      turbo_stream.replace(
+        "dashboard_calendar",
+        partial: "dashboard/calendar_frame",
+        locals: { events: occurrences, start_date: start_date, draft: draft }
+      ),
+      turbo_stream.update("event_drawer", "")
+    ]
   end
 
   def parse_start_date(raw)

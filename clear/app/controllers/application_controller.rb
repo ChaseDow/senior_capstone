@@ -11,7 +11,7 @@ class ApplicationController < ActionController::Base
 
   private
 
-  def calendar_occurrences_for_range(range_start, range_end)
+  def calendar_occurrences_for_range(range_start, range_end, draft: nil)
     base_events = current_user.events
       .where("starts_at <= ?", range_end)
       .where("recurring = FALSE OR repeat_until >= ?", range_start.to_date)
@@ -35,7 +35,18 @@ class ApplicationController < ActionController::Base
         .where(due_at: range_start..range_end)
         .includes(:course)
 
-    (event_occurrences + course_occurrences + course_items.to_a)
-      .sort_by(&:starts_at)
+    result = (event_occurrences + course_occurrences + course_items.to_a).sort_by(&:starts_at)
+
+    draft&.operation_count&.positive? ? draft.build_preview_occurrences(result, range_start, range_end) : result
+  end
+
+  def current_user_draft
+    return @current_user_draft if defined?(@current_user_draft)
+
+    @current_user_draft = if session[:calendar_draft_mode]
+      draft = CalendarDraft.find_by(user: current_user)
+      session.delete(:calendar_draft_mode) if draft.nil?
+      draft
+    end
   end
 end
