@@ -1,0 +1,79 @@
+<% content_for :page_title, "AI Chat" %>
+<% content_for :page_subtitle, "Consult with an AI" %>
+
+<div class="space-y-6">
+
+  <div id="ai_chat_flash">
+    <% if flash[:alert].present? %>
+      <div class="rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+        <%= flash[:alert] %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="rounded-2xl border border-zinc-800 bg-zinc-950/60 shadow-sm overflow-hidden">
+    <div class="flex items-center justify-between px-5 py-4 border-b border-zinc-800">
+      <div>
+        <h1 class="text-lg font-semibold text-zinc-100">Assistant</h1>
+        <p class="text-sm text-zinc-400">
+          Ask questions, explore scenarios, and compare schedule what-ifs.
+        </p>
+      </div>
+
+      <span class="inline-flex items-center gap-2 rounded-full border border-green-500/20 bg-green-500/10 px-3 py-1 text-xs font-medium text-green-200">
+        <span class="h-2 w-2 rounded-full bg-green-400 shadow-[0_0_12px_rgba(34,197,94,0.65)]"></span>
+        Online
+      </span>
+    </div>
+
+    <!-- Messages -->
+    <div
+      class="h-[55vh] overflow-y-auto px-5 py-4 space-y-4"
+      id="ai_chat_messages"
+    >
+
+      <% @messages.each do |m| %>
+        <%= render "ai_chat/message", m: m %>
+      <% end %>
+    </div>
+
+    <!-- Composer -->
+    <div class="border-t border-zinc-800 bg-zinc-950/70 px-5 py-4">
+      <%= form_with url: ai_chat_index_path,
+        method: :post,
+        data: { turbo: true },
+        html: {
+          class: "space-y-3",
+          data: {
+            controller: "chat",
+            action: "turbo:submit-end->chat#reset"
+          }
+        } do %>
+
+        <%= hidden_field_tag :history,
+          (@messages || []).to_json,
+          id: "ai_chat_history" %>
+
+        <div class="relative">
+          <%= text_area_tag :content, "",
+            id: "ai_chat_input",
+            rows: 3,
+            placeholder: "Ask a what-if… e.g., “If I postpone my project for a day, what else should change?”",
+            class: "w-full resize-none rounded-2xl border border-zinc-800 bg-zinc-900/50 px-4 py-3 text-sm text-emerald-100 placeholder:text-zinc-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-400/40" %>
+
+          <div class="pointer-events-none absolute inset-x-0 bottom-0 h-10 rounded-b-2xl bg-gradient-to-t from-zinc-950/40 to-transparent"></div>
+        </div>
+
+        <div class="flex items-center justify-between gap-3">
+          <p class="text-xs text-zinc-500">
+            Tip: Use details like dates, locations, and time for better results.
+          </p>
+
+          <%= submit_tag "Send",
+            class: "inline-flex items-center justify-center rounded-2xl bg-green-600 px-5 py-2 text-sm font-medium text-white hover:bg-green-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-400/40 transition" %>
+        </div>
+
+      <% end %>
+    </div>
+  </div>
+</div>
