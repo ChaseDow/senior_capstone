@@ -4,10 +4,24 @@ class User < ApplicationRecord
   has_many :syllabuses, dependent: :destroy
 
   devise :database_authenticatable, :registerable,
-        :recoverable, :rememberable, :validatable
+         :recoverable, :rememberable, :validatable
 
   enum :role, { user: 0, admin: 1 }
   has_one_attached :avatar
+
+  # ── Theme ────────────────────────────────────────────────
+  THEMES = %w[green blue purple rose amber cyan pink red lime slate orange].freeze
+  THEME_DEFAULT = "green".freeze
+
+  def theme
+    THEMES.include?(super) ? super : THEME_DEFAULT
+  end
+
+  def update_theme(params)
+    theme_name = params[:theme].to_s
+    update(theme: THEMES.include?(theme_name) ? theme_name : THEME_DEFAULT)
+  end
+  # ─────────────────────────────────────────────────────────
 
   def avatar_thumbnail
     avatar.variant(resize: "150x150!").processed

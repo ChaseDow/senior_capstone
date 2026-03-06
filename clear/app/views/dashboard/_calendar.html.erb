@@ -8,15 +8,7 @@
 <% prev_start  = week_start_date - 7.days %>
 <% next_start  = week_start_date + 7.days %>
 <% today_start = Date.current.beginning_of_week %>
-<%# --- Theme helpers --- %>
-<% camo_bg      = "bg-[#233a2a]/85" %>
-<% camo_bg_soft = "bg-[#233a2a]/60" %>
-<% vline = "border-emerald-300/12" %>
-<% nav_btn =
-  "inline-flex items-center rounded-xl border px-4 py-2 text-sm font-medium transition " \
-  "border-emerald-500/25 bg-emerald-500/10 text-emerald-100 " \
-  "hover:bg-emerald-500/15 hover:border-emerald-400/30"
-%>
+<% nav_btn = "studs-nav-btn" %>
 <% event_classes =
   "absolute z-10 cursor-pointer rounded-2xl border border-black/20 px-3 py-2 text-[12px] leading-snug shadow-md " \
   "hover:brightness-110 hover:saturate-110 transition"
@@ -30,73 +22,92 @@
 <style>
   [data-calendar-event] {
     transition:
-      box-shadow 0.15s ease,
-      transform 0.15s ease,
-      filter 0.15s ease;
+      box-shadow 0.2s ease,
+      transform 0.2s ease,
+      filter 0.2s ease,
+      width 0.2s ease,
+      left 0.2s ease;
   }
 
   [data-calendar-event]:hover {
     filter: brightness(1.08) saturate(1.15);
-    z-index: 30;
+    transform: translateY(-1px);
   }
 
   [data-calendar-event].is-selected {
-    z-index: 40;
-    transform: scale(1.04);
+    z-index: 50 !important;
+    width: calc(85% - 12px) !important;
+    left: 6px !important;
     box-shadow:
-      0 0 0 4px rgba(255,255,255,0.85),
-      0 16px 40px rgba(0,0,0,0.55);
+      0 0 0 3px rgba(255,255,255,0.90),
+      0 16px 40px rgba(0,0,0,0.60);
+    filter: brightness(1.05);
+    transform: none;
   }
 </style>
 <div class="flex h-full min-h-0 flex-col" data-controller="agenda-highlight">
+  <!-- Toolbar -->
   <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
     <div class="text-lg font-semibold text-zinc-100">
       <%= week_start_date.strftime("%B %Y") %>
     </div>
-    <nav class="flex items-center gap-2">
-      <%= link_to "Previous", dashboard_path(start_date: prev_start), class: nav_btn, data: { turbo_frame: "dashboard_calendar" } %>
-      <%= link_to "Today",    dashboard_path(start_date: today_start), class: nav_btn, data: { turbo_frame: "dashboard_calendar" } %>
-      <%= link_to "Next",     dashboard_path(start_date: next_start), class: nav_btn, data: { turbo_frame: "dashboard_calendar" } %>
-      <span class="mx-1 h-6 w-px bg-emerald-500/20"></span>
+    <nav class="flex items-center gap-1.5">
+      <%= link_to dashboard_path(start_date: prev_start), class: nav_btn, data: { turbo_frame: "dashboard_calendar" } do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+        </svg>
+        Prev
+      <% end %>
+      <%= link_to "Today", dashboard_path(start_date: today_start), class: nav_btn, data: { turbo_frame: "dashboard_calendar" } %>
+      <%= link_to dashboard_path(start_date: next_start), class: nav_btn, data: { turbo_frame: "dashboard_calendar" } do %>
+        Next
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+        </svg>
+      <% end %>
+      <div class="mx-1 h-5 w-px rounded-full" style="background-color: var(--studs-border);"></div>
       <button
         type="button"
         class="<%= nav_btn %>"
         data-action="click->agenda-drawer#open"
         data-agenda-drawer-date-param="<%= Date.current.iso8601 %>"
         >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h10"/>
+        </svg>
         Agenda
       </button>
     </nav>
   </div>
   <!-- Calendar shell -->
-  <div class="min-h-0 flex-1 overflow-auto rounded-2xl border border-emerald-900/40 bg-emerald-950/10 shadow-[inset_0_0_0_1px_rgba(16,185,129,0.08)]">
-    <!-- Sticky header -->
+  <div class="min-h-0 flex-1 overflow-auto rounded-2xl shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)]"
+       style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg-2);">
+    <!-- Sticky header row -->
     <div
-      class="sticky top-0 z-20 border-b border-emerald-900/35 backdrop-blur"
-      style="height: <%= header_height_px %>px;"
+      class="sticky top-0 z-20 backdrop-blur"
+      style="height: <%= header_height_px %>px; border-bottom: 1px solid var(--studs-border);"
     >
       <div class="grid h-full" style="grid-template-columns: <%= time_col_px %>px repeat(7, minmax(0, 1fr));">
-        <div class="<%= camo_bg %> border-r <%= vline %>"></div>
+        <div style="background-color: var(--studs-panel-header); border-right: 1px solid var(--studs-border);"></div>
         <% days.each do |day| %>
           <% is_today = (day == Date.current) %>
-          <div class="<%= camo_bg %> border-r <%= vline %> px-4 py-2">
-            <div class="flex items-center justify-between">
-              <div class="min-w-0">
-                <div class="text-[11px] font-semibold tracking-wide text-emerald-100/85">
-                  <%= day.strftime("%a").upcase %>
-                </div>
-                <div class="mt-0.5 flex items-center gap-2">
-                  <% if is_today %>
-                    <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-emerald-400/25 text-emerald-100 font-semibold">
-                      <%= day.strftime("%-d") %>
-                    </span>
-                    <span class="text-xs font-semibold text-emerald-200/90">Today</span>
-                  <% else %>
-                    <span class="text-lg font-semibold text-zinc-100">
-                      <%= day.strftime("%-d") %>
-                    </span>
-                  <% end %>
-                </div>
+          <div style="background-color: var(--studs-panel-header); border-right: 1px solid var(--studs-border);" class="px-4 py-2">
+            <div class="min-w-0">
+              <div class="text-[11px] font-semibold tracking-widest uppercase text-zinc-200/80">
+                <%= day.strftime("%a") %>
+              </div>
+              <div class="mt-0.5 flex items-center gap-2">
+                <% if is_today %>
+                  <span class="inline-flex h-8 w-8 items-center justify-center rounded-full font-bold text-white shadow-lg"
+                        style="background-color: var(--studs-accent); box-shadow: 0 0 12px color-mix(in srgb, var(--studs-accent) 60%, transparent);">
+                    <%= day.strftime("%-d") %>
+                  </span>
+                  <span class="text-xs font-semibold" style="color: var(--studs-accent);">Today</span>
+                <% else %>
+                  <span class="text-lg font-semibold text-zinc-100">
+                    <%= day.strftime("%-d") %>
+                  </span>
+                <% end %>
               </div>
             </div>
           </div>
@@ -106,11 +117,13 @@
     <!-- Body grid -->
     <div class="grid" style="grid-template-columns: <%= time_col_px %>px repeat(7, minmax(0, 1fr));">
       <!-- Hours gutter -->
-      <div class="<%= camo_bg_soft %> border-r <%= vline %>">
+      <div style="background-color: var(--studs-panel-header); border-right: 1px solid var(--studs-border);">
         <% 24.times do |h| %>
           <div
-            class="border-b border-emerald-900/20 px-3 pt-2 text-right text-sm font-semibold text-zinc-200"
-            style="height: <%= hour_height_px %>px;"
+            class="px-3 pt-2 text-right text-xs font-semibold tracking-wide"
+            style="height: <%= hour_height_px %>px;
+                   border-bottom: 1px solid var(--studs-divider);
+                   color: color-mix(in srgb, var(--studs-accent) 80%, white);"
           >
             <% label =
               if h == 0
@@ -133,13 +146,17 @@
         <% day_end   = day_start.end_of_day %>
         <% is_today   = (day == Date.current) %>
         <% is_weekend = day.saturday? || day.sunday? %>
-        <div class="relative border-r <%= vline %> <%= is_weekend ? "bg-white/0" : "" %> <%= is_today ? "bg-emerald-500/10" : "" %>">
-          <!-- Clickable time slots (30 min) -->
+        <div class="relative"
+             data-action="click->agenda-highlight#clear"
+          style="border-right: 1px solid var(--studs-divider);
+          <%= is_today ? "background-color: color-mix(in srgb, var(--studs-accent) 8%, transparent);" : "" %>
+          <%= is_weekend && !is_today ? "background-color: rgba(0,0,0,0.08);" : "" %>">
+          <!-- Clickable time slots -->
           <div class="absolute inset-0 z-[1]">
             <% 48.times do |i| %>
               <% slot_time = day_start + (i * 30).minutes %>
               <%= link_to new_event_path(start_time: slot_time.iso8601),
-                class: "timeslot absolute left-0 w-full hover:bg-emerald-500/10 transition-colors cursor-pointer",
+                class: "timeslot absolute left-0 w-full transition-colors cursor-pointer hover:bg-white/5",
                 style: "top: #{i * (hour_height_px / 2.0)}px; height: #{hour_height_px / 2.0}px;",
                 data: { turbo: false } do %>
               <% end %>
@@ -149,23 +166,21 @@
           <div class="absolute inset-0 pointer-events-none">
             <% 24.times do %>
               <div class="relative" style="height: <%= hour_height_px %>px;">
-                <div class="absolute top-0 left-0 w-full border-b border-emerald-300/25"></div>
-                <div class="absolute top-1/2 left-0 w-full border-b border-dashed border-emerald-200/18"></div>
+                <div class="absolute top-0 left-0 w-full" style="border-bottom: 1px solid var(--studs-divider);"></div>
+                <div class="absolute top-1/2 left-0 w-full" style="border-bottom: 1px dashed color-mix(in srgb, var(--studs-divider) 60%, transparent);"></div>
               </div>
             <% end %>
           </div>
-          <!-- Unified Event layer (Events + Courses + CourseItems) -->
+          <!-- Event layer -->
           <div class="relative" style="height: <%= day_height_px %>px;">
             <% day_events = events_by_day.fetch(day, []) %>
-            <% due_height_px = 28 %>
-            <% due_min_minutes = 10 %>
+            <% due_height_px    = 28 %>
+            <% due_min_minutes  = 10 %>
             <% segments =
               day_events.map do |e|
-                record = e.respond_to?(:event) ? e.event : e
-                model  = record.model_name.singular
-
+                record   = e.respond_to?(:event) ? e.event : e
+                model    = record.model_name.singular
                 start_at = e.starts_at.in_time_zone
-
                 finish_at =
                   if model == "course_item"
                     start_at + due_min_minutes.minutes
@@ -174,65 +189,50 @@
                   else
                     start_at + 1.hour
                   end
-
                 seg_start = [start_at, day_start].max
                 seg_end   = [finish_at, day_end].min
                 next if seg_end <= seg_start
-
                 minutes_from_midnight = ((seg_start - day_start) / 60.0)
-                duration_minutes      = ((seg_end - seg_start) / 60.0)
-
-                top_px = (minutes_from_midnight * px_per_minute)
-
+                duration_minutes      = ((seg_end   - seg_start) / 60.0)
+                top_px    = (minutes_from_midnight * px_per_minute)
                 height_px =
                   if model == "course_item"
                     due_height_px
                   else
                     ([duration_minutes, 15].max * px_per_minute)
                   end
-
                 max_height_px = day_height_px - top_px
-                height_px = [height_px, max_height_px].min
-
+                height_px     = [height_px, max_height_px].min
                 {
-                  record: record,
-                  model: model,
-                  seg_start: seg_start,
-                  seg_end: seg_end,
-                  top: top_px,
-                  height: height_px,
-                  col: 0,
-                  group_cols: 1
+                  record: record, model: model,
+                  seg_start: seg_start, seg_end: seg_end,
+                  top: top_px, height: height_px,
+                  col: 0, group_cols: 1
                 }
               end.compact.sort_by { |s| [s[:seg_start], s[:model] == "course_item" ? 1 : 0] }
             %>
+            <%# Build overlap groups %>
             <% groups = [] %>
             <% current_group = [] %>
             <% current_end = nil %>
             <% segments.each do |seg| %>
               <% if current_group.empty? %>
-                <% current_group = [seg] %>
-                <% current_end = seg[:seg_end] %>
+                <% current_group = [seg]; current_end = seg[:seg_end] %>
               <% elsif seg[:seg_start] < current_end %>
-                <% current_group << seg %>
-                <% current_end = [current_end, seg[:seg_end]].max %>
+                <% current_group << seg; current_end = [current_end, seg[:seg_end]].max %>
               <% else %>
-                <% groups << current_group %>
-                <% current_group = [seg] %>
-                <% current_end = seg[:seg_end] %>
+                <% groups << current_group; current_group = [seg]; current_end = seg[:seg_end] %>
               <% end %>
             <% end %>
             <% groups << current_group if current_group.any? %>
+            <%# Assign columns within each group %>
             <% groups.each do |group| %>
-              <% active = [] %>
-              <% max_cols = 1 %>
+              <% active = []; max_cols = 1 %>
               <% group.each do |seg| %>
                 <% active.reject! { |a| a[:seg_end] <= seg[:seg_start] } %>
-                <% used = active.map { |a| a[:col] } %>
-                <% col = 0 %>
+                <% used = active.map { |a| a[:col] }; col = 0 %>
                 <% col += 1 while used.include?(col) %>
-                <% seg[:col] = col %>
-                <% active << seg %>
+                <% seg[:col] = col; active << seg %>
                 <% max_cols = [max_cols, (active.map { |a| a[:col] }.max.to_i + 1)].max %>
               <% end %>
               <% group.each { |seg| seg[:group_cols] = max_cols } %>
@@ -242,59 +242,46 @@
               " linear-gradient(to right, rgba(255,255,255,0.60) 0px, rgba(255,255,255,0.60) 6px, rgba(255,255,255,0.0) 6px)," \
               " repeating-linear-gradient(135deg, rgba(255,255,255,0.20) 0px, rgba(255,255,255,0.20) 10px, rgba(255,255,255,0.0) 10px, rgba(255,255,255,0.0) 20px);" \
               " background-blend-mode: overlay;" \
-              " border-left-style: solid;" \
-              " border-left-width: 6px;" \
-              " border-left-color: rgba(255,255,255,0.70);"
+              " border-left-style: solid; border-left-width: 6px; border-left-color: rgba(255,255,255,0.70);"
             %>
             <% due_css =
-              "border-left-style: solid;" \
-              " border-left-width: 6px;" \
+              "border-left-style: solid; border-left-width: 6px;" \
               " border-left-color: rgba(0,0,0,0.25);" \
               " box-shadow: 0 10px 24px rgba(0,0,0,0.35);"
             %>
             <% segments.each do |seg| %>
-              <% record = seg[:record] %>
-              <% model  = seg[:model] %>
-              <% is_course = (model == "course") %>
-              <% is_due    = (model == "course_item") %>
-              <% width_pct = (100.0 / seg[:group_cols]) %>
-              <% left_pct  = seg[:col] * width_pct %>
-              <% base_bg   = record.respond_to?(:color) && record.color.present? ? record.color : "#34D399" %>
-              <% base_text = record.respond_to?(:contrast_text_color) ? record.contrast_text_color : "#F9FAFB" %>
-              <% badge_class =
-                if is_course || is_due
-                  "bg-white/40 text-black/90"
-                else
-                  "bg-black/25 text-white/95"
-                end
-              %>
-              <% type_label =
-                if is_due
-                  "DUE"
-                elsif is_course
-                  "COURSE"
-                else
-                  "EVENT"
-                end
-              %>
+              <% record    = seg[:record]; model = seg[:model] %>
+              <% is_course = (model == "course"); is_due = (model == "course_item") %>
+              <% total     = seg[:group_cols]; col = seg[:col] %>
+              <% peek_px   = 20 %>
+              <%# Tab-stack: single events fill width, overlapping events peek behind %>
+              <% if total == 1 %>
+                <% width_css = "calc(100% - 12px)" %>
+                <% left_css  = "6px" %>
+              <% else %>
+                <% left_val  = 6 + (col * peek_px) %>
+                <% right_val = 6 + ((total - 1 - col) * peek_px) %>
+                <% width_css = "calc(100% - #{left_val + right_val}px)" %>
+                <% left_css  = "#{left_val}px" %>
+              <% end %>
+              <% base_bg    = record.respond_to?(:color) && record.color.present? ? record.color : "#34D399" %>
+              <% base_text  = record.respond_to?(:contrast_text_color) ? record.contrast_text_color : "#F9FAFB" %>
+              <% badge_class = (is_course || is_due) ? "bg-white/40 text-black/90" : "bg-black/25 text-white/95" %>
+              <% type_label  = is_due ? "DUE" : is_course ? "COURSE" : "EVENT" %>
+              <% z           = 10 + col %>
               <% style_str =
                 "top: #{seg[:top]}px; " \
                 "height: #{seg[:height]}px; " \
-                "left: calc(#{left_pct}% + 6px); " \
-                "width: calc(#{width_pct}% - 12px); " \
+                "left: #{left_css}; " \
+                "width: #{width_css}; " \
                 "background-color: #{base_bg}; " \
                 "color: #{base_text}; " \
                 "border-color: rgba(0,0,0,0.22); " \
+                "z-index: #{z}; " \
                 "#{is_course ? course_css : (is_due ? due_css : "")}"
               %>
               <% highlight_id = "#{model}-#{record.id}-#{seg[:seg_start].to_date.iso8601}" %>
-              <% href =
-                if is_due
-                  edit_course_course_item_path(record.course, record)
-                else
-                  polymorphic_path(record, start_date: start_date.to_date)
-                end
-              %>
+              <% href = is_due ? edit_course_course_item_path(record.course, record) : polymorphic_path(record, start_date: start_date.to_date) %>
               <%= link_to href,
                 id: highlight_id,
                 class: (is_due ? due_classes : event_classes),
@@ -302,7 +289,7 @@
                 data: {
                   calendar_event: true,
                   turbo_frame: "event_drawer",
-                  action: "click->agenda-highlight#clear click->drawer#start",
+                  action: "click->agenda-highlight#selectFromCalendar click->drawer#start",
                   turbo_prefetch: false
                 } do %>
                 <% if is_due %>
@@ -310,9 +297,7 @@
                     <div class="min-w-0 font-semibold truncate text-[13px]">
                       <%= record[:title].presence || "(Untitled)" %> - <%= record.due_at.in_time_zone.strftime("%-I:%M%P") %>
                     </div>
-                    <span class="shrink-0 rounded-md px-2 py-0.5 text-[10px] font-semibold <%= badge_class %>">
-                      DUE
-                    </span>
+                    <span class="shrink-0 rounded-md px-2 py-0.5 text-[10px] font-semibold <%= badge_class %>">DUE</span>
                   </div>
                 <% else %>
                   <% start_label = seg[:seg_start].strftime("%-I:%M %p") %>

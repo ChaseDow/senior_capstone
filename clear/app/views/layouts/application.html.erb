@@ -1,7 +1,5 @@
 <!DOCTYPE html>
 <html>
-
- 
   <head>
     <title><%= content_for(:title) || "Clear" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -10,23 +8,16 @@
     <meta name="mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
-
     <%= yield :head %>
-    
     <%= favicon_link_tag asset_path("logo-favicon.png"), type: "image/png" %>
-
     <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
   </head>
-
-
-
   <body class="min-h-screen bg-zinc-950 text-zinc-100">
     <% show_public_header =
         controller_name == "home" ||
         (controller.respond_to?(:devise_controller?) && controller.devise_controller?) %>
-
     <% if show_public_header %>
       <!-- Public aurora background -->
       <div class="aurora pointer-events-none fixed inset-0 -z-10 overflow-hidden">
@@ -36,9 +27,7 @@
         <div class="aurora__orb aurora__orb--3"></div>
         <div class="aurora__vignette"></div>
       </div>
-
       <header class="border-b border-zinc-800/80 bg-zinc-950/60 backdrop-blur">
-        
         <div class="flex w-full items-center justify-between px-4 py-5">
           <%= link_to root_path, class: "flex items-center gap-2" do %>
             <%= image_tag "Logo.png",
@@ -46,29 +35,26 @@
                           class: "h-6 w-auto" %>
             <span class="text-sm font-semibold tracking-wide text-zinc-100">Clear</span>
           <% end %>
-          </nav>
-        </div>
-      </header>
-    <% end %>
-
-    <% if notice.present? || alert.present? %>
-      <div class="fixed top-4 left-0 right-0 z-50 px-4">
-        <div class="mx-auto w-full max-w-2xl space-y-3">
-          <% if notice.present? %>
-            <div class="rounded-2xl border border-emerald-900 bg-emerald-950/40 px-4 py-3 text-sm text-emerald-200">
-              <%= notice %>
-            </div>
-          <% end %>
-
-          <% if alert.present? %>
-            <div class="rounded-2xl border border-rose-900 bg-rose-950/40 px-4 py-3 text-sm text-rose-200">
-              <%= alert %>
-            </div>
-          <% end %>
-        </div>
+        </nav>
       </div>
-    <% end %>
-
-    <%= yield %>
-  </body>
+    </header>
+  <% end %>
+  <% if notice.present? || alert.present? %>
+    <div class="fixed top-4 left-0 right-0 z-50 px-4">
+      <div class="mx-auto w-full max-w-2xl space-y-3">
+        <% if notice.present? %>
+          <div class="rounded-2xl border border-emerald-900 bg-emerald-950/40 px-4 py-3 text-sm text-emerald-200">
+            <%= notice %>
+          </div>
+        <% end %>
+        <% if alert.present? %>
+          <div class="rounded-2xl border border-rose-900 bg-rose-950/40 px-4 py-3 text-sm text-rose-200">
+            <%= alert %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+  <%= yield %>
+</body>
 </html>

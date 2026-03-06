@@ -1,30 +1,301 @@
 @import "tailwindcss";
+
 /* =========================
-   Studs Theme (default: green)
+   Studs Themes
    ========================= */
 
 :root,
 body[data-theme="green"] {
-  /* Colors pulled from your palette image */
-  --studs-panel-bg: rgba(3, 98, 76, 0.18);        /* Bangladesh Green (#03624C) tinted */
-  --studs-panel-bg-2: rgba(3, 98, 76, 0.10);      /* lighter surface */
-  --studs-panel-hover: rgba(3, 98, 76, 0.22);     /* hover lift */
-
-  --studs-border: rgba(47, 169, 140, 0.22);       /* Mint (#2FA98C) border */
-  --studs-divider: rgba(47, 169, 140, 0.16);      /* subtle divider */
+  --studs-panel-bg:     rgba(3, 98, 76, 0.18);
+  --studs-panel-bg-2:   rgba(3, 98, 76, 0.10);
+  --studs-panel-hover:  rgba(3, 98, 76, 0.22);
+  --studs-panel-header: rgba(3, 98, 76, 0.45);
+  --studs-border:       rgba(47, 169, 140, 0.22);
+  --studs-divider:      rgba(47, 169, 140, 0.16);
+  --studs-accent:       #10b981;
+  --studs-sidebar-bg:   #15261d;
 }
 
-/* Override common "gray panel" utilities app-wide */
+body[data-theme="blue"] {
+  --studs-panel-bg:     rgba(29, 78, 216, 0.18);
+  --studs-panel-bg-2:   rgba(29, 78, 216, 0.10);
+  --studs-panel-hover:  rgba(29, 78, 216, 0.22);
+  --studs-panel-header: rgba(29, 78, 216, 0.45);
+  --studs-border:       rgba(96, 165, 250, 0.22);
+  --studs-divider:      rgba(96, 165, 250, 0.16);
+  --studs-accent:       #3b82f6;
+  --studs-sidebar-bg:   #0f1e3a;
+}
+
+body[data-theme="purple"] {
+  --studs-panel-bg:     rgba(109, 40, 217, 0.18);
+  --studs-panel-bg-2:   rgba(109, 40, 217, 0.10);
+  --studs-panel-hover:  rgba(109, 40, 217, 0.22);
+  --studs-panel-header: rgba(109, 40, 217, 0.45);
+  --studs-border:       rgba(167, 139, 250, 0.22);
+  --studs-divider:      rgba(167, 139, 250, 0.16);
+  --studs-accent:       #8b5cf6;
+  --studs-sidebar-bg:   #1a1035;
+}
+
+body[data-theme="rose"] {
+  --studs-panel-bg:     rgba(190, 18, 60, 0.18);
+  --studs-panel-bg-2:   rgba(190, 18, 60, 0.10);
+  --studs-panel-hover:  rgba(190, 18, 60, 0.22);
+  --studs-panel-header: rgba(190, 18, 60, 0.45);
+  --studs-border:       rgba(251, 113, 133, 0.22);
+  --studs-divider:      rgba(251, 113, 133, 0.16);
+  --studs-accent:       #f43f5e;
+  --studs-sidebar-bg:   #2d1020;
+}
+
+body[data-theme="amber"] {
+  --studs-panel-bg:     rgba(180, 83, 9, 0.18);
+  --studs-panel-bg-2:   rgba(180, 83, 9, 0.10);
+  --studs-panel-hover:  rgba(180, 83, 9, 0.22);
+  --studs-panel-header: rgba(180, 83, 9, 0.50);
+  --studs-border:       rgba(251, 191, 36, 0.22);
+  --studs-divider:      rgba(251, 191, 36, 0.16);
+  --studs-accent:       #f59e0b;
+  --studs-sidebar-bg:   #2d1a05;
+}
+
+body[data-theme="cyan"] {
+  --studs-panel-bg:     rgba(8, 145, 178, 0.18);
+  --studs-panel-bg-2:   rgba(8, 145, 178, 0.10);
+  --studs-panel-hover:  rgba(8, 145, 178, 0.22);
+  --studs-panel-header: rgba(8, 145, 178, 0.45);
+  --studs-border:       rgba(34, 211, 238, 0.22);
+  --studs-divider:      rgba(34, 211, 238, 0.16);
+  --studs-accent:       #06b6d4;
+  --studs-sidebar-bg:   #061e26;
+}
+
+body[data-theme="pink"] {
+  --studs-panel-bg:     rgba(219, 39, 119, 0.18);
+  --studs-panel-bg-2:   rgba(219, 39, 119, 0.10);
+  --studs-panel-hover:  rgba(219, 39, 119, 0.22);
+  --studs-panel-header: rgba(219, 39, 119, 0.45);
+  --studs-border:       rgba(244, 114, 182, 0.22);
+  --studs-divider:      rgba(244, 114, 182, 0.16);
+  --studs-accent:       #ec4899;
+  --studs-sidebar-bg:   #2d0a1e;
+}
+
+body[data-theme="red"] {
+  --studs-panel-bg:     rgba(185, 28, 28, 0.18);
+  --studs-panel-bg-2:   rgba(185, 28, 28, 0.10);
+  --studs-panel-hover:  rgba(185, 28, 28, 0.22);
+  --studs-panel-header: rgba(185, 28, 28, 0.45);
+  --studs-border:       rgba(248, 113, 113, 0.22);
+  --studs-divider:      rgba(248, 113, 113, 0.16);
+  --studs-accent:       #ef4444;
+  --studs-sidebar-bg:   #2d0a0a;
+}
+
+body[data-theme="lime"] {
+  --studs-panel-bg:     rgba(77, 124, 15, 0.18);
+  --studs-panel-bg-2:   rgba(77, 124, 15, 0.10);
+  --studs-panel-hover:  rgba(77, 124, 15, 0.22);
+  --studs-panel-header: rgba(77, 124, 15, 0.45);
+  --studs-border:       rgba(163, 230, 53, 0.22);
+  --studs-divider:      rgba(163, 230, 53, 0.16);
+  --studs-accent:       #84cc16;
+  --studs-sidebar-bg:   #141f05;
+}
+
+body[data-theme="slate"] {
+  --studs-panel-bg:     rgba(51, 65, 85, 0.30);
+  --studs-panel-bg-2:   rgba(51, 65, 85, 0.18);
+  --studs-panel-hover:  rgba(51, 65, 85, 0.40);
+  --studs-panel-header: rgba(51, 65, 85, 0.60);
+  --studs-border:       rgba(148, 163, 184, 0.22);
+  --studs-divider:      rgba(148, 163, 184, 0.16);
+  --studs-accent:       #94a3b8;
+  --studs-sidebar-bg:   #0f172a;
+}
+
+body[data-theme="orange"] {
+  --studs-panel-bg:     rgba(194, 65, 12, 0.18);
+  --studs-panel-bg-2:   rgba(194, 65, 12, 0.10);
+  --studs-panel-hover:  rgba(194, 65, 12, 0.22);
+  --studs-panel-header: rgba(194, 65, 12, 0.45);
+  --studs-border:       rgba(251, 146, 60, 0.22);
+  --studs-divider:      rgba(251, 146, 60, 0.16);
+  --studs-accent:       #f97316;
+  --studs-sidebar-bg:   #2d1200;
+}
+
+/* ── Theme-aware utilities ──────────────────────────────── */
+
 .bg-zinc-900\/40 { background-color: var(--studs-panel-bg) !important; }
 .border-zinc-800  { border-color: var(--studs-border) !important; }
 
-/* Tailwind divide utilities apply border-color to children */
 .divide-zinc-800 > :not([hidden]) ~ :not([hidden]) {
   border-color: var(--studs-divider) !important;
 }
 
 .bg-zinc-900\/50 { background-color: var(--studs-panel-hover) !important; }
 .bg-zinc-950\/40 { background-color: var(--studs-panel-bg-2) !important; }
+
+/* ── Top bar ────────────────────────────────────────────── */
+.studs-topbar {
+  background-color: var(--studs-sidebar-bg);
+  border-bottom: 1px solid var(--studs-border);
+}
+
+/* ── Nav buttons (ghost/outline pill) ───────────────────── */
+.studs-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  border-radius: 9999px;
+  border: 1px solid var(--studs-border);
+  background-color: var(--studs-panel-bg);
+  color: #e4e4e7;
+  padding: 0.4rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow:
+    0 1px 3px rgba(0,0,0,0.25),
+    0 0 0 0px var(--studs-accent),
+    inset 0 1px 0 rgba(255,255,255,0.07);
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.2s ease,
+    color 0.15s ease,
+    transform 0.1s ease;
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+}
+
+.studs-nav-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.studs-nav-btn:hover {
+  background-color: var(--studs-panel-hover);
+  border-color: var(--studs-accent);
+  color: #ffffff;
+  box-shadow:
+    0 4px 12px rgba(0,0,0,0.3),
+    0 0 0 1px var(--studs-accent),
+    inset 0 1px 0 rgba(255,255,255,0.10);
+  transform: translateY(-1px);
+}
+
+.studs-nav-btn:active {
+  transform: translateY(0px);
+  box-shadow:
+    0 1px 3px rgba(0,0,0,0.2),
+    inset 0 1px 0 rgba(255,255,255,0.05);
+}
+
+/* ── Accent filled button (theme-aware CTA) ─────────────── */
+.studs-btn-accent {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  border-radius: 9999px;
+  border: 1px solid var(--studs-accent);
+  background-color: var(--studs-accent);
+  color: white;
+  padding: 0.4rem 1.1rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow:
+    0 0 12px color-mix(in srgb, var(--studs-accent) 45%, transparent),
+    0 1px 3px rgba(0,0,0,0.25),
+    inset 0 1px 0 rgba(255,255,255,0.18);
+  transition:
+    box-shadow 0.2s ease,
+    transform 0.1s ease,
+    filter 0.15s ease;
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+}
+
+.studs-btn-accent::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.18) 0%, transparent 55%);
+  pointer-events: none;
+}
+
+.studs-btn-accent:hover {
+  box-shadow:
+    0 0 22px color-mix(in srgb, var(--studs-accent) 70%, transparent),
+    0 0 0 1.5px var(--studs-accent),
+    0 4px 14px rgba(0,0,0,0.35),
+    inset 0 1px 0 rgba(255,255,255,0.22);
+  transform: translateY(-1px);
+  color: white;
+  filter: brightness(1.12);
+}
+
+.studs-btn-accent:active {
+  transform: translateY(0px);
+  filter: brightness(0.97);
+  box-shadow:
+    0 0 8px color-mix(in srgb, var(--studs-accent) 40%, transparent),
+    inset 0 1px 0 rgba(255,255,255,0.10);
+}
+
+/* ── Active nav link ────────────────────────────────────── */
+.studs-nav-link--active {
+  color: #f4f4f5;
+}
+
+/* ── Icon colors ────────────────────────────────────────── */
+.studs-icon--active {
+  color: var(--studs-accent);
+}
+
+.studs-icon--active [stroke],
+.studs-icon--active *[stroke] {
+  stroke: var(--studs-accent) !important;
+}
+
+.studs-icon--inactive {
+  color: #d4d4d8;
+}
+
+.studs-icon--inactive [stroke],
+.studs-icon--inactive *[stroke] {
+  stroke: #d4d4d8 !important;
+}
+
+/* ── Theme swatches ─────────────────────────────────────── */
+.theme-swatch--green  { background-color: #10b981; }
+.theme-swatch--blue   { background-color: #3b82f6; }
+.theme-swatch--purple { background-color: #8b5cf6; }
+.theme-swatch--rose   { background-color: #f43f5e; }
+.theme-swatch--amber  { background-color: #f59e0b; }
+.theme-swatch--cyan   { background-color: #06b6d4; }
+.theme-swatch--pink   { background-color: #ec4899; }
+.theme-swatch--red    { background-color: #ef4444; }
+.theme-swatch--lime   { background-color: #84cc16; }
+.theme-swatch--slate  { background-color: #94a3b8; }
+.theme-swatch--orange { background-color: #f97316; }
 
 @layer base {
   input:-webkit-autofill,
@@ -36,12 +307,10 @@ body[data-theme="green"] {
   select:-webkit-autofill,
   select:-webkit-autofill:hover,
   select:-webkit-autofill:focus {
-    -webkit-text-fill-color: #e4e4e7; 
+    -webkit-text-fill-color: #e4e4e7;
     caret-color: #e4e4e7;
-
-    -webkit-box-shadow: 0 0 0px 1000px rgba(9, 9, 11, 0.60) inset; 
+    -webkit-box-shadow: 0 0 0px 1000px rgba(9, 9, 11, 0.60) inset;
     box-shadow: 0 0 0px 1000px rgba(9, 9, 11, 0.60) inset;
-
     transition: background-color 9999s ease-in-out 0s;
   }
 
@@ -53,10 +322,9 @@ body[data-theme="green"] {
     box-shadow: 0 0 0px 1000px rgba(9, 9, 11, 0.60) inset;
   }
 }
-/* Public-page aurora background (Home + Devise) */
-.aurora {
-  background: #09090b; /* zinc-950 base */
-}
+
+/* ── Aurora background (Home + Devise) ─────────────────── */
+.aurora { background: #09090b; }
 
 .aurora__gradient {
   position: absolute;
@@ -120,28 +388,23 @@ body[data-theme="green"] {
   100% { transform: translate3d(0, 0, 0) scale(1); }
 }
 
-/* Respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  .aurora__orb {
-    animation: none;
-  }
+  .aurora__orb { animation: none; }
 }
 
 @layer base {
   :root {
-    --sb-track: #f4f4f5;       /* light track */
-    --sb-thumb: #d4d4d8;       /* light thumb */
-    --sb-thumb-hover: #a1a1aa; /* light hover */
+    --sb-track: #f4f4f5;
+    --sb-thumb: #d4d4d8;
+    --sb-thumb-hover: #a1a1aa;
   }
 
-  /* If you use Tailwind class-based dark mode (html.dark) */
   html.dark {
     --sb-track: #18181b;
     --sb-thumb: #3f3f46;
     --sb-thumb-hover: #52525b;
   }
 
-  /* If you use system dark mode */
   @media (prefers-color-scheme: dark) {
     :root {
       --sb-track: #18181b;
@@ -150,26 +413,17 @@ body[data-theme="green"] {
     }
   }
 
-  /* Firefox */
   * {
     scrollbar-width: thin;
     scrollbar-color: var(--sb-thumb) var(--sb-track);
   }
 
-  /* Chrome/Edge/Safari */
-  *::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
-  }
-  *::-webkit-scrollbar-track {
-    background: var(--sb-track) !important;
-  }
+  *::-webkit-scrollbar { width: 10px; height: 10px; }
+  *::-webkit-scrollbar-track { background: var(--sb-track) !important; }
   *::-webkit-scrollbar-thumb {
     background: var(--sb-thumb) !important;
     border-radius: 9999px;
     border: 2px solid var(--sb-track);
   }
-  *::-webkit-scrollbar-thumb:hover {
-    background: var(--sb-thumb-hover) !important;
-  }
+  *::-webkit-scrollbar-thumb:hover { background: var(--sb-thumb-hover) !important; }
 }

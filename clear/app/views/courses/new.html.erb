@@ -1,16 +1,9 @@
 <% content_for :page_title, "Courses" %>
-<% content_for :page_subtitle, "Current enrolled courses"%>
-<div class="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6">
-  <div class="flex items-center justify-between">
-    <div>
-      <h1 class="text-xl font-semibold text-zinc-100">New Course</h1>
-      <p class="mt-1 text-sm text-zinc-400">Create a new course.</p>
-    </div>
-
-    <%= render Studs::SecondaryButtonComponent.new(label: "Back", href: courses_path) %>
+<% content_for :page_subtitle, "Current enrolled courses" %>
+<div class="rounded-2xl p-6" style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg);">
+  <div class="mb-4">
+    <div class="text-base font-semibold text-zinc-100">New course</div>
+    <div class="text-sm text-zinc-500">Add a course to your schedule.</div>
   </div>
-
-  <div class="mt-6">
-    <%= render "form", course: @course %>
-  </div>
+  <%= render "form", course: @course, turbo: false %>
 </div>

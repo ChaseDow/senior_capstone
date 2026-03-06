@@ -5,7 +5,10 @@ class CoursesController < ApplicationController
   before_action :set_course, only: %i[show edit update destroy]
 
   def index
+    @q = params[:q].to_s.strip
     @courses = current_user.courses.order(:title)
+    @courses = @courses.where("title ILIKE ? OR professor ILIKE ? OR term ILIKE ? OR location ILIKE ?",
+                              "%#{@q}%", "%#{@q}%", "%#{@q}%", "%#{@q}%") if @q.present?
   end
 
   def show

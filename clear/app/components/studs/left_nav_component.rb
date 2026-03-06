@@ -18,9 +18,7 @@ class Studs::LeftNavComponent < ViewComponent::Base
     cur  = current_path
 
     return true if path == "/dashboard" && cur == "/"
-
     return true if cur == path
-
     return false if path == "/"
     cur.start_with?("#{path}/")
   end
@@ -41,9 +39,9 @@ class Studs::LeftNavComponent < ViewComponent::Base
 
   def icon_classes(active)
     if active
-      "text-emerald-300"
+      "studs-icon--active"
     else
-      "text-zinc-200 group-hover:text-zinc-50"
+      "studs-icon--inactive group-hover:text-zinc-50"
     end
   end
 end

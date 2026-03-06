@@ -7,7 +7,9 @@ class EventsController < ApplicationController
   before_action :set_event, only: %i[show edit update destroy]
 
   def index
+    @q = params[:q].to_s.strip
     @events = current_user.events.order(starts_at: :asc)
+    @events = @events.where("title ILIKE ?", "%#{@q}%") if @q.present?
   end
 
   def show
@@ -19,7 +21,6 @@ class EventsController < ApplicationController
 
   def new
     start_time = params[:start_time].present? ? Time.zone.parse(params[:start_time]) : nil
-
     @event = current_user.events.new(starts_at: start_time)
   end
 
@@ -40,7 +41,6 @@ class EventsController < ApplicationController
           week_start  = start_date.beginning_of_week
           range_start = week_start.beginning_of_day
           range_end   = (week_start + 6.days).end_of_day
-
           occurrences = calendar_occurrences_for_range(range_start, range_end)
 
           render turbo_stream: [
@@ -90,7 +90,6 @@ class EventsController < ApplicationController
           week_start  = start_date.beginning_of_week
           range_start = week_start.beginning_of_day
           range_end   = (week_start + 6.days).end_of_day
-
           occurrences = calendar_occurrences_for_range(range_start, range_end)
 
           render turbo_stream: [
@@ -134,7 +133,6 @@ class EventsController < ApplicationController
         week_start  = start_date.beginning_of_week
         range_start = week_start.beginning_of_day
         range_end   = (week_start + 6.days).end_of_day
-
         occurrences = calendar_occurrences_for_range(range_start, range_end)
 
         render turbo_stream: [
@@ -163,15 +161,8 @@ class EventsController < ApplicationController
 
   def event_params
     params.require(:event).permit(
-      :title,
-      :starts_at,
-      :ends_at,
-      :location,
-      :priority,
-      :description,
-      :color,
-      :recurring,
-      :repeat_until,
+      :title, :starts_at, :ends_at, :location, :priority,
+      :description, :color, :recurring, :repeat_until,
       repeat_days: []
     )
   end
