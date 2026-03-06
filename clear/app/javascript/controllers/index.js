@@ -19,6 +19,9 @@ application.register("avatar-crop", AvatarCropController)
 import ChatController from "./chat_controller"
 application.register("chat", ChatController)
 
+import CountdownController from "./countdown_controller"
+application.register("countdown", CountdownController)
+
 import DrawerController from "./drawer_controller"
 application.register("drawer", DrawerController)
 

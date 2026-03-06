@@ -48,8 +48,21 @@
 <div class="flex h-full min-h-0 flex-col" data-controller="agenda-highlight">
   <!-- Toolbar -->
   <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
-    <div class="text-lg font-semibold text-zinc-100">
-      <%= week_start_date.strftime("%B %Y") %>
+    <div>
+      <div class="text-lg font-semibold text-zinc-100">
+        <%= week_start_date.strftime("%B %Y") %>
+      </div>
+      <% if @next_occurrence %>
+        <div class="mt-0.5 flex items-center gap-1.5 text-xs text-zinc-400"
+             data-controller="countdown"
+             data-countdown-event-time-value="<%= @next_occurrence.starts_at.iso8601 %>">
+          <span class="inline-block h-1.5 w-1.5 rounded-full animate-pulse" style="background-color: var(--studs-accent);"></span>
+          Next:
+          <span class="font-medium text-zinc-200"><%= @next_occurrence.title %></span>
+          <span class="mx-0.5 text-zinc-600">-</span>
+          <span data-countdown-display class="font-mono tabular-nums" style="color: var(--studs-accent);">...</span>
+        </div>
+      <% end %>
     </div>
     <nav class="flex items-center gap-1.5">
       <%= link_to dashboard_path(start_date: prev_start), class: nav_btn, data: { turbo_frame: "dashboard_calendar" } do %>
@@ -147,7 +160,7 @@
         <% is_today   = (day == Date.current) %>
         <% is_weekend = day.saturday? || day.sunday? %>
         <div class="relative"
-             data-action="click->agenda-highlight#clear"
+             data-action="click->agenda-highlight#clearFromDay"
           style="border-right: 1px solid var(--studs-divider);
           <%= is_today ? "background-color: color-mix(in srgb, var(--studs-accent) 8%, transparent);" : "" %>
           <%= is_weekend && !is_today ? "background-color: rgba(0,0,0,0.08);" : "" %>">
