@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class EventsController < ApplicationController
+  include Pagy::Method
+
   layout "app_shell"
 
   before_action :authenticate_user!
@@ -8,8 +10,9 @@ class EventsController < ApplicationController
 
   def index
     @q = params[:q].to_s.strip
-    @events = current_user.events.order(starts_at: :asc)
-    @events = @events.where("title ILIKE ?", "%#{@q}%") if @q.present?
+    events = current_user.events.order(starts_at: :asc)
+    events = events.where("title ILIKE ?", "%#{@q}%") if @q.present?
+    @pagy, @events = pagy(events, limit: 10)
   end
 
   def show
@@ -115,6 +118,11 @@ class EventsController < ApplicationController
         end
       end
     end
+  end
+
+  def destroy_all
+    current_user.events.destroy_all
+    redirect_to events_path, notice: "All events deleted."
   end
 
   def destroy

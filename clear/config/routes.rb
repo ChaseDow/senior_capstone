@@ -13,7 +13,11 @@ Rails.application.routes.draw do
     delete :reset, on: :member
   end
 
-  resources :events
+  resources :events do
+    collection do
+      delete :destroy_all
+    end
+  end
 
   scope :university_calendar do
     get  "preview", to: "university_calendar#preview", as: :university_calendar_preview
