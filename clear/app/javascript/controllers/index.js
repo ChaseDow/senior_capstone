@@ -16,6 +16,9 @@ application.register("agenda-item", AgendaItemController)
 import AvatarCropController from "./avatar_crop_controller"
 application.register("avatar-crop", AvatarCropController)
 
+import CountdownController from "./countdown_controller"
+application.register("countdown", CountdownController)
+
 import DrawerController from "./drawer_controller"
 application.register("drawer", DrawerController)
 
