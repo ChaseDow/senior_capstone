@@ -1,6 +1,6 @@
 class OllamaClient
     require "ollama"
-    
+
     def self.base_url
         ENV.fetch("OLLAMA_BASE_URL")
     end
@@ -19,5 +19,4 @@ class OllamaClient
         )
     response.message.content.to_s
     end
-
 end

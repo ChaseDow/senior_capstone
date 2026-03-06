@@ -1,4 +1,3 @@
-# app/controllers/ai_chat_controller.rb
 class AiChatController < ApplicationController
   layout "app_shell"
   before_action :authenticate_user!
@@ -22,10 +21,8 @@ class AiChatController < ApplicationController
       return
     end
 
-    # user message
     history << { "role" => "user", "content" => user_text }
 
-    # assistant message
     ollama_history = history.map { |m| { role: m["role"], content: m["content"] } }
     assistant_text = OllamaClient.chat(messages: ollama_history)
 
@@ -44,11 +41,10 @@ class AiChatController < ApplicationController
           ),
           turbo_stream.update("ai_chat_history", history.to_json),
           turbo_stream.replace("ai_chat_flash", partial: "ai_chat/flash"),
-          turbo_stream.update("ai_chat_input", "") # clears textarea
+          turbo_stream.update("ai_chat_input", "")
         ]
       end
 
-      # fallback (non-turbo)
       format.html do
         @messages = history
         render :index
