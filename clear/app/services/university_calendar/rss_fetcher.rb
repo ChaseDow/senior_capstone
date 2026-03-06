@@ -5,10 +5,12 @@ require "uri"
 
 module UniversityCalendar
   class RssFetcher
-    RSS_URL = "https://api.calendar.moderncampus.net/pubcalendar/9a424096-0a54-475e-a112-ec2fb41d5fa1/rss?category=c458ee10-dfa2-475e-97f1-46f7f55b1631&url=https%3A%2F%2Fwww.latech.edu%2Fabout%2Facademic-calendar.php&hash=true"
+    def self.call(url)
+      new(url).call
+    end
 
-    def self.call
-      new.call
+    def initialize(url)
+      @url = url
     end
 
     def call
@@ -19,7 +21,7 @@ module UniversityCalendar
     private
 
     def fetch_feed
-      uri = URI(RSS_URL)
+      uri = URI(@url)
       response = Net::HTTP.get_response(uri)
       raise "Failed to fetch university calendar: HTTP #{response.code}" unless response.is_a?(Net::HTTPSuccess)
 

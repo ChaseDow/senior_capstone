@@ -8,14 +8,20 @@ class UniversityCalendarController < ApplicationController
   IMPORT_COLOR = "#60A5FA"
 
   def preview
-    @items = UniversityCalendar::RssFetcher.call
+    @rss_url = params[:rss_url].to_s.strip
+    return unless @rss_url.present?
+
+    @items = UniversityCalendar::RssFetcher.call(@rss_url)
     @existing_keys = existing_event_keys
   rescue => e
-    redirect_to events_path, alert: "Could not load university calendar: #{e.message}"
+    flash.now[:alert] = "Could not load calendar feed: #{e.message}"
+    @items = []
+    @existing_keys = Set.new
   end
 
   def import
-    items = UniversityCalendar::RssFetcher.call
+    @rss_url = params[:rss_url].to_s.strip
+    items = UniversityCalendar::RssFetcher.call(@rss_url)
     existing = existing_event_keys
 
     imported = 0
@@ -40,7 +46,7 @@ class UniversityCalendarController < ApplicationController
       imported += 1
     end
 
-    redirect_to events_path, notice: "Imported #{imported} event(s) from the university calendar. #{skipped} duplicate(s) skipped."
+    redirect_to events_path, notice: "Imported #{imported} event(s) from the calendar feed. #{skipped} duplicate(s) skipped."
   rescue => e
     redirect_to events_path, alert: "Import failed: #{e.message}"
   end
