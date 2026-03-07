@@ -20,19 +20,24 @@
       <% end %>
     <% end %>
   </nav>
-  <div class="shrink-0 border-t border-white/10 p-2">
-    <% user = (helpers.current_user rescue nil) %>
-    <% if user&.respond_to?(:email) %>
-      <%= link_to profile_path,
-        data: {turbo_frame: "event_drawer", turbo_prefetch: false},
-        class: "px-3 py-2 text-xs text-zinc-400 hover:text-zinc-200
-            transition block
-            group-data-[collapsed=true]/sidebar:hidden 
-            hover:bg-white/5 rounded-lg" do %>
-        <%= user.email %>
-      <% end %>
-    <% end %>
-    <%= button_to destroy_user_session_path,
+
+<div class="shrink-0 border-t border-white/10 p-2 flex flex-col gap-3">
+  <%= link_to profile_path, 
+    data: {turbo_frame: "event_drawer", turbo_prefetch: false},
+      class: "flex items-center gap-3 rounded-xl px-1 py-2 hover:bg-white/5 transition group-data-[collapsed=true]/sidebar:justify-center group-data-[collapsed=true]/sidebar:px-0" do %>
+        <div class="h-12 w-12 rounded-full overflow-hidden ring-2 ring-emerald-900/30 shadow-lg bg-zinc-900">
+          <% if helpers.current_user.avatar.attached? %>
+            <%= image_tag helpers.current_user.avatar, class: "h-full w-full object-cover", alt: "Profile avatar" %>
+          <% else %>
+            <%= image_tag "default_icon.png", class: "h-full w-full object-cover", alt: "Profile avatar" %>
+          <% end %>
+        </div>
+    <span class="text-xs text-zinc-400 truncate group-data-[collapsed=true]/sidebar:hidden">
+      <%= helpers.current_user.email %>
+    </span>
+  <% end %>
+
+  <%= button_to destroy_user_session_path,
     method: :delete,
     form: { class: "w-full" },
     title: "Sign out",
@@ -41,14 +46,14 @@
             text-zinc-100 hover:bg-white/5 transition
             group-data-[collapsed=true]/sidebar:justify-center
             group-data-[collapsed=true]/sidebar:px-2" do %>
-      <span class="shrink-0 text-zinc-200 hover:text-zinc-50
-               [&_svg]:w-6 [&_svg]:h-6
-               [&_svg]:text-current
-               [&_svg_*]:stroke-current
-               [&_svg_*]:fill-none">
-        <%= helpers.icon "logout-01-stroke-rounded" %>
-      </span>
-      <span class="truncate group-data-[collapsed=true]/sidebar:hidden">Sign out</span>
-    <% end %>
-  </div>
+    <span class="shrink-0 text-zinc-200 hover:text-zinc-50
+             [&_svg]:w-6 [&_svg]:h-6
+             [&_svg]:text-current
+             [&_svg_*]:stroke-current
+             [&_svg_*]:fill-none">
+      <%= helpers.icon "logout-01-stroke-rounded" %>
+    </span>
+    <span class="truncate group-data-[collapsed=true]/sidebar:hidden">Sign out</span>
+  <% end %>
+</div>
 </div>
