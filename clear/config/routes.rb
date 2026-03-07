@@ -6,6 +6,7 @@ Rails.application.routes.draw do
     patch :update_password
     get :edit_avatar
     patch :update_avatar
+    get :delete_account
   end
 
   # Theme
