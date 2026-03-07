@@ -113,7 +113,9 @@
                   <div class="text-xs text-zinc-500">Permanently delete your account</div>
                 </div>
                 <div class="shrink-0">
-                  <%= render Studs::PrimaryButtonComponent.new(label: "Delete Account", color: :red) %>
+                  <%= link_to delete_account_profile_path, data: { turbo_frame: "event_drawer", turbo_prefetch: false } do %>
+                    <%= render Studs::PrimaryButtonComponent.new(label: "Delete account", color: :red) %>
+                  <% end %>
                 </div>
               </div>
             </div>

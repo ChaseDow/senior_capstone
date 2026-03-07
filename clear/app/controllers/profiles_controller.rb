@@ -92,4 +92,30 @@ class ProfilesController < ApplicationController
   def avatar_params
     params.require(:user).permit(:avatar)
   end
+
+  # form for deleting your account
+  def delete_account
+    @user = current_user
+    render partial: "profiles/delete_account_form", locals: { user: @user }
+  end
+
+  def delete_params
+    params.require(:user).permit(:current_password)
+  end
+
+  # deletes the account and all of its info
+  def destroy_account
+    #@user = current_user 
+    # Current password checker
+    #unless @user.valid_password?(password_params[:password])
+    #  @user.errors.add(:password, "is invalid")
+    #  return render partial: "profiles/delete_account_form", locals: { user: @user }, status: :unprocessable_entity
+    #end
+
+    # New password checker
+    #if password_params[:password].blank?
+    #  @user.errors.add(:base, "New password can't be blank")
+    #  return render partial: "profiles/delete_account_form", locals: { user: @user }, status: :unprocessable_entity
+    #end
+  end 
 end
