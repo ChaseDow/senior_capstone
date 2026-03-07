@@ -7,9 +7,12 @@
         data: {turbo_frame: "profile_modal", turbo_prefetch: false, action: "click->modal#start"},
         class: "flex items-center gap-3 rounded-xl px-2 py-2.5
                hover:bg-white/5 transition-all duration-200 group/profile" do %>
-        <div class="shrink-0 flex h-9 w-9 items-center justify-center rounded-full
-                    text-xs font-bold studs-avatar-circle">
-          <%= user_initials %>
+        <div class="h-12 w-12 shrink-0 rounded-full overflow-hidden ring-2 ring-emerald-900/30 shadow-lg bg-zinc-900">
+          <% if user.avatar.attached? %>
+            <%= image_tag user.avatar, class: "h-full w-full object-cover", alt: "Profile avatar" %>
+          <% else %>
+            <%= image_tag "default_icon.png", class: "h-full w-full object-cover", alt: "Profile avatar" %>
+          <% end %>
         </div>
         <div class="min-w-0 group-data-[collapsed=true]/sidebar:hidden">
           <div class="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Welcome</div>
