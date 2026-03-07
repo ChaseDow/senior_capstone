@@ -1,0 +1,64 @@
+<%= turbo_frame_tag "event_drawer" do %>
+  <div class="p-5 space-y-4">
+    <div>
+      <h2 class="text-lg font-semibold text-zinc-50">Delete Account</h2>
+    </div>
+
+    <%= form_with model: user,
+          url: destroy_account_profile_path,
+          method: :patch,
+          data: { turbo_frame: "event_drawer" } do |f| %>
+
+      <% if user.errors.any? %>
+        <div class="rounded-xl border border-red-900/40 bg-red-950/30 p-3 text-sm text-red-200">
+          <ul class="list-disc pl-5">
+            <% user.errors.full_messages.each do |msg| %>
+              <li><%= msg %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div class="space-y-4">
+        <div
+          class="w-full rounded-2xl px-4 py-3 text-md leading-relaxed border bg-green-500/10 border-green-400/40 text-zinc-100"
+        >
+        <div class="relative">
+            Are you sure you want to delete your account? This will permanently remove your account and all associated data. This action cannot be reversed. Enter your
+            password to confirm. 
+        </div>
+        </div>
+
+        <div class="relative">
+          <%= f.label :password, "Password", class: "text-sm text-zinc-300" %>
+          <%= f.password_field :password,
+                id: "confirm-password",
+                autocomplete: "new-password",
+                class: "mt-2 w-full rounded-xl border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-zinc-100 placeholder-zinc-500 focus:border-emerald-500/60 focus:outline-none focus:ring-2 focus:ring-emerald-500/30",
+                placeholder: "your password" %>
+
+          <button type="button"
+            data-password-toggle
+            data-target="confirm-password"
+            class="absolute right-3 top-[calc(50%+1rem)] -translate-y-1/2 rounded-md p-1 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/60 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 transition">
+            <span data-show>
+              <%= icon "eye-stroke-rounded", class: "h-5 w-5 text-emerald-500/40" %>
+            </span>
+            <span data-hide class="hidden">
+              <%= icon "view-off-slash-stroke-rounded", class: "h-5 w-5 text-emerald-500/40" %>
+            </span>
+          </button>
+        </div>
+
+        <%= f.submit "Delete Account",
+              class: "mt-2 w-full rounded-xl bg-red-500 px-4 py-2 text-sm font-medium text-white-950 hover:bg-red-400" %>
+
+        <%= link_to profile_path,
+              data: { turbo_frame: "event_drawer", turbo_prefetch: false },
+              class: "block w-full text-center rounded-xl border border-zinc-800 px-4 py-2 text-sm text-zinc-200 hover:bg-zinc-800/40" do %>
+          Cancel
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+<% end %>
