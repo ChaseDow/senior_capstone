@@ -25,12 +25,15 @@ export default class extends Controller {
       return
     }
 
-    const hours = Math.floor(diff / 3600)
+    const days = Math.floor(diff / 86400)
+    const hours = Math.floor((diff % 86400) / 3600)
     const minutes = Math.floor((diff % 3600) / 60)
     const seconds = diff % 60
 
     let text
-    if (hours > 0) {
+    if (days > 0) {
+      text = `in ${days}d ${hours}h`
+    } else if (hours > 0) {
       text = `in ${hours}h ${minutes}m`
     } else if (minutes > 0) {
       text = `in ${minutes}m ${seconds}s`

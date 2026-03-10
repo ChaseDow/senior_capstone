@@ -52,17 +52,6 @@
       <div class="text-lg font-semibold text-zinc-100">
         <%= week_start_date.strftime("%B %Y") %>
       </div>
-      <% if @next_occurrence %>
-        <div class="mt-0.5 flex items-center gap-1.5 text-xs text-zinc-400"
-             data-controller="countdown"
-             data-countdown-event-time-value="<%= @next_occurrence.starts_at.iso8601 %>">
-          <span class="inline-block h-1.5 w-1.5 rounded-full animate-pulse" style="background-color: var(--studs-accent);"></span>
-          Next:
-          <span class="font-medium text-zinc-200"><%= @next_occurrence.title %></span>
-          <span class="mx-0.5 text-zinc-600">-</span>
-          <span data-countdown-display class="font-mono tabular-nums" style="color: var(--studs-accent);">...</span>
-        </div>
-      <% end %>
     </div>
     <nav class="flex items-center gap-1.5">
       <%= link_to dashboard_path(start_date: prev_start), class: nav_btn, data: { turbo_frame: "dashboard_calendar" } do %>
