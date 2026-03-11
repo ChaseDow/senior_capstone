@@ -48,4 +48,94 @@ class EventTest < ActiveSupport::TestCase
     assert_not event.valid?
     assert event.errors[:ends_at].any?
   end
+
+  # duration fallback: derive_ends_at_from_duration
+
+  test "sets ends_at from duration_minutes when ends_at is blank" do
+    event = Event.new(
+      title: "With duration",
+      starts_at: Time.zone.parse("2026-06-01 09:00:00"),
+      duration_minutes: 90,
+      user: @user
+    )
+
+    event.valid?
+    assert_equal event.starts_at + 90.minutes, event.ends_at
+  end
+
+  test "does not overwrite an explicit ends_at with duration_minutes" do
+    starts_at = Time.zone.parse("2026-06-01 09:00:00")
+    explicit_end = starts_at + 2.hours
+    event = Event.new(
+      title: "Explicit end",
+      starts_at: starts_at,
+      ends_at: explicit_end,
+      duration_minutes: 30,
+      user: @user
+    )
+
+    event.valid?
+    assert_equal explicit_end, event.ends_at
+  end
+
+  test "leaves ends_at nil when duration_minutes is blank and ends_at is blank" do
+    event = Event.new(
+      title: "No end or duration",
+      starts_at: Time.current,
+      user: @user
+    )
+
+    event.valid?
+    assert_nil event.ends_at
+  end
+
+  test "leaves ends_at nil when starts_at is blank" do
+    event = Event.new(
+      title: "No start",
+      duration_minutes: 60,
+      user: @user
+    )
+
+    event.valid?
+    assert_nil event.ends_at
+  end
+
+  test "duration_minutes of zero sets ends_at equal to starts_at (valid via >= check)" do
+    event = Event.new(
+      title: "Zero duration",
+      starts_at: Time.zone.parse("2026-06-01 09:00:00"),
+      duration_minutes: 0,
+      user: @user
+    )
+
+    event.valid?
+    # 0.blank? is false, so the callback fires and sets ends_at = starts_at + 0
+    # ends_at_after_starts_at uses >=, so equal times pass
+    assert_equal event.starts_at, event.ends_at
+    assert event.valid?
+  end
+
+  test "duration_minutes works for short durations like 15 minutes" do
+    event = Event.new(
+      title: "Quick meeting",
+      starts_at: Time.zone.parse("2026-06-01 09:00:00"),
+      duration_minutes: 15,
+      user: @user
+    )
+
+    event.valid?
+    assert_equal event.starts_at + 15.minutes, event.ends_at
+  end
+
+  test "duration_minutes works for long durations like 480 minutes (8 hours)" do
+    event = Event.new(
+      title: "All day workshop",
+      starts_at: Time.zone.parse("2026-06-01 09:00:00"),
+      duration_minutes: 480,
+      user: @user
+    )
+
+    event.valid?
+    assert_equal event.starts_at + 480.minutes, event.ends_at
+  end
 end
