@@ -25,6 +25,7 @@ class Course < ApplicationRecord
             allow_nil: true
 
   # Normalize fields before validation
+  before_validation :derive_end_time_from_duration
   before_validation :normalize_color
   before_validation :normalize_meeting_days
   before_validation :sync_repeat_days_from_meeting_days
@@ -80,6 +81,11 @@ class Course < ApplicationRecord
   end
 
   private
+
+  def derive_end_time_from_duration
+    return if end_time.present? || start_time.blank? || duration_minutes.blank?
+    self.end_time = start_time + duration_minutes.minutes
+  end
 
   # Courses are always recurring in our app
   def force_recurrence_defaults
@@ -146,7 +152,7 @@ class Course < ApplicationRecord
   end
 
   def self.ransackable_attributes(auth_object = nil)
-    [ "code", "color", "created_at", "description", "end_date", "end_time", "instructor", "location", "meeting_days", "professor", "recurring", "repeat_days", "repeat_until", "start_date", "start_time", "term", "title", "updated_at" ]
+    [ "code", "color", "created_at", "description", "duration_minutes", "end_date", "end_time", "instructor", "location", "meeting_days", "professor", "recurring", "repeat_days", "repeat_until", "start_date", "start_time", "term", "title", "updated_at" ]
   end
 
   def self.ransackable_associations(auth_object = nil)
