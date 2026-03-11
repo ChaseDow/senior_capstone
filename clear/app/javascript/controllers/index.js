@@ -22,6 +22,9 @@ application.register("chat", ChatController)
 import DrawerController from "./drawer_controller"
 application.register("drawer", DrawerController)
 
+import FullHeightController from "./full_height_controller"
+application.register("full-height", FullHeightController)
+
 import HelloController from "./hello_controller"
 application.register("hello", HelloController)
 
