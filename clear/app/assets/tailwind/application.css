@@ -380,6 +380,15 @@ body[data-theme="orange"] {
     linear-gradient(to bottom, rgba(0,0,0,0.25), rgba(0,0,0,0.70));
 }
 
+@keyframes ai-chat-pop {
+  from { opacity: 0; transform: translateY(8px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.ai-chat-pop {
+  animation: ai-chat-pop 0.18s ease-out both;
+}
+
 @keyframes aurora-float {
   0%   { transform: translate3d(0, 0, 0) scale(1); }
   25%  { transform: translate3d(6%, 4%, 0) scale(1.04); }
