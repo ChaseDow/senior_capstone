@@ -168,6 +168,7 @@ class CoursesController < ApplicationController
       :end_date,
       :start_time,
       :end_time,
+      :duration_minutes,
       :professor,
       :location,
       :description,

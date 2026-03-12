@@ -16,6 +16,7 @@ class Event < ApplicationRecord
   validate :repeat_days_are_valid_weekdays
   validate :repeat_until_not_before_start, if: -> { recurring? && repeat_until.present? && starts_at.present? }
 
+  before_validation :derive_ends_at_from_duration
   before_validation :normalize_recurrence_fields
   before_validation :normalize_color
 
@@ -64,6 +65,11 @@ class Event < ApplicationRecord
 
   private
 
+  def derive_ends_at_from_duration
+    return if ends_at.present? || starts_at.blank? || duration_minutes.blank?
+    self.ends_at = starts_at + duration_minutes.minutes
+  end
+
   def ends_at_after_starts_at
     return if ends_at >= starts_at
     errors.add(:ends_at, "must be after the start time")
@@ -105,7 +111,7 @@ class Event < ApplicationRecord
   end
 
   def self.ransackable_attributes(auth_object = nil)
-    [ "color", "created_at", "description", "ends_at", "location", "recurring", "repeat_days", "repeat_until", "starts_at", "title", "updated_at" ]
+    [ "color", "created_at", "description", "duration_minutes", "ends_at", "location", "recurring", "repeat_days", "repeat_until", "starts_at", "title", "updated_at" ]
   end
 
   def self.ransackable_associations(auth_object = nil)
