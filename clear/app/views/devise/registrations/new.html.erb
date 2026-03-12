@@ -1,8 +1,8 @@
 <div class="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-6xl items-center justify-center px-6 py-12">
-  <div class="w-full max-w-md rounded-3xl border border-zinc-800 bg-zinc-900/40 p-6 shadow-xl shadow-black/20">
-    <div class="mb-6">
-      <h1 class="text-2xl font-semibold text-zinc-50">Create your account</h1>
-      <p class="mt-1 text-sm text-zinc-400">Sign up to access your dashboard.</p>
+  <div class="w-full max-w-md rounded-3xl border border-zinc-800 bg-zinc-900/40 p-8 shadow-2xl shadow-black/30 backdrop-blur-md">
+    <div class="mb-8">
+      <h1 class="text-2xl font-bold tracking-tight text-zinc-50">Create your account</h1>
+      <p class="mt-1 text-sm text-zinc-500">Sign up to access your dashboard.</p>
     </div>
 
     <%= form_for(resource,
@@ -12,41 +12,40 @@
 
       <%= render "devise/shared/error_messages", resource: resource %>
 
-      <div class="space-y-4">
+      <div class="space-y-5">
         <div>
-          <%= f.label :email, class: "text-sm text-zinc-300" %>
+          <%= f.label :email, class: "text-sm font-medium text-zinc-300" %>
           <%= f.email_field :email,
                 autofocus: true,
                 autocomplete: "email",
-                class: "mt-2 w-full rounded-xl border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-zinc-100 placeholder-zinc-500 focus:border-emerald-500/60 focus:outline-none focus:ring-2 focus:ring-emerald-500/30",
+                class: "mt-2 w-full rounded-xl border border-zinc-800 bg-zinc-950/60 px-4 py-2.5 text-sm text-zinc-100 placeholder-zinc-600 backdrop-blur-sm transition-colors duration-200 focus:border-emerald-500/60 focus:outline-none focus:ring-2 focus:ring-emerald-500/20",
                 placeholder: "your email" %>
         </div>
 
         <div class="relative">
           <div class="flex items-baseline justify-between">
-            <%= f.label :password, class: "text-sm text-zinc-300" %>
+            <%= f.label :password, class: "text-sm font-medium text-zinc-300" %>
             <% if @minimum_password_length %>
-              <span class="text-xs text-zinc-500"><%= @minimum_password_length %>+ characters</span>
+              <span class="text-xs text-zinc-600"><%= @minimum_password_length %>+ characters</span>
             <% end %>
           </div>
 
           <%= f.password_field :password,
                 id: "current-password",
                 autocomplete: "new-password",
-                class: "mt-2 w-full rounded-xl border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-zinc-100 placeholder-zinc-500 focus:border-emerald-500/60 focus:outline-none focus:ring-2 focus:ring-emerald-500/30",
+                class: "mt-2 w-full rounded-xl border border-zinc-800 bg-zinc-950/60 px-4 py-2.5 text-sm text-zinc-100 placeholder-zinc-600 backdrop-blur-sm transition-colors duration-200 focus:border-emerald-500/60 focus:outline-none focus:ring-2 focus:ring-emerald-500/20",
                 placeholder: "your password" %>
 
                 <button type="button"
                 id="toggle_password"
                 class="absolute right-3 top-[calc(50%+1rem)] -translate-y-1/2
-                      rounded-md p-1
-                      text-zinc-400
-                      hover:text-zinc-100
+                      rounded-lg p-1
+                      text-zinc-500
+                      hover:text-zinc-200
                       hover:bg-zinc-800/60
                       focus:outline-none
                       focus:ring-2 focus:ring-emerald-500/40
-                      transition">
-
+                      transition-colors duration-200">
 
                   <span id="icon-show">
                     <%= icon "eye-stroke-rounded", class: "h-5 w-5 text-emerald-500/40" %>
@@ -60,24 +59,23 @@
         </div>
 
         <div class="relative">
-          <%= f.label :password_confirmation, class: "text-sm text-zinc-300" %>
+          <%= f.label :password_confirmation, class: "text-sm font-medium text-zinc-300" %>
           <%= f.password_field :password_confirmation,
                 id: "confirm-password",
                 autocomplete: "new-password",
-                class: "mt-2 w-full rounded-xl border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-zinc-100 placeholder-zinc-500 focus:border-emerald-500/60 focus:outline-none focus:ring-2 focus:ring-emerald-500/30",
+                class: "mt-2 w-full rounded-xl border border-zinc-800 bg-zinc-950/60 px-4 py-2.5 text-sm text-zinc-100 placeholder-zinc-600 backdrop-blur-sm transition-colors duration-200 focus:border-emerald-500/60 focus:outline-none focus:ring-2 focus:ring-emerald-500/20",
                 placeholder: "re-type password" %>
 
           <button type="button"
             id="toggle_confirm_password"
             class="absolute right-3 top-[calc(50%+1rem)] -translate-y-1/2
-                  rounded-md p-1
-                  text-zinc-400
-                  hover:text-zinc-100
+                  rounded-lg p-1
+                  text-zinc-500
+                  hover:text-zinc-200
                   hover:bg-zinc-800/60
                   focus:outline-none
                   focus:ring-2 focus:ring-emerald-500/40
-                  transition">
-
+                  transition-colors duration-200">
 
               <span id="confirm_icon-show">
                 <%= icon "eye-stroke-rounded", class: "h-5 w-5 text-emerald-500/40" %>
@@ -91,7 +89,7 @@
         </div>
 
         <%= f.submit "Sign up",
-              class: "mt-2 w-full rounded-xl bg-emerald-500 px-4 py-2 text-sm font-medium text-zinc-950 hover:bg-emerald-400" %>
+              class: "studs-btn-accent mt-3 !w-full !rounded-xl !py-2.5 !text-sm" %>
       </div>
     <% end %>
 
