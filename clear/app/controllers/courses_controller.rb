@@ -14,7 +14,13 @@ class CoursesController < ApplicationController
   def show
     return unless turbo_frame_request?
 
-    render partial: "courses/drawer_detail",
+    partial = if request.headers["Turbo-Frame"] == "event_popover"
+                "courses/popover_detail"
+              else
+                "courses/drawer_detail"
+              end
+
+    render partial: partial,
            locals: { course: @course, start_date: params[:start_date] }
   end
 
@@ -141,7 +147,8 @@ class CoursesController < ApplicationController
             partial: "dashboard/calendar_frame",
             locals: { events: occurrences, start_date: start_date }
           ),
-          turbo_stream.update("event_drawer", "")
+          turbo_stream.update("event_drawer", ""),
+          turbo_stream.update("event_popover", "")
         ]
       end
     end

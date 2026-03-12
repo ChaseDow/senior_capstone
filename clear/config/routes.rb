@@ -24,7 +24,7 @@ Rails.application.routes.draw do
     post "import",  to: "university_calendar#import",  as: :university_calendar_import
   end
   resources :courses do
-    resources :course_items, only: %i[index create edit update destroy]
+    resources :course_items, only: %i[index create show edit update destroy]
   end
   resources :agenda
 

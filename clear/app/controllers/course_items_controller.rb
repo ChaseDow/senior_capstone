@@ -5,7 +5,7 @@ class CourseItemsController < ApplicationController
 
   before_action :authenticate_user!
   before_action :set_course
-  before_action :set_course_item, only: %i[edit update destroy]
+  before_action :set_course_item, only: %i[show edit update destroy]
 
   def index
     @course_items = @course.course_items.order(:due_at)
@@ -35,6 +35,13 @@ class CourseItemsController < ApplicationController
         format.turbo_stream { render :index, status: :unprocessable_entity }
       end
     end
+  end
+
+  def show
+    return unless turbo_frame_request?
+
+    render partial: "course_items/popover_detail",
+           locals: { course_item: @course_item, course: @course, start_date: params[:start_date] }
   end
 
   def edit; end
@@ -69,9 +76,25 @@ class CourseItemsController < ApplicationController
       end
 
       format.turbo_stream do
-        redirect_to course_course_items_path(@course),
-                    notice: "Course item deleted.",
-                    status: :see_other
+        unless turbo_frame_request?
+          redirect_to course_course_items_path(@course), notice: "Course item deleted.", status: :see_other
+          next
+        end
+
+        start_date  = parse_start_date(params[:start_date])
+        week_start  = start_date.beginning_of_week
+        range_start = week_start.beginning_of_day
+        range_end   = (week_start + 6.days).end_of_day
+        occurrences = calendar_occurrences_for_range(range_start, range_end)
+
+        render turbo_stream: [
+          turbo_stream.replace(
+            "dashboard_calendar",
+            partial: "dashboard/calendar_frame",
+            locals: { events: occurrences, start_date: start_date }
+          ),
+          turbo_stream.update("event_popover", "")
+        ]
       end
     end
   end
@@ -88,5 +111,11 @@ class CourseItemsController < ApplicationController
 
   def course_item_params
     params.require(:course_item).permit(:title, :kind, :due_at, :details)
+  end
+
+  def parse_start_date(raw)
+    raw.present? ? Date.parse(raw) : Date.current
+  rescue ArgumentError
+    Date.current
   end
 end

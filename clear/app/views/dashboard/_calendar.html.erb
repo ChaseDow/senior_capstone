@@ -324,7 +324,7 @@
                 "#{is_course ? course_css : (is_due ? due_css : "")}"
               %>
               <% highlight_id = "#{model}-#{record.id}-#{seg[:seg_start].to_date.iso8601}" %>
-              <% href = is_due ? edit_course_course_item_path(record.course, record) : polymorphic_path(record, start_date: seg[:seg_start].to_date) %>
+              <% href = is_due ? course_course_item_path(record.course, record, start_date: seg[:seg_start].to_date) : polymorphic_path(record, start_date: seg[:seg_start].to_date) %>
               <%= link_to href,
                 id: highlight_id,
                 class: (is_due ? due_classes : event_classes),
