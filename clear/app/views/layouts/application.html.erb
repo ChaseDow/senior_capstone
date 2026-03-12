@@ -27,28 +27,27 @@
         <div class="aurora__orb aurora__orb--3"></div>
         <div class="aurora__vignette"></div>
       </div>
-      <header class="border-b border-zinc-800/80 bg-zinc-950/60 backdrop-blur">
-        <div class="flex w-full items-center justify-between px-4 py-5">
-          <%= link_to root_path, class: "flex items-center gap-2" do %>
+      <header class="border-b border-zinc-800/60 bg-zinc-950/40 backdrop-blur-xl">
+        <div class="flex w-full items-center px-6 py-4">
+          <%= link_to root_path, class: "flex items-center gap-3" do %>
             <%= image_tag "Logo.png",
                           alt: "Clear",
-                          class: "h-6 w-auto" %>
-            <span class="text-sm font-semibold tracking-wide text-zinc-100">Clear</span>
+                          class: "h-9 w-auto" %>
+            <span class="text-xl font-bold tracking-wide text-zinc-50">Clear</span>
           <% end %>
-        </nav>
-      </div>
-    </header>
-  <% end %>
+        </div>
+      </header>
+    <% end %>
   <% if notice.present? || alert.present? %>
     <div class="fixed top-4 left-0 right-0 z-50 px-4">
       <div class="mx-auto w-full max-w-2xl space-y-3">
         <% if notice.present? %>
-          <div class="rounded-2xl border border-emerald-900 bg-emerald-950/40 px-4 py-3 text-sm text-emerald-200">
+          <div class="rounded-2xl border border-emerald-900 bg-emerald-950/40 px-4 py-3 text-sm text-emerald-200 backdrop-blur-md">
             <%= notice %>
           </div>
         <% end %>
         <% if alert.present? %>
-          <div class="rounded-2xl border border-rose-900 bg-rose-950/40 px-4 py-3 text-sm text-rose-200">
+          <div class="rounded-2xl border border-rose-900 bg-rose-950/40 px-4 py-3 text-sm text-rose-200 backdrop-blur-md">
             <%= alert %>
           </div>
         <% end %>
