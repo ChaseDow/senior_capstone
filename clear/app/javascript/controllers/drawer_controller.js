@@ -88,6 +88,7 @@ export default class extends Controller {
 
     const empty = this.frameTarget.innerHTML.trim() === ""
     if (empty && this.openValue) this.close()
+    else if (!empty && !this.openValue) this.open()
   }
 
   clearFrame() {
@@ -103,13 +104,13 @@ export default class extends Controller {
       this.overlayTarget.classList.remove("opacity-0", "pointer-events-none")
       this.overlayTarget.classList.add("opacity-100")
 
-      this.panelTarget.classList.remove("translate-x-[110vw]")
+      this.panelTarget.classList.remove("translate-x-full")
       this.panelTarget.classList.add("translate-x-0")
     } else {
       this.overlayTarget.classList.add("opacity-0", "pointer-events-none")
       this.overlayTarget.classList.remove("opacity-100")
 
-      this.panelTarget.classList.add("translate-x-[110vw]")
+      this.panelTarget.classList.add("translate-x-full")
       this.panelTarget.classList.remove("translate-x-0")
     }
   }

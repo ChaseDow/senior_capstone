@@ -1,3 +1,6 @@
+<%# Turbo-frame fallback: ensures the event_drawer frame is present in the response
+    if the Turbo-Frame header is not detected. %>
+<div hidden><%= render "courses/drawer_edit", course: @course, start_date: params[:start_date] %></div>
 <% content_for :page_title, "Courses" %>
 <% content_for :page_subtitle, "Current enrolled courses"%>
 <div class="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6">

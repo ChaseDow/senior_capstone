@@ -2,6 +2,7 @@
 
 class Event < ApplicationRecord
   belongs_to :user
+  has_many :event_exceptions, dependent: :destroy
 
   validates :title, presence: true
   validates :starts_at, presence: true
@@ -35,11 +36,13 @@ class Event < ApplicationRecord
 
     start_time = starts_at.in_time_zone
     duration = ends_at.present? ? (ends_at.in_time_zone - start_time) : nil
+    excluded = event_exceptions.where(excluded_date: window_start_date..window_end_date)
+                               .pluck(:excluded_date).to_set
 
     out = []
     d = window_start_date
     while d <= window_end_date
-      if repeat_days.include?(d.wday)
+      if repeat_days.include?(d.wday) && !excluded.include?(d)
         occ_start = Time.zone.local(d.year, d.month, d.day, start_time.hour, start_time.min, start_time.sec)
         occ_end   = duration.present? ? (occ_start + duration) : nil
         out << Occurrence.new(event: self, starts_at: occ_start, ends_at: occ_end)

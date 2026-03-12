@@ -67,7 +67,10 @@ export default class extends Controller {
     this._selectAgendaCard(id)
   }
 
-  clear() {
+  clear(event) {
+    // Don't clear when clicking a calendar event link (it has its own handler)
+    if (event && event.target.closest("[data-calendar-event]")) return
+
     this.selectedId = null
 
     document.querySelectorAll("[data-calendar-event]").forEach((el) => {
