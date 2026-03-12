@@ -1,3 +1,6 @@
+<%# Turbo-frame fallback: ensures the event_drawer frame is present in the response
+    if the Turbo-Frame header is not detected, so the drawer edit form opens correctly. %>
+<div hidden><%= render "events/drawer_edit", event: @event, start_date: params[:start_date] %></div>
 <% content_for :page_title, "Edit Event" %>
 <% content_for :page_subtitle, @event.title.presence || "Update details" %>
 <div class="rounded-2xl p-6"

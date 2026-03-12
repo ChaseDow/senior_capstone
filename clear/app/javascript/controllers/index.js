@@ -22,8 +22,14 @@ application.register("chat", ChatController)
 import CountdownController from "./countdown_controller"
 application.register("countdown", CountdownController)
 
+import DeleteOptionsController from "./delete_options_controller"
+application.register("delete-options", DeleteOptionsController)
+
 import DrawerController from "./drawer_controller"
 application.register("drawer", DrawerController)
+
+import EventPopoverController from "./event_popover_controller"
+application.register("event-popover", EventPopoverController)
 
 import FullHeightController from "./full_height_controller"
 application.register("full-height", FullHeightController)

@@ -18,7 +18,13 @@ class EventsController < ApplicationController
   def show
     return unless turbo_frame_request?
 
-    render partial: "events/drawer_detail",
+    partial = if request.headers["Turbo-Frame"] == "event_popover"
+                "events/popover_detail"
+              else
+                "events/drawer_detail"
+              end
+
+    render partial: partial,
            locals: { event: @event, start_date: params[:start_date] }
   end
 
@@ -126,10 +132,17 @@ class EventsController < ApplicationController
   end
 
   def destroy
-    @event.destroy!
+    if @event.recurring? && params[:scope] == "single"
+      excluded_date = parse_start_date(params[:start_date])
+      @event.event_exceptions.find_or_create_by!(excluded_date: excluded_date)
+      notice = "This occurrence was removed."
+    else
+      @event.destroy!
+      notice = "Event deleted."
+    end
 
     respond_to do |format|
-      format.html { redirect_to events_path, notice: "Event deleted." }
+      format.html { redirect_to events_path, notice: notice }
 
       format.turbo_stream do
         unless turbo_frame_request?
@@ -149,7 +162,8 @@ class EventsController < ApplicationController
             partial: "dashboard/calendar_frame",
             locals: { events: occurrences, start_date: start_date }
           ),
-          turbo_stream.update("event_drawer", "")
+          turbo_stream.update("event_drawer", ""),
+          turbo_stream.update("event_popover", "")
         ]
       end
     end

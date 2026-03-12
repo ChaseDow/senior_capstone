@@ -45,7 +45,7 @@
     transform: none;
   }
 </style>
-<div class="flex h-full min-h-0 flex-col" data-controller="agenda-highlight">
+<div class="flex h-full min-h-0 flex-col" data-controller="agenda-highlight event-popover">
   <!-- Toolbar -->
   <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
     <div>
@@ -82,8 +82,21 @@
     </nav>
   </div>
   <!-- Calendar shell -->
-  <div class="min-h-0 flex-1 overflow-auto rounded-2xl shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)]"
+  <div class="min-h-0 flex-1 overflow-auto rounded-2xl shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)] relative"
        style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg-2);">
+    <!-- Event popover -->
+    <div
+      data-event-popover-target="popover"
+      class="hidden absolute z-[100] w-80 rounded-xl border border-zinc-700"
+      style="background-color: #18181b; box-shadow: 0 8px 30px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.06);">
+      <%= turbo_frame_tag "event_popover",
+            class: "block",
+            data: {
+              event_popover_target: "frame",
+              action: "turbo:frame-load->event-popover#frameLoaded"
+            } do %>
+      <% end %>
+    </div>
     <!-- Sticky header row -->
     <div
       class="sticky top-0 z-20 backdrop-blur"
@@ -283,15 +296,15 @@
                 "#{is_course ? course_css : (is_due ? due_css : "")}"
               %>
               <% highlight_id = "#{model}-#{record.id}-#{seg[:seg_start].to_date.iso8601}" %>
-              <% href = is_due ? edit_course_course_item_path(record.course, record) : polymorphic_path(record, start_date: start_date.to_date) %>
+              <% href = is_due ? edit_course_course_item_path(record.course, record) : polymorphic_path(record, start_date: seg[:seg_start].to_date) %>
               <%= link_to href,
                 id: highlight_id,
                 class: (is_due ? due_classes : event_classes),
                 style: style_str,
                 data: {
                   calendar_event: true,
-                  turbo_frame: "event_drawer",
-                  action: "click->agenda-highlight#selectFromCalendar click->drawer#start",
+                  turbo_frame: "event_popover",
+                  action: "click->agenda-highlight#selectFromCalendar click->event-popover#show",
                   turbo_prefetch: false
                 } do %>
                 <% if is_due %>

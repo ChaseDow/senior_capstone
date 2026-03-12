@@ -1,3 +1,8 @@
+<%# Turbo-frame fallback: if the Turbo-Frame request header is stripped (e.g. by a
+    proxy/CDN), the show action falls through to this template. Including the drawer
+    partial here ensures the event_drawer frame is always present in the response so
+    Turbo updates the panel rather than doing a full-page navigation. %>
+<div hidden><%= render "events/drawer_detail", event: @event, start_date: params[:start_date] %></div>
 <% content_for :page_title, @event.title.presence || "Event" %>
 <% content_for :page_subtitle, "Event details" %>
 <div class="space-y-4">

@@ -103,24 +103,22 @@
         class="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
       </div>
       <!-- Event Drawer Panel -->
-      <div class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none px-4">
-        <div
-          data-drawer-target="panel"
-          role="dialog"
-          aria-modal="true"
-          class="pointer-events-auto w-[min(92vw,64rem)]
-                 max-h-[85vh] overflow-hidden
-                 rounded-2xl backdrop-blur shadow-2xl
-                 translate-x-[110vw] transition-transform duration-300 ease-in-out"
-          style="border: 1px solid var(--studs-border); background-color: var(--studs-sidebar-bg);">
-          <%= turbo_frame_tag "event_drawer",
-                class: "block h-full",
-                data: {
-                  drawer_target: "frame",
-                  action: "turbo:frame-load->drawer#frameLoaded turbo:submit-end->drawer#submitEnded"
-                } do %>
-          <% end %>
-        </div>
+      <div
+        data-drawer-target="panel"
+        role="dialog"
+        aria-modal="true"
+        class="fixed inset-y-0 right-0 z-50
+               w-full sm:w-[520px]
+               overflow-hidden shadow-2xl
+               translate-x-full transition-transform duration-300 ease-in-out"
+        style="border-left: 1px solid var(--studs-border); background-color: var(--studs-sidebar-bg);">
+        <%= turbo_frame_tag "event_drawer",
+              class: "block h-full",
+              data: {
+                drawer_target: "frame",
+                action: "turbo:frame-load->drawer#frameLoaded turbo:submit-end->drawer#submitEnded"
+              } do %>
+        <% end %>
       </div>
       <!-- Event Drawer Skeleton -->
       <template data-drawer-target="skeleton">

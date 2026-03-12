@@ -1,3 +1,6 @@
+<%# Turbo-frame fallback: ensures the event_drawer frame is always present in the
+    response even when the Turbo-Frame header is not detected server-side. %>
+<div hidden><%= render "courses/drawer_detail", course: @course, start_date: params[:start_date] %></div>
 <% content_for :page_title, "Courses" %>
 <% content_for :page_subtitle, "Current enrolled courses" %>
 <% color = @course.try(:color).presence || "#34D399" %>
