@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["popover", "frame"]
+  static targets = ["popover", "frame", "skeleton"]
 
   connect() {
     this._onKeydown = (e) => {
@@ -26,6 +26,12 @@ export default class extends Controller {
   show(event) {
     const anchor = event.currentTarget
     this._open = true
+
+    // Show skeleton immediately while frame loads
+    if (this.hasSkeletonTarget && this.hasFrameTarget) {
+      this.frameTarget.innerHTML = this.skeletonTarget.innerHTML
+    }
+
     this.popoverTarget.classList.remove("hidden")
     this._position(anchor)
   }
