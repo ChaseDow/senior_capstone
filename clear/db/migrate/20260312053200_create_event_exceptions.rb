@@ -7,6 +7,6 @@ class CreateEventExceptions < ActiveRecord::Migration[8.1]
       t.timestamps
     end
 
-    add_index :event_exceptions, [:event_id, :excluded_date], unique: true
+    add_index :event_exceptions, [ :event_id, :excluded_date ], unique: true
   end
 end
