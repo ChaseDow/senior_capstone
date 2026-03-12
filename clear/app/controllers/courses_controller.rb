@@ -16,9 +16,9 @@ class CoursesController < ApplicationController
 
     partial = if request.headers["Turbo-Frame"] == "event_popover"
                 "courses/popover_detail"
-              else
+    else
                 "courses/drawer_detail"
-              end
+    end
 
     render partial: partial,
            locals: { course: @course, start_date: params[:start_date] }
