@@ -77,7 +77,7 @@ class ProfilesController < ApplicationController
     unless params.dig(:user, :avatar).present?
       flash.now[:notice] = "No changes to save."
       return render turbo_stream: turbo_stream.replace(
-        "event_drawer",
+        "profile_modal",
         partial: "profiles/drawer_detail",
         locals: { user: @user }
       )
@@ -87,11 +87,11 @@ class ProfilesController < ApplicationController
       flash.now[:notice] = "Successfully updated."
       render turbo_stream: [
         turbo_stream.replace(
-          "event_drawer",
+          "profile_modal",
           partial: "profiles/drawer_detail",
           locals: { user: @user }
         ),
-        turbo_stream.replace(
+        turbo_stream.update(
           "left_nav_profile",
           partial: "profiles/left_nav_profile",
           locals: { user: @user }
@@ -124,10 +124,15 @@ class ProfilesController < ApplicationController
 
     unless @user.valid_password?(password_params[:password])
       @user.errors.add(:password, "is invalid")
-      return render partial: "profiles/delete_account_form", locals: { user: @user }, status: :unprocessable_entity
+      return render turbo_stream: turbo_stream.replace(
+        "profile_modal",
+        partial: "profiles/delete_account_form",
+        locals: { user: @user }
+      ), status: :unprocessable_entity
     end
 
     @user.destroy!
-    redirect_to root, notice: "Account Successfully Deleted"
+    sign_out(@user)
+    redirect_to root_path, notice: "Account Successfully Deleted"
   end
 end
