@@ -76,12 +76,27 @@ class ProfilesController < ApplicationController
     # If user hit Save without selecting a file, just show the drawer again
     unless params.dig(:user, :avatar).present?
       flash.now[:notice] = "No changes to save."
-      return render partial: "profiles/drawer_detail", locals: { user: @user }
+      return render turbo_stream: turbo_stream.replace(
+        "event_drawer",
+        partial: "profiles/drawer_detail",
+        locals: { user: @user }
+      )
     end
 
     if @user.update(avatar_params)
       flash.now[:notice] = "Successfully updated."
-      render partial: "profiles/drawer_detail", locals: { user: @user }
+      render turbo_stream: [
+        turbo_stream.replace(
+          "event_drawer",
+          partial: "profiles/drawer_detail",
+          locals: { user: @user }
+        ),
+        turbo_stream.replace(
+          "left_nav_profile",
+          partial: "profiles/left_nav_profile",
+          locals: { user: @user }
+        )
+      ]
     else
       render partial: "profiles/edit_avatar_form",
         locals: { user: @user },
@@ -106,7 +121,7 @@ class ProfilesController < ApplicationController
   # deletes the account and all of its info
   def destroy_account
     @user = current_user
- 
+
     unless @user.valid_password?(password_params[:password])
       @user.errors.add(:password, "is invalid")
       return render partial: "profiles/delete_account_form", locals: { user: @user }, status: :unprocessable_entity
