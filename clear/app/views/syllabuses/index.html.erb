@@ -1,65 +1,84 @@
 <% content_for :page_title, "Syllabuses" %>
 <% content_for :page_subtitle, "Uploaded syllabuses" %>
+<style>
+  .syllabus-row { transition: background-color 0.15s ease; }
+  .syllabus-row:hover { background-color: var(--studs-panel-hover); }
+</style>
 
-<div class="rounded-2xl border border-emerald-900/35 bg-emerald-950/15 backdrop-blur-sm p-6">
-  <div class="flex items-center justify-between">
-    <div class="text-sm text-zinc-300">
-      Your uploaded syllabuses will appear below.
-    </div>
-
-
-    <div class="flex justify-end space-x-5">
-      <%= render Studs::SearchBarComponent.new(class_name: "w-80", placeholder: "Search…" ) %>
-      <%= render Studs::PrimaryButtonComponent.new(
-            label: "New Syllabus",
-            href: new_syllabus_path,
-            color: :emerald
-          ) %>
+<div class="rounded-2xl p-6" style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg);">
+  <div class="flex items-center justify-between gap-4 mb-5">
+    <div class="text-lg font-semibold text-zinc-100">Syllabuses</div>
+    <div class="flex items-center gap-1.5">
+      <%= render Studs::SearchBarComponent.new(class_name: "w-80", placeholder: "Search…") %>
+      <div class="mx-1 h-5 w-px rounded-full" style="background-color: var(--studs-border);"></div>
+      <%= link_to new_syllabus_path, class: "studs-nav-btn", data: { turbo_frame: "_top" } do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+        </svg>
+        New syllabus
+      <% end %>
     </div>
   </div>
 
-
-  <div class="mt-4 overflow-hidden rounded-2xl border border-emerald-900/30 bg-emerald-950/10">
+  <div class="overflow-hidden rounded-2xl"
+       style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg-2);">
     <% if @syllabuses.any? %>
-      <div class="divide-y divide-emerald-900/25">
-        <% @syllabuses.each do |syllabus| %>
-          <div class="flex items-start justify-between gap-4 p-4 bg-emerald-950/10 hover:bg-emerald-900/10 transition">
-            <div class="min-w-0">
-              <p class="truncate font-medium text-zinc-100">
-                <%= link_to syllabus.title.presence || "(Untitled)", syllabus_path(syllabus), class: "hover:underline" %>
+      <% @syllabuses.each_with_index do |syllabus, i| %>
+        <div class="syllabus-row flex items-start justify-between gap-4 p-4"
+             style="<%= i > 0 ? "border-top: 1px solid var(--studs-divider);" : "" %>">
+          <div class="min-w-0 flex-1">
+            <p class="font-medium text-zinc-100 truncate">
+              <%= link_to syllabus.title.presence || "(Untitled)", syllabus_path(syllabus),
+                    class: "hover:underline underline-offset-2",
+                    data: { turbo_frame: "_top" } %>
+            </p>
+
+            <% if syllabus.file.attached? %>
+              <p class="mt-1 text-sm text-zinc-400">
+                File: <%= syllabus.file.filename.to_s %>
               </p>
-
-              <% if syllabus.file.attached? %>
-                <p class="mt-1 text-sm text-zinc-400">
-                  File: <%= syllabus.file.filename.to_s %>
-                </p>
-              <% end %>
-            </div>
-
-            <div class="flex shrink-0 items-center gap-2">
-              <%= render Studs::SecondaryButtonComponent.new(
-                    path: syllabus_path(syllabus),
-                    label: "View",
-                    size: :sm
-                  ) %>
-
-              <%= turbo_frame_tag dom_id(syllabus, :status), src: status_syllabus_path(syllabus) do %>
-                <%= render "syllabuses/status", syllabus: syllabus %>
-              <% end %>
-
-              <%= button_to "Delete",
-                    syllabus_path(syllabus),
-                    method: :delete,
-                    form: { data: { turbo_confirm: "Delete this syllabus?" } },
-                    class: "inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium
-                    border border-red-500/40 text-red-200 hover:bg-red-950/40 transition"
-              %>
-            </div>
+            <% end %>
           </div>
-        <% end %>
-      </div>
+
+          <div class="flex shrink-0 items-center gap-2">
+            <%= link_to syllabus_path(syllabus), class: "studs-nav-btn", data: { turbo_frame: "_top" } do %>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12H9m12 0A9 9 0 113 12a9 9 0 0118 0z"/>
+              </svg>
+              View
+            <% end %>
+
+            <%= turbo_frame_tag dom_id(syllabus, :status), src: status_syllabus_path(syllabus) do %>
+              <%= render "syllabuses/status", syllabus: syllabus %>
+            <% end %>
+
+            <%= button_to syllabus_path(syllabus),
+                  method: :delete,
+                  form: { data: { turbo_confirm: "Delete this syllabus?", turbo_frame: "_top" } },
+                  class: "studs-nav-btn",
+                  style: "border-color: rgba(239,68,68,0.4); color: #fca5a5;" do %>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+              </svg>
+              Delete
+            <% end %>
+          </div>
+        </div>
+      <% end %>
     <% else %>
-      <div class="p-6 text-sm text-zinc-400">Upload your syllabi by pressing 'New Syllabus' then click 'Click to browse your files'. Find the your syllabus and upload from there.</div>
+      <div class="flex flex-col items-center justify-center py-16 text-center">
+        <div class="mb-3 text-4xl opacity-30">📄</div>
+        <p class="text-sm font-medium text-zinc-300">No syllabuses yet</p>
+        <p class="mt-1 text-xs text-zinc-500">Upload your first syllabus to get started</p>
+        <div class="mt-4">
+          <%= link_to new_syllabus_path, class: "studs-nav-btn", data: { turbo_frame: "_top" } do %>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+            </svg>
+            New syllabus
+          <% end %>
+        </div>
+      </div>
     <% end %>
   </div>
 </div>
