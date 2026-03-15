@@ -3,6 +3,7 @@
 class Event < ApplicationRecord
   belongs_to :user
   has_many :event_exceptions, dependent: :destroy
+  has_many :notifications, as: :notifiable, dependent: :destroy
 
   validates :title, presence: true
   validates :starts_at, presence: true
@@ -20,6 +21,8 @@ class Event < ApplicationRecord
   before_validation :derive_ends_at_from_duration
   before_validation :normalize_recurrence_fields
   before_validation :normalize_color
+
+  after_create_commit :create_priority_notification, if: -> { priority.present? && priority > 0 }
 
   Occurrence = Struct.new(:event, :starts_at, :ends_at, :draft_status, keyword_init: true) do
     delegate :id, :title, :location, :description, :color, :contrast_text_color, to: :event
@@ -106,6 +109,15 @@ class Event < ApplicationRecord
   def repeat_until_not_before_start
     return if repeat_until >= starts_at.to_date
     errors.add(:repeat_until, "must be on/after the start date")
+  end
+
+  def create_priority_notification
+    Notification.create!(
+      user: user,
+      notifiable: self,
+      category: "high_priority",
+      message: "High priority event: #{title}"
+    )
   end
 
   def srgb_linear(channel_0_255)
