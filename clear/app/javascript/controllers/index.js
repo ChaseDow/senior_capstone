@@ -49,6 +49,9 @@ application.register("hello", HelloController)
 import ModalController from "./modal_controller"
 application.register("modal", ModalController)
 
+import NotificationsDropdownController from "./notifications_dropdown_controller"
+application.register("notifications-dropdown", NotificationsDropdownController)
+
 import PollFrameController from "./poll_frame_controller"
 application.register("poll-frame", PollFrameController)
 

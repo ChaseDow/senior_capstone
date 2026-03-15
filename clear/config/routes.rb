@@ -50,6 +50,12 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :notifications, only: [ :index, :destroy ] do
+    collection do
+      patch :mark_all_read
+    end
+  end
+
   # Admin-only pages (guarded in controllers via current_user.admin?)
   namespace :admin do
     resources :users, only: [ :index, :destroy ]

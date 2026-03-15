@@ -83,6 +83,38 @@
                 title: (content_for?(:page_title) ? yield(:page_title) : "Dashboard"),
                 subtitle: (content_for?(:page_subtitle) ? yield(:page_subtitle) : nil)
               ) do |t| %>
+          <% t.with_actions do %>
+            <% unread_count = user_signed_in? ? current_user.notifications.unread.count : 0 %>
+            <div class="relative" data-controller="notifications-dropdown">
+              <button
+                type="button"
+                data-action="click->notifications-dropdown#toggle"
+                class="relative inline-flex h-10 w-10 items-center justify-center rounded-xl
+                       border border-white/10 bg-zinc-950/30 hover:bg-white/5 transition
+                       text-zinc-200 hover:text-zinc-50
+                       [&_svg]:text-current [&_svg_*]:stroke-current [&_svg_*]:fill-none"
+                aria-label="Notifications"
+              >
+                <span class="[&>svg]:h-6 [&>svg]:w-6">
+                  <%= icon "bell-dot-stroke-rounded" %>
+                </span>
+                <%= render "notifications/badge", unread_count: unread_count %>
+              </button>
+
+              <%# Dropdown panel %>
+              <div
+                data-notifications-dropdown-target="panel"
+                class="hidden absolute right-0 top-full mt-2 w-80 z-50 rounded-2xl border shadow-2xl overflow-hidden"
+                style="border-color: var(--studs-border); background-color: var(--studs-sidebar-bg);"
+              >
+                <%= turbo_frame_tag "notifications_panel",
+                      src: notifications_path,
+                      loading: :lazy do %>
+                  <div class="px-4 py-6 text-center text-sm text-zinc-400">Loading...</div>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
           <% end %>
         </header>
         <!-- Page content -->
