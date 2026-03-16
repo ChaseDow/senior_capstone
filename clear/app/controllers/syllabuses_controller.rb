@@ -12,7 +12,9 @@ class SyllabusesController < ApplicationController
   ].freeze
 
   def index
-    @syllabuses = current_user.syllabuses.order(created_at: :desc)
+    @q = params[:q].to_s.strip
+    @syllabuses = current_user.syllabuses.order(:title)
+    @syllabuses = @syllabuses.where("title ILIKE ?", "%#{@q}%") if @q.present?
   end
 
   def show; end
