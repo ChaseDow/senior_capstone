@@ -1,5 +1,5 @@
-<% content_for :page_title, "Syllabuses" %>
-<% content_for :page_subtitle, "Uploaded syllabuses" %>
+<% content_for :page_title, "Syllabi" %>
+<% content_for :page_subtitle, "Uploaded syllabi" %>
 
 <div class="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6">
   <div class="flex items-center justify-between">
@@ -9,6 +9,9 @@
     </div>
     <div class="mx-1 h-5 rounded-full" style="background-color: var(--studs-border);"></div>
       <%= link_to syllabuses_path, class: "studs-nav-btn", data: { turbo_frame: "_top" } do %>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+      </svg>
         Back
       <% end %>
     </div>
