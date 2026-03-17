@@ -1,68 +1,77 @@
-<div class="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-6xl items-center px-6 py-12">
-  <div class="grid w-full grid-cols-1 gap-10 md:grid-cols-2">
-    <div class="space-y-6">
-      <div class="inline-flex items-center gap-2 rounded-full border border-zinc-800 bg-zinc-900/40 px-3 py-1 text-xs text-zinc-300">
-        <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
+<div class="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-7xl items-center px-6 py-12">
+  <div class="grid w-full grid-cols-1 gap-16 md:grid-cols-[5fr_7fr]">
+    <div class="space-y-8">
+      <div class="inline-flex items-center gap-2 rounded-full border border-zinc-800 bg-zinc-900/40 px-4 py-1.5 text-xs font-medium tracking-wide text-zinc-300 backdrop-blur-md">
+        <span class="relative flex h-2 w-2">
+          <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+          <span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-400"></span>
+        </span>
         Planner + dashboard foundation
       </div>
 
-      <h1 class="text-4xl font-semibold tracking-tight text-zinc-50 sm:text-5xl">
-        Clear
-      </h1>
+      <div class="space-y-4">
+        <h1 class="text-5xl font-bold tracking-tight text-zinc-50 sm:text-6xl">
+          Clear
+        </h1>
 
-      <p class="text-base leading-relaxed text-zinc-300">
-        A clean, fast dashboard for your schedule, events, and life. Sign in to continue or create an account in seconds.
-      </p>
+        <p class="max-w-md text-base leading-relaxed text-zinc-400">
+          A clean, fast dashboard for your schedule, events, and life. Sign in to continue or create an account in seconds.
+        </p>
+      </div>
 
       <div class="flex flex-wrap items-center gap-3">
         <% if user_signed_in? %>
           <%= link_to "Go to dashboard",
                 authenticated_root_path,
-                class: "rounded-xl bg-emerald-500 px-4 py-2 text-sm font-medium text-zinc-950 hover:bg-emerald-400" %>
+                class: "studs-btn-accent !rounded-xl !px-5 !py-2.5 !text-sm" %>
 
           <%= button_to "Sign out",
                 destroy_user_session_path,
                 method: :delete,
                 data: { turbo: false },
-                class: "rounded-xl border border-zinc-800 bg-zinc-900/40 px-4 py-2 text-sm text-zinc-100 hover:bg-zinc-900" %>
+                class: "studs-nav-btn !rounded-xl !px-5 !py-2.5 !text-sm" %>
         <% else %>
           <%= link_to "Create account",
                 new_user_registration_path,
                 data: { turbo: false },
-                class: "rounded-xl bg-emerald-500 px-4 py-2 text-sm font-medium text-zinc-950 hover:bg-emerald-400" %>
+                class: "studs-btn-accent !rounded-xl !px-5 !py-2.5 !text-sm" %>
 
           <%= link_to "Sign in",
                 new_user_session_path,
                 data: { turbo: false },
-                class: "rounded-xl border border-zinc-800 bg-zinc-900/40 px-4 py-2 text-sm text-zinc-100 hover:bg-zinc-900" %>
+                class: "studs-nav-btn !rounded-xl !px-5 !py-2.5 !text-sm" %>
         <% end %>
       </div>
 
-      <div class="grid grid-cols-1 gap-3 pt-4 sm:grid-cols-2">
-        <div class="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-4">
+      <div class="grid grid-cols-1 gap-3 pt-2 sm:grid-cols-2">
+        <div class="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5 backdrop-blur-md transition-all duration-200 hover:border-emerald-500/30 hover:shadow-lg hover:shadow-emerald-500/5">
+          <div class="mb-2 flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10">
+            <svg class="h-4 w-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+            </svg>
+          </div>
           <div class="text-sm font-medium text-zinc-100">Simple</div>
-          <div class="mt-1 text-sm text-zinc-400">No clutter. Just what you need.</div>
+          <div class="mt-1 text-sm text-zinc-500">No clutter. Just what you need.</div>
         </div>
-        <div class="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-4">
+        <div class="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5 backdrop-blur-md transition-all duration-200 hover:border-emerald-500/30 hover:shadow-lg hover:shadow-emerald-500/5">
+          <div class="mb-2 flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10">
+            <svg class="h-4 w-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+            </svg>
+          </div>
           <div class="text-sm font-medium text-zinc-100">Secure</div>
-          <div class="mt-1 text-sm text-zinc-400">Devise auth + reset flow.</div>
+          <div class="mt-1 text-sm text-zinc-500">Devise auth + reset flow.</div>
         </div>
       </div>
     </div>
 
-    <div class="hidden md:block">
-      <div class="rounded-3xl border border-zinc-800 bg-gradient-to-b from-zinc-900/40 to-zinc-950 p-6">
-        <div class="rounded-2xl border border-zinc-800 bg-zinc-950/60 p-6">
-          <div class="text-sm font-medium text-zinc-100">Preview</div>
-
-          <div class="mt-2 space-y-3">
-            <%#  %>
-            <%= image_tag "Preview.gif", alt: "Dashboard preview animation", class: "w-full h-full object-contain bg-zinc-950" %> 
-          </div>
-          <%# opacity %>
-          <div class="mt-4 text-s text-zinc-550"> 
-            Your real dashboard lives behind login.
-          </div>
+    <div class="hidden items-center md:flex">
+      <div class="w-full rounded-3xl border border-zinc-800 bg-gradient-to-b from-zinc-900/40 to-zinc-950 p-1.5 shadow-2xl shadow-black/40 backdrop-blur-md">
+        <div class="overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950/60">
+          <%= image_tag "Preview.gif", alt: "Dashboard preview animation", class: "w-full h-full object-contain bg-zinc-950" %>
+        </div>
+        <div class="px-4 py-3 text-xs text-zinc-500">
+          Your real dashboard lives behind login.
         </div>
       </div>
     </div>
