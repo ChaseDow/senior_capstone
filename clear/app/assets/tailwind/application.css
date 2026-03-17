@@ -349,14 +349,34 @@ body[data-theme="orange"] {
 
 .filepond-host .filepond--panel-root {
   border-radius: 0.75rem;
-  border: 1px solid var(--studs-border);
-  background-color: rgba(9 9 11 / 0.6);
+  border: 0;
+  background-color: transparent;
 }
 
 .filepond-host .filepond--drop-label {
-  min-height: 16rem;
+  height: 32rem;
   display: grid;
   place-items: center;
+}
+
+.filepond-host .filepond--drop-label label {
+  color: rgb(212 212 216);
+  transition: none;
+}
+
+.filepond-host .filepond--drop-label .filepond--label-action {
+  color: var(--studs-accent);
+  text-decoration: underline;
+  text-decoration-color: currentColor;
+}
+
+/* Prevent first-paint native file input flash and reserve space pre-init. */
+.filepond-host {
+  min-height: 32rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--studs-border);
+  background-color: rgba(9 9 11 / 0.6);
+  overflow: hidden;
 }
 
 @layer base {

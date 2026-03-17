@@ -21,7 +21,8 @@ export default class extends Controller {
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         "application/msword"
       ],
-      labelIdle: "Drag & Drop your file or <span class=\"filepond--label-action\">Browse</span>",
+      lableIdle: "",
+      // labelIdle: "<span style=\"color: rgb(212 212 216);\">Drag & Drop your file or <span style=\"color: var(--studs-accent); text-decoration: underline; text-decoration-color: currentColor;\">Browse</span></span>",
       oninit: () => this.element.classList.add("filepond-ready")
     })
   }
