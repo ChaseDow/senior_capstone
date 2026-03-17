@@ -2,3 +2,4 @@
 import "@hotwired/turbo-rails"
 import "./controllers"
 import "cropperjs"
+import "filepond/dist/filepond.min.css"
