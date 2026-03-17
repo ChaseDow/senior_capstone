@@ -1,4 +1,4 @@
-<% content_for :page_title, "Syllabi" %>
+<% content_for :page_title, "Syllabus" %>
 <% content_for :page_subtitle, "Uploaded syllabi" %>
 <style>
   .syllabus-row { transition: background-color 0.15s ease; }
@@ -18,7 +18,7 @@
       <div class="flex items-center gap-1.5">
         <%= render Studs::SearchBarComponent.new(
               class_name: "w-72",
-              placeholder: "Search syllabuses…",
+              placeholder: "Search syllabi…",
               value: params[:q],
               data: {
                 search_target: "input",

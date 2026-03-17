@@ -354,7 +354,7 @@ body[data-theme="orange"] {
 }
 
 .filepond-host .filepond--drop-label {
-  height: 32rem;
+  height: 20rem;
   display: grid;
   place-items: center;
 }
@@ -372,7 +372,7 @@ body[data-theme="orange"] {
 
 /* Prevent first-paint native file input flash and reserve space pre-init. */
 .filepond-host {
-  min-height: 32rem;
+  min-height: 20rem;
   border-radius: 0.75rem;
   border: 1px solid var(--studs-border);
   background-color: rgba(9 9 11 / 0.6);
