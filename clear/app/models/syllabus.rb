@@ -42,8 +42,13 @@ class Syllabus < ApplicationRecord
   private
 
   def correct_file_type
-    if file.attached? && !file.content_type.in?(ALLOWED_CONTENT_TYPES)
-      errors.add(:file, "must be a PDF or DOCX file")
+    if file.attached?
+      if !file.content_type.in?(ALLOWED_CONTENT_TYPES)
+        errors.add(:file, "must be a PDF or DOCX file")
+      end
+      if file.byte_size > 400000
+        errors.add(:file, "size is over 400 KB")
+      end
     end
   end
 end

@@ -1,13 +1,14 @@
 <% missing = @missing_fields || [] %>
-<% label_base   = "text-xs mb-1" %>
-<% label_ok     = "text-zinc-400" %>
+<% label_base   = "text-[10px] font-bold uppercase tracking-widest mb-1.5" %>
+<% label_ok     = "text-zinc-300" %>
+<% label_ok_style = "color: var(--studs-accent); opacity: 0.8;" %>
 <% label_miss   = "text-amber-200" %>
-<% input_base   = "w-full rounded-xl px-3 py-2 text-zinc-100 focus:outline-none focus:ring-2" %>
-<% input_ok     = "bg-emerald-950/10 border border-emerald-900/30 focus:ring-emerald-300/30" %>
-<% input_miss   = "bg-amber-500/10 border border-amber-400/50 focus:ring-amber-300/30" %>
-<% wrap_miss    = "rounded-2xl border border-amber-400/20 bg-amber-500/5 p-2" %>
+<% input_base   = "w-full rounded-2xl px-4 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-600 bg-zinc-950/60 focus:outline-none focus:ring-2 transition-all duration-150 border" %>
+<% input_ok     = "focus:ring-[var(--studs-accent)]" %>
+<% input_ok_style = "border-color: var(--studs-border);" %>
+<% input_miss   = "bg-amber-500/20 border border-amber-300/80 shadow-[0_0_0_1px_rgba(251,191,36,0.35)] focus:ring-amber-300/50" %>
 <% if syllabus.parse_status.in?(%w[queued processing]) %>
-  <div class="text-sm text-zinc-300">Parsing…</div>
+  <div class="text-sm text-zinc-400">Parsing…</div>
 <% elsif syllabus.parse_status == "failed" %>
   <div class="text-sm text-red-200">
     Parsing failed: <%= syllabus.parse_error %>
@@ -15,63 +16,63 @@
 <% else %>
   <%= form_with model: course,
         url: confirm_course_syllabus_path(syllabus),
+
         method: :post,
         data: { turbo_frame: "_top" } do |f| %>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <% needs = missing.include?(:title) %>
-      <div id="field_title" class="<%= needs ? wrap_miss : "" %>">
-        <div class="<%= "#{label_base} #{needs ? label_miss : label_ok}" %>">Title</div>
-        <%= f.text_field :title, class: "#{input_base} #{needs ? input_miss : input_ok}" %>
+      <div id="field_title">
+        <div class="<%= "#{label_base} #{needs ? label_miss : label_ok}" %>" style="<%= (needs ? nil : label_ok_style) %>">Title</div>
+        <%= f.text_field :title, class: "#{input_base} #{needs ? input_miss : input_ok}", style: (needs ? nil : input_ok_style) %>
       </div>
       <% needs = missing.include?(:code) %>
-      <div id="field_code" class="<%= needs ? wrap_miss : "" %>">
-        <div class="<%= "#{label_base} #{needs ? label_miss : label_ok}" %>">Code</div>
-        <%= f.text_field :code, class: "#{input_base} #{needs ? input_miss : input_ok}" %>
+      <div id="field_code">
+        <div class="<%= "#{label_base} #{needs ? label_miss : label_ok}" %>" style="<%= (needs ? nil : label_ok_style) %>">Code</div>
+        <%= f.text_field :code, class: "#{input_base} #{needs ? input_miss : input_ok}", style: (needs ? nil : input_ok_style) %>
       </div>
       <% needs = missing.include?(:term) %>
-      <div id="field_term" class="<%= needs ? wrap_miss : "" %>">
-        <div class="<%= "#{label_base} #{needs ? label_miss : label_ok}" %>">Term</div>
-        <%= f.text_field :term, class: "#{input_base} #{needs ? input_miss : input_ok}" %>
+      <div id="field_term">
+        <div class="<%= "#{label_base} #{needs ? label_miss : label_ok}" %>" style="<%= (needs ? nil : label_ok_style) %>">Term</div>
+        <%= f.text_field :term, class: "#{input_base} #{needs ? input_miss : input_ok}", style: (needs ? nil : input_ok_style) %>
       </div>
       <% needs = missing.include?(:professor) %>
-      <div id="field_professor" class="<%= needs ? wrap_miss : "" %>">
-        <div class="<%= "#{label_base} #{needs ? label_miss : label_ok}" %>">Professor</div>
-        <%= f.text_field :professor, class: "#{input_base} #{needs ? input_miss : input_ok}" %>
+      <div id="field_professor">
+        <div class="<%= "#{label_base} #{needs ? label_miss : label_ok}" %>" style="<%= (needs ? nil : label_ok_style) %>">Professor</div>
+        <%= f.text_field :professor, class: "#{input_base} #{needs ? input_miss : input_ok}", style: (needs ? nil : input_ok_style) %>
       </div>
       <% needs = missing.include?(:meeting_days) %>
-      <div id="field_meeting_days" class="<%= needs ? wrap_miss : "" %>">
-        <div class="<%= "#{label_base} #{needs ? label_miss : label_ok}" %>">Meeting Days</div>
-        <%= f.text_field :meeting_days, class: "#{input_base} #{needs ? input_miss : input_ok}" %>
+      <div id="field_meeting_days">
+        <div class="<%= "#{label_base} #{needs ? label_miss : label_ok}" %>" style="<%= (needs ? nil : label_ok_style) %>">Meeting Days</div>
+        <%= f.text_field :meeting_days, class: "#{input_base} #{needs ? input_miss : input_ok}", style: (needs ? nil : input_ok_style) %>
       </div>
       <% needs = missing.include?(:location) %>
-      <div id="field_location" class="<%= needs ? wrap_miss : "" %>">
-        <div class="<%= "#{label_base} #{needs ? label_miss : label_ok}" %>">Location</div>
-        <%= f.text_field :location, class: "#{input_base} #{needs ? input_miss : input_ok}" %>
+      <div id="field_location">
+        <div class="<%= "#{label_base} #{needs ? label_miss : label_ok}" %>" style="<%= (needs ? nil : label_ok_style) %>">Location</div>
+        <%= f.text_field :location, class: "#{input_base} #{needs ? input_miss : input_ok}", style: (needs ? nil : input_ok_style) %>
       </div>
       <% needs = missing.include?(:start_time) %>
-      <div id="field_start_time" class="<%= needs ? wrap_miss : "" %>">
-        <div class="<%= "#{label_base} #{needs ? label_miss : label_ok}" %>">Start Time</div>
-        <%= f.text_field :start_time, class: "#{input_base} #{needs ? input_miss : input_ok}" %>
+      <div id="field_start_time">
+        <div class="<%= "#{label_base} #{needs ? label_miss : label_ok}" %>" style="<%= (needs ? nil : label_ok_style) %>">Start Time</div>
+        <%= f.text_field :start_time, class: "#{input_base} #{needs ? input_miss : input_ok}", style: (needs ? nil : input_ok_style) %>
       </div>
       <% needs = missing.include?(:end_time) %>
-      <div id="field_end_time" class="<%= needs ? wrap_miss : "" %>">
-        <div class="<%= "#{label_base} #{needs ? label_miss : label_ok}" %>">End Time</div>
-        <%= f.text_field :end_time, class: "#{input_base} #{needs ? input_miss : input_ok}" %>
+      <div id="field_end_time">
+        <div class="<%= "#{label_base} #{needs ? label_miss : label_ok}" %>" style="<%= (needs ? nil : label_ok_style) %>">End Time</div>
+        <%= f.text_field :end_time, class: "#{input_base} #{needs ? input_miss : input_ok}", style: (needs ? nil : input_ok_style) %>
       </div>
       <% needs = missing.include?(:start_date) %>
-      <div id="field_start_date" class="<%= needs ? wrap_miss : "" %>">
-        <div class="<%= "#{label_base} #{needs ? label_miss : label_ok}" %>">Start Date*</div>
-        <%= f.date_field :start_date, class: "#{input_base} #{needs ? input_miss : input_ok}" %>
+      <div id="field_start_date">
+        <div class="<%= "#{label_base} #{needs ? label_miss : label_ok}" %>" style="<%= (needs ? nil : label_ok_style) %>">Start Date*</div>
+        <%= f.date_field :start_date, class: "#{input_base} #{needs ? input_miss : input_ok}", style: (needs ? nil : input_ok_style) %>
       </div>
       <% needs = missing.include?(:end_date) %>
-      <div id="field_end_date" class="<%= needs ? wrap_miss : "" %>">
-        <div class="<%= "#{label_base} #{needs ? label_miss : label_ok}" %>">End Date*</div>
-        <%= f.date_field :end_date, class: "#{input_base} #{needs ? input_miss : input_ok}" %>
+      <div id="field_end_date">
+        <div class="<%= "#{label_base} #{needs ? label_miss : label_ok}" %>" style="<%= (needs ? nil : label_ok_style) %>">End Date*</div>
+        <%= f.date_field :end_date, class: "#{input_base} #{needs ? input_miss : input_ok}", style: (needs ? nil : input_ok_style) %>
       </div>
     </div>
-    <div class="mt-4">
-      <%= f.submit "Create course",
-            class: "inline-flex items-center rounded-xl bg-emerald-500 px-4 py-2 text-sm font-semibold text-emerald-950 hover:bg-emerald-400 transition" %>
+    <div class="mt-6">
+      <%= f.submit "Create course", class: "studs-btn-accent" %>
     </div>
   <% end %>
 <% end %>
