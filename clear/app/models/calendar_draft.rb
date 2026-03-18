@@ -43,25 +43,25 @@ class CalendarDraft < ApplicationRecord
 
   def add_create(model, data)
     temp_id = "d_#{SecureRandom.hex(4)}"
-    update!(operations: operations + [{
+    update!(operations: operations + [ {
       "type" => "create", "model" => model,
       "temp_id" => temp_id, "data" => data.stringify_keys
-    }])
+    } ])
     temp_id
   end
 
   def add_update(model, id, data)
     # Collapse repeated updates to the same record into a single entry
     filtered = operations.reject { |op| op["type"] == "update" && op["model"] == model && op["id"] == id }
-    update!(operations: filtered + [{
+    update!(operations: filtered + [ {
       "type" => "update", "model" => model, "id" => id, "data" => data.stringify_keys
-    }])
+    } ])
   end
 
   def add_delete(model, id)
     # Drop any pending update for this record, then queue the delete
     filtered = operations.reject { |op| op["model"] == model && op["id"] == id }
-    update!(operations: filtered + [{ "type" => "delete", "model" => model, "id" => id }])
+    update!(operations: filtered + [ { "type" => "delete", "model" => model, "id" => id } ])
   end
 
   # --------------------------------------------------------------------------
@@ -194,7 +194,7 @@ class CalendarDraft < ApplicationRecord
           new_end   = if updated.end_time.present?
                         Time.zone.local(occ_date.year, occ_date.month, occ_date.day,
                                         updated.end_time.hour, updated.end_time.min, updated.end_time.sec)
-                      end
+          end
 
           next Course::Occurrence.new(event: updated, starts_at: new_start, ends_at: new_end, draft_status: "updated")
         end
@@ -254,8 +254,8 @@ class CalendarDraft < ApplicationRecord
       )
 
       # Generate occurrences for the draft course within the visible range
-      window_start = [range_start.to_date, course_start].compact.max
-      window_end   = [range_end.to_date, course_end].compact.min
+      window_start = [ range_start.to_date, course_start ].compact.max
+      window_end   = [ range_end.to_date, course_end ].compact.min
       next if window_end < window_start
 
       d = window_start
