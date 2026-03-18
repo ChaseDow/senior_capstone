@@ -31,6 +31,9 @@ application.register("drawer", DrawerController)
 import EventPopoverController from "./event_popover_controller"
 application.register("event-popover", EventPopoverController)
 
+import FilepondController from "./filepond_controller"
+application.register("filepond", FilepondController)
+
 import FullHeightController from "./full_height_controller"
 application.register("full-height", FullHeightController)
 
