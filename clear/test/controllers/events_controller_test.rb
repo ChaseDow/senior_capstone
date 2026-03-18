@@ -60,7 +60,7 @@ class EventsControllerTest < ActionDispatch::IntegrationTest
       }
     }
 
-    assert_redirected_to event_url(@event)
+    assert_redirected_to dashboard_url
     @event.reload
     assert_equal "Updated title", @event.title
   end

@@ -14,7 +14,8 @@ class DashboardController < ApplicationController
     range_start = week_start.beginning_of_day
     range_end   = (week_start + 6.days).end_of_day
 
-    @occurrences = calendar_occurrences_for_range(range_start, range_end)
+    @draft       = current_user_draft
+    @occurrences = calendar_occurrences_for_range(range_start, range_end, draft: @draft)
 
     now = Time.current
     next_occurrences = calendar_occurrences_for_range(now, now + 7.days)
@@ -23,7 +24,7 @@ class DashboardController < ApplicationController
     return unless turbo_frame_request?
 
     render partial: "dashboard/calendar_frame",
-           locals: { events: @occurrences, start_date: @start_date }
+           locals: { events: @occurrences, start_date: @start_date, draft: @draft }
   end
 
   def agenda

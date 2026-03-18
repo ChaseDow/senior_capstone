@@ -21,7 +21,7 @@ class Event < ApplicationRecord
   before_validation :normalize_recurrence_fields
   before_validation :normalize_color
 
-  Occurrence = Struct.new(:event, :starts_at, :ends_at, keyword_init: true) do
+  Occurrence = Struct.new(:event, :starts_at, :ends_at, :draft_status, keyword_init: true) do
     delegate :id, :title, :location, :description, :color, :contrast_text_color, to: :event
   end
 
