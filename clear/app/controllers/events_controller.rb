@@ -203,14 +203,26 @@ class EventsController < ApplicationController
 
     occurrences = calendar_occurrences_for_range(range_start, range_end, draft: draft)
 
-    render turbo_stream: [
-      turbo_stream.replace(
-        "dashboard_calendar",
-        partial: "dashboard/calendar_frame",
-        locals: { events: occurrences, start_date: start_date, draft: draft }
-      ),
-      turbo_stream.update("event_drawer", "")
-    ]
+    respond_to do |format|
+      format.html { redirect_to dashboard_path(start_date: start_date.iso8601), notice: "Draft updated." }
+
+      format.turbo_stream do
+        unless turbo_frame_request?
+          redirect_to dashboard_path(start_date: start_date.iso8601), status: :see_other
+          next
+        end
+
+        render turbo_stream: [
+          turbo_stream.replace(
+            "dashboard_calendar",
+            partial: "dashboard/calendar_frame",
+            locals: { events: occurrences, start_date: start_date, draft: draft }
+          ),
+          turbo_stream.update("event_drawer", ""),
+          turbo_stream.update("event_popover", "")
+        ]
+      end
+    end
   end
 
   def parse_start_date(raw)

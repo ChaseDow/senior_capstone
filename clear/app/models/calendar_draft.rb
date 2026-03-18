@@ -111,6 +111,7 @@ class CalendarDraft < ApplicationRecord
         updated = updated_event_cache[record.id] ||= begin
           e = Event.new(record.attributes.except("id", "created_at", "updated_at").merge(update_op["data"]))
           e.id = record.id
+          e.instance_variable_set(:@new_record, false)
           e
         end
 

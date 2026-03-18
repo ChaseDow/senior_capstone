@@ -218,6 +218,7 @@
         <% day_start = Time.zone.local(day.year, day.month, day.day, 0, 0, 0) %>
         <% day_end   = day_start.end_of_day %>
         <% is_today   = (day == Date.current) %>
+        <% is_weekend = day.saturday? || day.sunday? %>
         <div class="relative"
              data-action="click->agenda-highlight#clearFromDay"
           style="border-right: 1px solid var(--studs-divider);
