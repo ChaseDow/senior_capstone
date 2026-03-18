@@ -97,7 +97,7 @@ class EventsController < ApplicationController
 
     if @event.update(event_params)
       respond_to do |format|
-        format.html { redirect_to event_path(@event), notice: "Event updated." }
+        format.html { redirect_to dashboard_path, notice: "Event updated." }
 
         format.turbo_stream do
           unless turbo_frame_request?

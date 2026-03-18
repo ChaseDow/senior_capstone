@@ -37,7 +37,7 @@ class Course < ApplicationRecord
   validate :repeat_days_are_valid_weekdays
 
   # Used by the dashboard calendar
-  Occurrence = Struct.new(:event, :starts_at, :ends_at, keyword_init: true) do
+  Occurrence = Struct.new(:event, :starts_at, :ends_at, :draft_status, keyword_init: true) do
     delegate :id, :title, :location, :description, :color, :contrast_text_color, to: :event
   end
 

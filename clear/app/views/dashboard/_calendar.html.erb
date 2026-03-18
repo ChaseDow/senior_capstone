@@ -12,13 +12,11 @@
 <% today_start = Date.current.beginning_of_week %>
 <% nav_btn = "studs-nav-btn" %>
 <% event_classes =
-  "absolute z-10 cursor-pointer rounded-2xl border border-black/20 px-3 py-2 text-[12px] leading-snug shadow-md " \
-  "hover:brightness-110 hover:saturate-110 transition"
+  "absolute z-10 cursor-pointer rounded-2xl border border-black/20 px-3 py-2 text-[12px] leading-snug shadow-md"
 %>
 <% due_classes =
   "absolute z-20 cursor-pointer rounded-xl border border-black/20 px-3 py-1 text-[12px] leading-tight shadow-md " \
-  "overflow-hidden " \
-  "hover:brightness-110 hover:saturate-110 transition"
+  "overflow-hidden"
 %>
 <% events_by_day = events.group_by { |e| e.starts_at.in_time_zone.to_date } %>
 <style>
@@ -45,6 +43,10 @@
       0 16px 40px rgba(0,0,0,0.60);
     filter: brightness(1.05);
     transform: none;
+  }
+
+  .timeslot:hover {
+    background-color: color-mix(in srgb, var(--studs-accent) 10%, transparent);
   }
 </style>
 <div class="flex h-full min-h-0 flex-col" data-controller="agenda-highlight event-popover">
@@ -93,6 +95,13 @@
         </svg>
       <% end %>
       <div class="mx-1 h-5 w-px rounded-full" style="background-color: var(--studs-border);"></div>
+      <% unless in_draft %>
+        <%= button_to enter_draft_path(start_date: week_start_date.iso8601),
+              method: :post,
+              class: nav_btn do %>
+          Draft Mode
+        <% end %>
+      <% end %>
       <button
         type="button"
         class="<%= nav_btn %>"
@@ -104,13 +113,6 @@
         </svg>
         Agenda
       </button>
-      <% unless in_draft %>
-        <span class="mx-1 h-6 w-px bg-emerald-500/20"></span>
-        <%= button_to "Draft Mode",
-              enter_draft_path(start_date: week_start_date.iso8601),
-              method: :post,
-              class: nav_btn + " opacity-75 hover:opacity-100" %>
-      <% end %>
     </nav>
   </div>
   <!-- Calendar shell -->
@@ -222,14 +224,13 @@
         <div class="relative"
              data-action="click->agenda-highlight#clearFromDay"
           style="border-right: 1px solid var(--studs-divider);
-          <%= is_today ? "background-color: color-mix(in srgb, var(--studs-accent) 8%, transparent);" : "" %>
-          <%= is_weekend && !is_today ? "background-color: rgba(0,0,0,0.08);" : "" %>">
+          <%= is_today ? "background-color: color-mix(in srgb, var(--studs-accent) 8%, transparent); isolation: isolate;" : "" %>">
           <!-- Clickable time slots -->
           <div class="absolute inset-0 z-[1]">
             <% 48.times do |i| %>
               <% slot_time = day_start + (i * 30).minutes %>
               <%= link_to new_event_path(start_time: slot_time.iso8601),
-                class: "timeslot absolute left-0 w-full hover:bg-emerald-500/10 transition-colors cursor-pointer",
+                class: "timeslot absolute left-0 w-full cursor-pointer",
                 style: "top: #{i * (hour_height_px / 2.0)}px; height: #{hour_height_px / 2.0}px;",
                 data: { turbo: false } do %>
               <% end %>
