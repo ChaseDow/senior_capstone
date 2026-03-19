@@ -1,7 +1,7 @@
 <%= turbo_frame_tag "profile_modal" do %>
-  <div class="flex max-h-[85vh] flex-col" data-controller="avatar-crop">
+  <div class="flex max-h-[95vh] md:max-h-[85vh] flex-col" data-controller="avatar-crop">
     <!-- Header -->
-    <div class="flex items-start justify-between border-b border-zinc-800 bg-zinc-950/50 px-6 py-4">
+    <div class="flex items-start justify-between border-b border-zinc-800 bg-zinc-950/50 px-4 py-3 md:px-6 md:py-4">
       <div>
         <div class="text-sm font-semibold text-zinc-100">Change Icon</div>
         <div class="text-xs text-zinc-500">Upload and crop your new avatar</div>
@@ -28,7 +28,7 @@
     </div>
 
     <!-- Body -->
-    <div class="min-h-0 flex-1 overflow-y-auto p-6 space-y-4">
+    <div class="min-h-0 flex-1 overflow-y-auto p-4 md:p-6 space-y-4">
       <div class="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5 space-y-4">
         <div class="flex items-center justify-between">
           <div class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Avatar</div>

@@ -1,12 +1,12 @@
 <%= turbo_frame_tag "profile_modal" do %>
-  <div class="flex max-h-[85vh] flex-col">
+  <div class="flex max-h-[95vh] md:max-h-[85vh] flex-col">
     <% if flash.now[:notice].present? %>
       <div class="mb-3 rounded-xl border border-emerald-900/40 bg-emerald-950/30 p-3 text-sm text-emerald-200">
         <%= flash.now[:notice] %>
       </div>
     <% end %>
     <!-- Header -->
-    <div class="flex items-start justify-between border-b border-zinc-800 bg-zinc-950/50 px-6 py-4">
+    <div class="flex items-start justify-between border-b border-zinc-800 bg-zinc-950/50 px-4 py-3 md:px-6 md:py-4">
       <div>
         <div class="text-sm font-semibold text-zinc-100">Profile</div>
         <div class="text-xs text-zinc-500">Manage your account and preferences</div>
@@ -20,9 +20,9 @@
     </div>
     <!-- Body -->
     <div class="min-h-0 flex-1 overflow-y-auto">
-      <div class="grid min-h-0 grid-cols-12">
+      <div class="flex flex-col md:grid min-h-0 md:grid-cols-12">
         <!-- Left nav -->
-        <aside class="col-span-3 border-r border-zinc-800 bg-zinc-950/30 p-4 flex flex-col">
+        <aside class="md:col-span-3 border-b md:border-b-0 md:border-r border-zinc-800 bg-zinc-950/30 p-3 md:p-4 flex flex-row md:flex-col gap-1 overflow-x-auto">
           <div class="space-y-1">
             <a href="#account" class="studs-nav-btn w-full justify-start">
               My Account
@@ -35,7 +35,7 @@
             </a>
           </div>
           <div class="mt-auto"></div>
-          <div class="mt-6 border-t border-zinc-800 pt-4">
+          <div class="md:mt-6 md:border-t border-zinc-800 md:pt-4">
             <%= button_to destroy_user_session_path,
                   method: :delete,
                   form: { data: { turbo: false } },
@@ -45,7 +45,7 @@
           </div>
         </aside>
         <!-- Right content -->
-        <section class="col-span-9 p-6 space-y-8 overflow-y-auto">
+        <section class="md:col-span-9 p-4 md:p-6 space-y-6 md:space-y-8 overflow-y-auto">
           <!-- Account -->
           <div id="account">
             <div class="text-xs font-semibold uppercase tracking-wide text-zinc-500">User Profile</div>

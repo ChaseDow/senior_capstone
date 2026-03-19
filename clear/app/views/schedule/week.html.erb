@@ -1,14 +1,14 @@
 <% content_for :page_title, "Schedule" %>
 <% content_for :page_subtitle, "A week at a glance"%>
-<div class="mb-6 flex items-center justify-center">
-  <div class="flex items-center gap-155">
+<div class="mb-4 md:mb-6 flex items-center justify-center">
+  <div class="flex items-center gap-4 md:gap-155">
     <%= render Studs::PrimaryButtonComponent.new(
           label: "← Prev",
           href: schedule_week_path(date: @week_start - 7.days),
           color: :emerald
         ) %>
     <div class="text-center">
-      <h1 class="text-xl font-semibold text-zinc-100">
+      <h1 class="text-lg md:text-xl font-semibold text-zinc-100">
         Schedule
       </h1>
       <p class="text-sm text-zinc-400">
@@ -25,7 +25,7 @@
   </div>
 </div>
 <%# ================== Week Grid ================== %>
-<div class="grid grid-cols-7 gap-4 h-170">
+<div class="grid grid-cols-1 md:grid-cols-7 gap-3 md:gap-4 md:h-170">
   <% @days.each do |day| %>
     <div class="flex flex-col rounded-2xl border border-zinc-800 bg-emerald-950/40 p-3 min-h-0">
       <%# Day header %>
