@@ -1,5 +1,5 @@
 class AiChatController < ApplicationController
-  MAX_HISTORY_MESSAGES = 3
+  MAX_HISTORY_MESSAGES = 30
 
   layout "app_shell"
   before_action :authenticate_user!
@@ -40,7 +40,12 @@ class AiChatController < ApplicationController
 
     conversation.ai_messages.create!(role: "user", content: user_text)
     ollama_history = chat_history.map { |m| { role: m.role, content: m.content } }
-    assistant_text = OllamaClient.chat(messages: ollama_history)
+    assistant_text = OllamaClient.chat(messages: ollama_history, system_prompt: AiChat::Toolbox.system_prompt)
+    assistant_text = AiChat::Toolbox.run_if_requested(
+      raw_reply: assistant_text,
+      user: current_user,
+      session: session
+    )
     conversation.ai_messages.create!(role: "assistant", content: assistant_text)
     trim_history!
     @message_cap_reached = message_cap_reached?
@@ -67,6 +72,14 @@ class AiChatController < ApplicationController
         @message_cap_reached = message_cap_reached?
         render :index
       end
+    end
+  rescue OllamaClient::TimeoutError => e
+    respond_to do |format|
+      format.turbo_stream do
+        flash.now[:alert] = "AI request timed out. #{e.message} Try again, or increase OLLAMA_READ_TIMEOUT_SECONDS."
+        render turbo_stream: turbo_stream.replace("ai_chat_flash", partial: "ai_chat/flash")
+      end
+      format.html { redirect_to ai_chat_index_path, alert: "AI request timed out. #{e.message}" }
     end
   rescue => e
     respond_to do |format|
