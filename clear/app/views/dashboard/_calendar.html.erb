@@ -34,6 +34,16 @@
     transform: translateY(-1px);
   }
 
+  [data-calendar-event].is-past {
+    opacity: 0.45;
+    filter: saturate(0.4) brightness(0.85);
+  }
+
+  [data-calendar-event].is-past:hover {
+    opacity: 0.65;
+    filter: saturate(0.6) brightness(0.95);
+  }
+
   [data-calendar-event].is-selected {
     z-index: 50 !important;
     width: calc(85% - 12px) !important;
@@ -117,7 +127,9 @@
   </div>
   <!-- Calendar shell -->
   <div class="min-h-0 flex-1 overflow-auto rounded-2xl shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)] relative"
-       style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg-2);">
+       style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg-2);"
+       data-controller="current-time"
+       data-current-time-hour-height-value="<%= hour_height_px %>">
     <!-- Event popover -->
     <div
       data-event-popover-target="popover"
@@ -245,6 +257,20 @@
               </div>
             <% end %>
           </div>
+          <!-- Current time indicator (today only) -->
+          <% if is_today %>
+            <% now = Time.current %>
+            <% now_minutes = now.hour * 60 + now.min %>
+            <% now_top_px = now_minutes * px_per_minute %>
+            <div data-current-time-target="line"
+                 class="pointer-events-none absolute left-0 w-full z-30"
+                 style="top: <%= now_top_px %>px;">
+              <div class="relative flex items-center">
+                <div class="absolute -left-[5px] h-[10px] w-[10px] rounded-full bg-red-500 shadow-[0_0_6px_rgba(239,68,68,0.6)]"></div>
+                <div class="w-full" style="height: 2px; background-color: #ef4444; box-shadow: 0 0 8px rgba(239,68,68,0.4);"></div>
+              </div>
+            </div>
+          <% end %>
           <!-- Unified Event layer -->
           <div class="relative" style="height: <%= day_height_px %>px;">
             <% day_events = events_by_day.fetch(day, []) %>
@@ -414,12 +440,14 @@
                   polymorphic_path(record, start_date: seg[:seg_start].to_date)
                 end
               %>
+              <% event_ends_epoch = (seg[:seg_end].to_f * 1000).to_i %>
               <%= link_to href,
                 id: highlight_id,
-                class: (is_due ? due_classes : event_classes),
+                class: "#{is_due ? due_classes : event_classes}#{seg[:seg_end] < Time.current ? " is-past" : ""}",
                 style: style_str,
                 data: {
                   calendar_event: true,
+                  event_ends_at: event_ends_epoch,
                   turbo_frame: (is_draft_created || is_draft_deleted) ? nil : "event_popover",
                   action: (is_draft_created || is_draft_deleted) ? nil : "click->agenda-highlight#selectFromCalendar click->event-popover#show",
                   turbo_prefetch: false

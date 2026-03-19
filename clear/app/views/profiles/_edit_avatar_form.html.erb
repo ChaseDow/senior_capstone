@@ -1,5 +1,5 @@
-<%= turbo_frame_tag "event_drawer" do %>
-  <div class="flex h-full flex-col" data-controller="avatar-crop">
+<%= turbo_frame_tag "profile_modal" do %>
+  <div class="flex max-h-[85vh] flex-col" data-controller="avatar-crop">
     <!-- Header -->
     <div class="flex items-start justify-between border-b border-zinc-800 bg-zinc-950/50 px-6 py-4">
       <div>
@@ -21,8 +21,8 @@
 
       <button
         type="button"
-        data-action="drawer#close"
-        class="inline-flex items-center justify-center rounded-xl border border-zinc-950/40 bg-zinc-950/40 px-3 py-1.5 text-sm text-zinc-300 transition hover:border-zinc-500">
+        data-action="modal#close"
+        class="studs-nav-btn">
         ✕
       </button>
     </div>
@@ -35,8 +35,8 @@
 
           <%= link_to "Back",
                 profile_path,
-                data: { turbo_frame: "event_drawer", turbo_prefetch: false },
-                class: "rounded-xl border border-zinc-800 bg-zinc-950/30 px-3 py-1.5 text-xs text-zinc-200 transition hover:bg-white/5" %>
+                data: { turbo_frame: "profile_modal", turbo_prefetch: false },
+                class: "studs-nav-btn" %>
         </div>
 
         <%= form_with model: current_user,
@@ -61,19 +61,19 @@
                 <div class="flex gap-2">
                   <button type="button"
                     data-action="avatar-crop#zoomIn"
-                    class="rounded-xl border border-zinc-800 bg-zinc-950/30 px-3 py-1.5 text-xs text-zinc-200 transition hover:bg-white/5">
+                    class="studs-nav-btn">
                     +
                   </button>
 
                   <button type="button"
                     data-action="avatar-crop#zoomOut"
-                    class="rounded-xl border border-zinc-800 bg-zinc-950/30 px-3 py-1.5 text-xs text-zinc-200 transition hover:bg-white/5">
+                    class="studs-nav-btn">
                     −
                   </button>
 
                   <button type="button"
                     data-action="avatar-crop#reset"
-                    class="rounded-xl border border-zinc-800 bg-zinc-950/30 px-3 py-1.5 text-xs text-zinc-200 transition hover:bg-white/5">
+                    class="studs-nav-btn">
                     Reset
                   </button>
                 </div>
@@ -104,14 +104,10 @@
             </div>
 
             <div class="flex gap-2 pt-2">
-              <button type="submit"
-                class="rounded-xl bg-emerald-600 px-4 py-2 text-sm text-white transition hover:bg-emerald-500">
-                Save
-              </button>
-
+              <%= render Studs::PrimaryButtonComponent.new(label: "Save", color: :emerald, type: "submit") %>
               <button type="button"
-                data-action="drawer#close"
-                class="rounded-xl border border-zinc-800 bg-zinc-950/30 px-4 py-2 text-sm text-zinc-200 transition hover:bg-white/5">
+                data-action="modal#close"
+                class="studs-nav-btn">
                 Cancel
               </button>
             </div>

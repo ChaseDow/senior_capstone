@@ -125,6 +125,34 @@
         <%= render "events/drawer_skeleton" %>
       </template>
     </div>
+    <!-- Profile Modal -->
+    <div data-controller="modal">
+      <!-- Profile Modal Overlay -->
+      <div
+        data-modal-target="overlay"
+        data-action="click->modal#close"
+        class="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
+      </div>
+      <!-- Profile Modal Panel -->
+      <div
+        data-modal-target="panel"
+        role="dialog"
+        aria-modal="true"
+        class="fixed inset-0 z-50 flex items-center justify-center
+               opacity-0 scale-95 pointer-events-none
+               transition-all duration-300 ease-out">
+        <div class="w-full max-w-4xl max-h-[85vh] overflow-hidden rounded-2xl shadow-2xl"
+             style="border: 1px solid var(--studs-border); background-color: var(--studs-sidebar-bg);">
+          <%= turbo_frame_tag "profile_modal",
+                class: "block h-full",
+                data: {
+                  modal_target: "frame",
+                  action: "turbo:frame-load->modal#frameLoaded turbo:submit-end->modal#submitEnded"
+                } do %>
+          <% end %>
+        </div>
+      </div>
+    </div>
     <script>
       function bindPasswordToggles() {
         document.querySelectorAll('[data-password-toggle]').forEach((button) => {
