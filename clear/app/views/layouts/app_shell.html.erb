@@ -16,12 +16,24 @@
   </head>
   <body data-theme="<%= user_signed_in? ? current_user.theme : 'green' %>" class="h-full overflow-hidden bg-zinc-950 text-zinc-100">
     <div data-controller="sidebar drawer" class="flex h-full min-h-0 overflow-hidden">
+      <!-- Mobile sidebar overlay backdrop -->
+      <div
+        data-sidebar-target="overlay"
+        data-action="click->sidebar#closeMobile"
+        class="fixed inset-0 z-20 bg-black/50 backdrop-blur-sm hidden md:!hidden"
+      ></div>
       <aside
         data-sidebar-target="sidebar"
         data-collapsed="false"
+        data-mobile-open="false"
         style="background-color: var(--studs-sidebar-bg); border-right: 1px solid var(--studs-border);"
         class="group/sidebar flex h-full flex-col overflow-hidden
-               w-64 data-[collapsed=true]:w-16 transition-[width] duration-200"
+               fixed inset-y-0 left-0 z-30 w-64 -translate-x-full
+               data-[mobile-open=true]:translate-x-0
+               transition-transform duration-200
+               md:relative md:z-auto md:translate-x-0
+               md:transition-[width] md:duration-200
+               md:w-64 md:data-[collapsed=true]:w-16"
       >
         <div class="shrink-0 flex items-center gap-3 px-3 py-3">
           <button
@@ -75,11 +87,25 @@
                 title: (content_for?(:page_title) ? yield(:page_title) : "Dashboard"),
                 subtitle: (content_for?(:page_subtitle) ? yield(:page_subtitle) : nil)
               ) do |t| %>
+            <% t.with_leading do %>
+              <button
+                type="button"
+                data-action="sidebar#openMobile"
+                class="inline-flex h-10 w-10 items-center justify-center rounded-xl
+                       border border-white/10 bg-zinc-950/30 hover:bg-white/5 transition
+                       text-zinc-200 hover:text-zinc-50 md:hidden"
+                aria-label="Open navigation"
+              >
+                <span class="[&>svg]:h-6 [&>svg]:w-6">
+                  <%= icon "menu-01-stroke-rounded" %>
+                </span>
+              </button>
+            <% end %>
           <% end %>
         </header>
         <!-- Page content -->
         <main class="min-w-0 min-h-0 flex-1 overflow-y-auto scrollbars">
-          <div class="px-6 py-6">
+          <div class="px-3 py-4 md:px-6 md:py-6">
             <% if notice.present? %>
               <div class="mb-4 rounded-2xl border px-4 py-3 text-sm text-zinc-100"
                    style="border-color: var(--studs-border); background-color: var(--studs-panel-header);">
@@ -141,7 +167,7 @@
         class="fixed inset-0 z-50 flex items-center justify-center
                opacity-0 scale-95 pointer-events-none
                transition-all duration-300 ease-out">
-        <div class="w-full max-w-4xl max-h-[85vh] overflow-hidden rounded-2xl shadow-2xl"
+        <div class="w-full max-w-[95vw] max-h-[95vh] md:max-w-4xl md:max-h-[85vh] overflow-hidden rounded-2xl shadow-2xl"
              style="border: 1px solid var(--studs-border); background-color: var(--studs-sidebar-bg);">
           <%= turbo_frame_tag "profile_modal",
                 class: "block h-full",

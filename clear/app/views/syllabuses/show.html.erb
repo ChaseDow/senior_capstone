@@ -1,11 +1,16 @@
 <% content_for :page_title, "Syllabus" %>
 <% content_for :page_subtitle, "Uploaded syllabi" %>
 
-<div class="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6">
-  <div class="flex items-center justify-between">
+<div class="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-4 md:p-6">
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
     <div>
-      <h1 class="text-xl font-semibold text-zinc-100"> <%= @syllabus.title %></h1>
-      <p class="mt-1 text-sm text-zinc-400"> <%= @syllabus.file.filename.to_s %></p>
+      <h1 class="text-lg md:text-xl font-semibold text-zinc-100"><%= @syllabus.title %></h1>
+      <div class="mt-1.5 flex items-center gap-1.5 text-sm text-zinc-400">
+        <svg class="h-3.5 w-3.5 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/>
+        </svg>
+        <%= @syllabus.file.filename.to_s %>
+      </div>
     </div>
     <div class="mx-1 h-5 rounded-full" style="background-color: var(--studs-border);"></div>
       <%= link_to syllabuses_path, class: "studs-nav-btn", data: { turbo_frame: "_top" } do %>
@@ -19,7 +24,7 @@
   <div class="mt-6">
       <% if @syllabus.file.attached? %>
     <% if @syllabus.file.content_type == "application/pdf" %>
-      <iframe src="<%= rails_blob_url(@syllabus.file, disposition: 'inline') %>" width="100%" style="height:800px;"></iframe>
+      <iframe src="<%= rails_blob_url(@syllabus.file, disposition: 'inline') %>" width="100%" style="height:60vh;" class="md:!h-[800px]"></iframe>
     <% else %>
       <p class="text-zinc-400">
         Cannot preview this file type. 
