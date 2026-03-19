@@ -147,7 +147,7 @@
               id="agenda-item-<%= highlight_id %>"
               data-agenda-item-card
               class="rounded-2xl border p-3 transition cursor-pointer"
-              data-action="click->agenda-highlight#selectFromAgenda"
+              data-action="click->agenda-highlight#selectFromAgenda click->agenda-drawer#closeMobile"
               data-agenda-id="<%= highlight_id %>"
               style="
               --bg-normal: <%= tint_bg %>;

@@ -4,7 +4,7 @@
   .course-row { transition: background-color 0.15s ease; }
   .course-row:hover { background-color: var(--studs-panel-hover); }
 </style>
-<div class="rounded-2xl p-6" style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg);">
+<div class="rounded-2xl p-3 md:p-6" style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg);">
   <!-- Header with search -->
   <%= form_with url: courses_path,
                 method: :get,
@@ -13,11 +13,11 @@
                   controller: "search",
                   search_target: "form"
                 } do |f| %>
-    <div class="flex items-center justify-between gap-4 mb-5">
-      <div class="text-lg font-semibold text-zinc-100">Courses</div>
-      <div class="flex items-center gap-1.5">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-4 mb-4 md:mb-5">
+      <div class="text-base md:text-lg font-semibold text-zinc-100">Courses</div>
+      <div class="flex flex-wrap items-center gap-1.5">
         <%= render Studs::SearchBarComponent.new(
-              class_name: "w-72",
+              class_name: "w-full md:w-72",
               placeholder: "Search courses…",
               value: params[:q],
               data: {
@@ -44,7 +44,7 @@
           <% color = course.try(:color).presence || "#34D399" %>
           <% day_labels = { 0 => "Sun", 1 => "Mon", 2 => "Tue", 3 => "Wed", 4 => "Thu", 5 => "Fri", 6 => "Sat" } %>
           <% selected_days = Array(course.repeat_days).sort.map { |d| day_labels[d] }.compact %>
-          <div class="course-row flex items-start justify-between gap-4 p-4"
+          <div class="course-row flex flex-col md:flex-row md:items-start md:justify-between gap-3 md:gap-4 p-3 md:p-4"
                style="border-left: 4px solid <%= color %>;
                       <%= i > 0 ? "border-top: 1px solid var(--studs-divider);" : "" %>">
             <div class="min-w-0 flex-1">
@@ -52,33 +52,55 @@
                 <%= link_to course.title.presence || "(Untitled)", course_path(course),
                       class: "hover:underline underline-offset-2",
                       data: { turbo_frame: "_top" } %>
+                <% if course.term.present? %>
+                  <span class="rounded-full px-2 py-0.5 text-[10px] font-semibold"
+                        style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-hover); color: var(--studs-accent);">
+                    <%= course.term %>
+                  </span>
+                <% end %>
               </p>
-              <% details = [course.term.presence, course.professor.presence, course.location.presence].compact %>
-              <% if details.any? %>
-                <p class="mt-1 text-sm text-zinc-400"><%= details.join(" • ") %></p>
-              <% end %>
-              <% if course.start_time.present? && course.end_time.present? %>
-                <p class="mt-1 text-sm text-zinc-400">
-                  <% if selected_days.any? %>
-                    <% selected_days.each do |day| %>
-                      <span class="inline-block rounded px-1.5 py-0.5 text-[10px] font-semibold mr-0.5"
-                            style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-hover); color: var(--studs-accent);">
-                        <%= day %>
-                      </span>
-                    <% end %>
-                    <span class="ml-1">
-                    <% end %>
+              <div class="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-zinc-400">
+                <% if course.start_time.present? && course.end_time.present? %>
+                  <span class="flex items-center gap-1.5">
+                    <svg class="h-3.5 w-3.5 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
                     <%= course.start_time.strftime("%-I:%M%P") %> – <%= course.end_time.strftime("%-I:%M%P") %>
-                    <% if selected_days.any? %></span><% end %>
-                </p>
-              <% end %>
-              <% if course.end_date.present? %>
-                <p class="mt-1 text-xs text-zinc-500">
-                  Until <%= course.end_date.strftime("%b %d, %Y") %>
-                </p>
+                  </span>
+                <% end %>
+                <% if course.professor.present? %>
+                  <span class="flex items-center gap-1.5">
+                    <svg class="h-3.5 w-3.5 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                    </svg>
+                    <%= course.professor %>
+                  </span>
+                <% end %>
+                <% if course.location.present? %>
+                  <span class="flex items-center gap-1.5">
+                    <svg class="h-3.5 w-3.5 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                    <%= course.location %>
+                  </span>
+                <% end %>
+              </div>
+              <% if selected_days.any? %>
+                <div class="mt-2 flex items-center gap-1.5 flex-wrap">
+                  <% selected_days.each do |day| %>
+                    <span class="inline-block rounded px-1.5 py-0.5 text-[10px] font-semibold"
+                          style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-hover); color: var(--studs-accent);">
+                      <%= day %>
+                    </span>
+                  <% end %>
+                  <% if course.end_date.present? %>
+                    <span class="text-xs text-zinc-500 ml-1">until <%= course.end_date.strftime("%b %-d, %Y") %></span>
+                  <% end %>
+                </div>
               <% end %>
             </div>
-            <div class="flex shrink-0 items-center gap-1.5">
+            <div class="flex shrink-0 flex-wrap items-center gap-1.5 pt-1 md:pt-0 border-t md:border-t-0 border-zinc-800/50">
               <%= link_to edit_course_path(course),
                     class: "studs-nav-btn",
                     data: { turbo_frame: "_top" } do %>

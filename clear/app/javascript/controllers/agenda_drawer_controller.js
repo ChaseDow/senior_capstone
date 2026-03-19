@@ -29,7 +29,7 @@ export default class extends Controller {
     this.overlayTarget.classList.remove("opacity-0", "pointer-events-none");
     this.overlayTarget.classList.add("opacity-100");
 
-    this.panelTarget.classList.remove("translate-x-[120%]");
+    this.panelTarget.classList.remove("translate-x-[120%]", "hidden");
     this.panelTarget.classList.add("translate-x-0");
 
     this.panelTarget.style.width = "360px";
@@ -41,6 +41,10 @@ export default class extends Controller {
     }
     }
 
+    get isMobile() {
+      return !window.matchMedia("(min-width: 768px)").matches
+    }
+
     close() {
     this.overlayTarget.classList.add("opacity-0", "pointer-events-none");
     this.overlayTarget.classList.remove("opacity-100");
@@ -48,10 +52,19 @@ export default class extends Controller {
     this.panelTarget.classList.add("translate-x-[120%]");
     this.panelTarget.classList.remove("translate-x-0");
 
+    if (this.isMobile) {
+        this.panelTarget.classList.add("hidden");
+    }
+
     window.setTimeout(() => {
         this.panelTarget.style.width = "0px";
+        if (this.isMobile) this.panelTarget.classList.remove("hidden");
     }, 300);
     window.dispatchEvent(new CustomEvent("agenda:clear"))
+    }
+
+    closeMobile() {
+      if (this.isMobile) this.close();
     }
 
 

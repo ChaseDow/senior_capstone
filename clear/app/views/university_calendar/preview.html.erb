@@ -1,10 +1,10 @@
 <% content_for :page_title, "Import Calendar" %>
 <% content_for :page_subtitle, "Import events from an RSS calendar feed" %>
 
-<div class="rounded-2xl p-6" style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg);">
+<div class="rounded-2xl p-3 md:p-6" style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg);">
   <!-- URL entry form -->
   <%= form_with url: university_calendar_preview_path, method: :get do |f| %>
-    <div class="flex items-center gap-3 mb-6">
+    <div class="flex flex-col md:flex-row md:items-center gap-3 mb-4 md:mb-6">
       <%= f.text_field :rss_url,
             value: @rss_url,
             placeholder: "Paste your calendar RSS feed URL…",

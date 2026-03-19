@@ -5,7 +5,7 @@
   .syllabus-row:hover { background-color: var(--studs-panel-hover); }
 </style>
 
-<div class="rounded-2xl p-6" style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg);">
+<div class="rounded-2xl p-3 md:p-6" style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg);">
   <%= form_with url: syllabuses_path,
                 method: :get,
                 data: {
@@ -13,11 +13,11 @@
                   controller: "search",
                   search_target: "form"
                 } do |f| %>
-    <div class="flex items-center justify-between gap-4 mb-5">
-      <div class="text-lg font-semibold text-zinc-100">Syllabi</div>
-      <div class="flex items-center gap-1.5">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-4 mb-4 md:mb-5">
+      <div class="text-base md:text-lg font-semibold text-zinc-100">Syllabi</div>
+      <div class="flex flex-wrap items-center gap-1.5">
         <%= render Studs::SearchBarComponent.new(
-              class_name: "w-72",
+              class_name: "w-full md:w-72",
               placeholder: "Search syllabi…",
               value: params[:q],
               data: {
@@ -41,7 +41,7 @@
          style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg-2);">
     <% if @syllabuses.any? %>
       <% @syllabuses.each_with_index do |syllabus, i| %>
-        <div class="syllabus-row flex items-start justify-between gap-4 p-4"
+        <div class="syllabus-row flex flex-col md:flex-row md:items-start md:justify-between gap-3 md:gap-4 p-3 md:p-4"
              style="<%= i > 0 ? "border-top: 1px solid var(--studs-divider);" : "" %>">
           <div class="min-w-0 flex-1">
             <p class="font-medium text-zinc-100 truncate">
@@ -51,13 +51,16 @@
             </p>
 
             <% if syllabus.file.attached? %>
-              <p class="mt-1 text-sm text-zinc-400">
-                File: <%= syllabus.file.filename.to_s %>
-              </p>
+              <div class="mt-1.5 flex items-center gap-1.5 text-sm text-zinc-400">
+                <svg class="h-3.5 w-3.5 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/>
+                </svg>
+                <%= syllabus.file.filename.to_s %>
+              </div>
             <% end %>
           </div>
 
-          <div class="flex shrink-0 items-center gap-2">
+          <div class="flex shrink-0 flex-wrap items-center gap-2 pt-1 md:pt-0 border-t md:border-t-0 border-zinc-800/50">
             <%= link_to syllabus_path(syllabus), class: "studs-nav-btn", data: { turbo_frame: "_top" } do %>
               <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12S5.25 6.75 12 6.75 21.75 12 21.75 12 18.75 17.25 12 17.25 2.25 12 2.25 12z"/>

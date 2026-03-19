@@ -102,6 +102,51 @@
   .timeslot:hover {
     background-color: color-mix(in srgb, var(--studs-accent) 10%, transparent);
   }
+
+  /* Mobile: show one day at a time */
+  @media (max-width: 767px) {
+    /* Hide the time gutter and header corner inside the grids */
+    .cal-time-gutter,
+    .cal-header-corner {
+      display: none !important;
+    }
+    /* Grids only have 7 day columns, each = full width of scroll area */
+    .cal-grid {
+      grid-template-columns: repeat(7, var(--mobile-col-w, 85vw)) !important;
+    }
+    /* The scroll wrapper is a flex row: fixed time col + scrollable days */
+    .cal-mobile-times {
+      display: block !important;
+    }
+    .cal-scroll-container {
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .cal-scroll-container::-webkit-scrollbar {
+      display: none;
+    }
+    /* Agenda drawer: full-screen overlay on mobile */
+    [data-agenda-drawer-target="panel"] {
+      left: 0 !important;
+      right: 0 !important;
+      top: 0 !important;
+      bottom: 0 !important;
+      width: 100% !important;
+      border-radius: 0 !important;
+    }
+    /* Event popover as bottom sheet */
+    [data-event-popover-target="popover"] {
+      position: fixed !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      top: auto !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      border-radius: 1rem 1rem 0 0 !important;
+      z-index: 200 !important;
+    }
+  }
 </style>
 <div class="flex h-full min-h-0 flex-col" data-controller="agenda-highlight event-popover">
   <%# Draft mode banner %>
@@ -128,9 +173,9 @@
     </div>
   <% end %>
   <!-- Toolbar -->
-  <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+  <div class="mb-3 md:mb-4 flex flex-wrap items-center justify-between gap-2 md:gap-3">
     <div>
-      <div class="text-2xl font-bold tracking-tight text-zinc-100">
+      <div class="text-base md:text-2xl font-semibold md:font-bold md:tracking-tight text-zinc-100">
         <% week_end_date = week_start_date + 6.days %>
         <% if week_start_date.month == week_end_date.month %>
           <%= week_start_date.strftime("%B %Y") %>
@@ -141,7 +186,7 @@
         <% end %>
       </div>
     </div>
-    <nav class="flex items-center gap-1.5">
+    <nav class="flex flex-wrap items-center gap-1.5">
       <%= link_to dashboard_path(start_date: prev_start), class: nav_btn, data: { turbo_frame: "dashboard_calendar" } do %>
         <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
           <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
@@ -155,7 +200,7 @@
           <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
         </svg>
       <% end %>
-      <div class="mx-1 h-5 w-px rounded-full" style="background-color: var(--studs-border);"></div>
+      <div class="hidden md:block mx-1 h-5 w-px rounded-full" style="background-color: var(--studs-border);"></div>
       <% unless in_draft %>
         <%= button_to enter_draft_path(start_date: week_start_date.iso8601),
               method: :post,
@@ -177,10 +222,28 @@
     </nav>
   </div>
   <!-- Calendar shell -->
-  <div class="min-h-0 flex-1 overflow-auto rounded-2xl relative"
-       style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg-2); box-shadow: 0 1px 3px rgba(0,0,0,0.3), 0 4px 20px rgba(0,0,0,0.15), inset 0 0 0 1px rgba(255,255,255,0.04);"
-       data-controller="current-time"
-       data-current-time-hour-height-value="<%= hour_height_px %>">
+  <div class="min-h-0 flex-1 flex rounded-2xl shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)]"
+       style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg-2);">
+    <%# Mobile-only fixed time column — always visible, never scrolls horizontally %>
+    <div class="cal-mobile-times hidden shrink-0 overflow-hidden"
+         style="width: 48px; border-right: 1px solid var(--studs-border); background-color: var(--studs-panel-bg-2);">
+      <%# Empty header spacer to align with sticky day headers %>
+      <div style="height: <%= header_height_px %>px; border-bottom: 1px solid var(--studs-border); background-color: var(--studs-panel-header);"></div>
+      <% 24.times do |h| %>
+        <div class="px-1 pt-2 text-right text-[10px] font-semibold text-zinc-200"
+             style="height: <%= hour_height_px %>px; border-bottom: 1px solid var(--studs-border-subtle);">
+          <% label = if h == 0 then "12a"
+                     elsif h < 12 then "#{h}a"
+                     elsif h == 12 then "12p"
+                     else "#{h - 12}p"
+                     end %>
+          <%= label %>
+        </div>
+      <% end %>
+    </div>
+    <div class="cal-scroll-container min-h-0 min-w-0 flex-1 overflow-auto relative"
+         data-controller="current-time"
+         data-current-time-hour-height-value="<%= hour_height_px %>">
     <!-- Event popover -->
     <div
       data-event-popover-target="popover"
@@ -227,8 +290,8 @@
       class="sticky top-0 z-20 overflow-hidden"
       style="height: <%= header_height_px %>px; border-bottom: 1px solid var(--studs-border); background-color: var(--studs-panel-bg-2);"
     >
-      <div class="grid h-full" style="grid-template-columns: <%= time_col_px %>px repeat(7, minmax(0, 1fr));">
-        <div style="background-color: var(--studs-panel-header); border-right: 1px solid var(--studs-border);"></div>
+      <div class="cal-grid grid h-full" style="grid-template-columns: <%= time_col_px %>px repeat(7, minmax(0, 1fr));">
+        <div class="cal-header-corner" style="background-color: var(--studs-panel-header); border-right: 1px solid var(--studs-border);"></div>
         <% days.each do |day| %>
           <% is_today = (day == Date.current) %>
           <% is_weekend = day.saturday? || day.sunday? %>
@@ -304,9 +367,9 @@
       </div>
     <% end %>
     <!-- Body grid -->
-    <div class="grid" style="grid-template-columns: <%= time_col_px %>px repeat(7, minmax(0, 1fr));">
+    <div class="cal-grid grid" style="grid-template-columns: <%= time_col_px %>px repeat(7, minmax(0, 1fr));">
       <!-- Hours gutter -->
-      <div style="border-right: 1px solid var(--studs-border); background-color: var(--studs-panel-bg-soft);">
+      <div class="cal-time-gutter" style="border-right: 1px solid var(--studs-border); background-color: var(--studs-panel-bg-soft);">
         <% 24.times do |h| %>
           <div
             class="px-3 pt-2 text-right text-[11px] font-medium text-zinc-500"
@@ -592,4 +655,32 @@
       <% end %>
     </div>
   </div>
+  </div><%# close cal-scroll-container flex wrapper %>
 </div>
+<script>
+  (function() {
+    function setupMobileCal() {
+      if (window.matchMedia("(min-width: 768px)").matches) return;
+      var times = document.querySelector(".cal-mobile-times");
+      var scroller = document.querySelector(".cal-scroll-container");
+      if (!times || !scroller) return;
+
+      // Set day column width = scroll container's visible width
+      var colW = scroller.clientWidth;
+      scroller.style.setProperty("--mobile-col-w", colW + "px");
+
+      // Sync vertical scroll from main scroller to time column
+      scroller.addEventListener("scroll", function() {
+        times.scrollTop = scroller.scrollTop;
+      }, { passive: true });
+    }
+    document.addEventListener("DOMContentLoaded", setupMobileCal);
+    document.addEventListener("turbo:load", setupMobileCal);
+    window.addEventListener("resize", function() {
+      if (window.matchMedia("(min-width: 768px)").matches) return;
+      var scroller = document.querySelector(".cal-scroll-container");
+      if (!scroller) return;
+      scroller.style.setProperty("--mobile-col-w", scroller.clientWidth + "px");
+    });
+  })();
+</script>

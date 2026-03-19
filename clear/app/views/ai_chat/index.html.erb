@@ -4,7 +4,7 @@
      data-controller="full-height"
      style="background-color: var(--studs-panel-bg-2);">
   <!-- Header -->
-  <div class="shrink-0 flex items-center justify-between px-6 py-4 backdrop-blur"
+  <div class="shrink-0 flex items-center justify-between px-4 py-3 md:px-6 md:py-4 backdrop-blur"
        style="border-bottom: 1px solid var(--studs-border); background-color: var(--studs-panel-header);">
     <div>
       <h1 class="text-base font-semibold text-zinc-100">Assistant</h1>
@@ -25,7 +25,7 @@
     <%= render "ai_chat/usage", rate: @rate || { rpm: 0, rpm_limit: 10, rpd: 0, rpd_limit: 250 } %>
   </div>
   <!-- Flash -->
-  <div id="ai_chat_flash" class="shrink-0 px-6 pt-3 empty:hidden">
+  <div id="ai_chat_flash" class="shrink-0 px-4 md:px-6 pt-3 empty:hidden">
     <% if flash[:alert].present? %>
       <div class="rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
         <%= flash[:alert] %>
@@ -35,14 +35,14 @@
   <!-- Messages -->
   <div
     id="ai_chat_messages"
-    class="flex-1 min-h-0 overflow-y-auto px-6 py-5 flex flex-col justify-start gap-3 scrollbars"
+    class="flex-1 min-h-0 overflow-y-auto px-4 py-4 md:px-6 md:py-5 flex flex-col justify-start gap-3 scrollbars"
   >
     <% @messages.each do |m| %>
       <%= render "ai_chat/message", m: m %>
     <% end %>
   </div>
   <!-- Composer -->
-  <div class="shrink-0 px-6 py-4 backdrop-blur"
+  <div class="shrink-0 px-4 py-3 md:px-6 md:py-4 backdrop-blur"
        style="border-top: 1px solid var(--studs-border); background-color: var(--studs-panel-header);">
     <%= form_with url: ai_chat_index_path,
       method: :post,
