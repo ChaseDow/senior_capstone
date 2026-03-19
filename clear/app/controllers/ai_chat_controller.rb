@@ -39,7 +39,7 @@ class AiChatController < ApplicationController
             partial: "ai_chat/message",
             locals: { m: { "role" => "assistant", "content" => assistant_text } }
           ),
-          turbo_stream.update("ai_chat_history", history.to_json),
+          turbo_stream.replace("ai_chat_history", helpers.hidden_field_tag(:history, history.to_json, id: "ai_chat_history")),
           turbo_stream.replace("ai_chat_flash", partial: "ai_chat/flash"),
           turbo_stream.update("ai_chat_input", "")
         ]
