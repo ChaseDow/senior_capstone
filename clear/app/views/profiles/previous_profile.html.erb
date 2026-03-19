@@ -7,7 +7,7 @@
     <% end %> 
 
     <!-- Header -->
-    <div class="flex items-start justify-between border-b border-zinc-800 bg-zinc-950/50 px-6 py-4">
+    <div class="flex items-start justify-between border-b border-zinc-800 bg-zinc-950/50 px-4 py-3 md:px-6 md:py-4">
       <div>
         <div class="text-sm font-semibold text-zinc-100">Profile</div>
         <div class="text-xs text-zinc-500">Manage your account and preferences</div>
@@ -23,11 +23,11 @@
 
     <!-- Body -->
     <div class="min-h-0 flex-1 overflow-hidden">
-      <div class="grid h-full grid-cols-12">
+      <div class="flex flex-col md:grid md:h-full md:grid-cols-12">
 
         <!-- Left nav -->
-        <aside class="col-span-3 border-r border-zinc-800 bg-zinc-950/30 p-4 overflow-y-auto flex flex-col">
-          <div class="mb-3 flex items-center gap-3">
+        <aside class="flex flex-row md:flex-col md:col-span-3 border-b md:border-b-0 md:border-r border-zinc-800 bg-zinc-950/30 p-3 md:p-4 overflow-x-auto md:overflow-y-auto">
+          <div class="mb-3 hidden md:flex items-center gap-3">
             <div class="h-10 w-10 rounded-xl border border-zinc-800 bg-zinc-900/60 flex items-center justify-center text-sm font-semibold text-zinc-100">
               <%= user.email.to_s.first&.upcase || "U" %>
             </div>
@@ -37,21 +37,21 @@
             </div>
           </div>
 
-          <div class="space-y-1">
-            <a href="#account" class="block rounded-xl px-3 py-2 text-sm text-zinc-200 hover:bg-white/5 transition">
+          <div class="flex flex-row md:flex-col gap-1 md:space-y-1">
+            <a href="#account" class="block whitespace-nowrap rounded-xl px-3 py-2 text-sm text-zinc-200 hover:bg-white/5 transition">
               Account
             </a>
-            <a href="#security" class="block rounded-xl px-3 py-2 text-sm text-zinc-200 hover:bg-white/5 transition">
+            <a href="#security" class="block whitespace-nowrap rounded-xl px-3 py-2 text-sm text-zinc-200 hover:bg-white/5 transition">
               Security
             </a>
-            <a href="#preferences" class="block rounded-xl px-3 py-2 text-sm text-zinc-200 hover:bg-white/5 transition">
+            <a href="#preferences" class="block whitespace-nowrap rounded-xl px-3 py-2 text-sm text-zinc-200 hover:bg-white/5 transition">
               Preferences
             </a>
           </div>
 
-          <div class = "mt-auto"></div>
+          <div class="hidden md:block mt-auto"></div>
           <!-- sign out button -->
-          <div class="mt-6 border-t border-zinc-800 pt-4">
+          <div class="hidden md:block mt-6 border-t border-zinc-800 pt-4">
             <%= button_to destroy_user_session_path,
                   method: :delete,
                   form: { data: { turbo: false } },
@@ -62,7 +62,7 @@
         </aside>
 
         <!-- Right content -->
-        <section class="col-span-8 p-6 overflow-y-auto space-y-8">
+        <section class="md:col-span-8 p-4 md:p-6 overflow-y-auto space-y-6 md:space-y-8">
 
           <!-- Account -->
           <div id="account">
