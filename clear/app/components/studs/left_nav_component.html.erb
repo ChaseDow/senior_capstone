@@ -24,10 +24,10 @@
     <% user = (helpers.current_user rescue nil) %>
     <% if user&.respond_to?(:email) %>
       <%= link_to profile_path,
-        data: {turbo_frame: "event_drawer", turbo_prefetch: false, action: "click->drawer#start"},
+        data: {turbo_frame: "profile_modal", turbo_prefetch: false, action: "click->modal#start"},
         class: "px-3 py-2 text-xs text-zinc-400 hover:text-zinc-200
             transition block
-            group-data-[collapsed=true]/sidebar:hidden 
+            group-data-[collapsed=true]/sidebar:hidden
             hover:bg-white/5 rounded-lg" do %>
         <%= user.email %>
       <% end %>

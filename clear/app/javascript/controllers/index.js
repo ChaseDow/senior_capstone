@@ -22,6 +22,9 @@ application.register("chat", ChatController)
 import CountdownController from "./countdown_controller"
 application.register("countdown", CountdownController)
 
+import CurrentTimeController from "./current_time_controller"
+application.register("current-time", CurrentTimeController)
+
 import DeleteOptionsController from "./delete_options_controller"
 application.register("delete-options", DeleteOptionsController)
 
@@ -39,6 +42,9 @@ application.register("full-height", FullHeightController)
 
 import HelloController from "./hello_controller"
 application.register("hello", HelloController)
+
+import ModalController from "./modal_controller"
+application.register("modal", ModalController)
 
 import PollFrameController from "./poll_frame_controller"
 application.register("poll-frame", PollFrameController)
