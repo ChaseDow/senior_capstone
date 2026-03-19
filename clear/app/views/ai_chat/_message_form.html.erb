@@ -1,0 +1,36 @@
+<div id="ai_chat_message_form" class="shrink-0 px-6 py-4 backdrop-blur"
+     style="border-top: 1px solid var(--studs-border); background-color: var(--studs-panel-header);">
+  <%= form_with url: ai_chat_index_path,
+    method: :post,
+    class: "flex items-center gap-3",
+    data: {
+      turbo: true,
+      controller: "chat",
+      action: "turbo:submit-start->chat#submit turbo:submit-end->chat#reset"
+    } do %>
+    <div class="flex-1">
+      <%= text_area_tag :content, "",
+        id: "ai_chat_input",
+        rows: 2,
+        placeholder: message_cap_reached ? "Message cap reached. Click Reset to continue." : "Ask a what-if... (Shift+Enter for new line)",
+        disabled: message_cap_reached,
+        class: "w-full resize-none rounded-2xl px-4 py-3 text-sm text-zinc-100 placeholder:text-zinc-500 focus:outline-none transition disabled:cursor-not-allowed disabled:opacity-60",
+        style: "background-color: color-mix(in srgb, var(--studs-panel-bg) 60%, #09090b); border: 1px solid var(--studs-border);",
+        data: { action: "keydown->chat#sendOnEnter" } %>
+    </div>
+    <button type="submit"
+            <%= "disabled" if message_cap_reached %>
+            class="shrink-0 inline-flex items-center justify-center rounded-2xl w-11 h-11 transition focus:outline-none disabled:cursor-not-allowed"
+            style="<%= message_cap_reached ? "background-color: transparent; border: 1px solid var(--studs-border); box-shadow: none;" : "background-color: var(--studs-accent); box-shadow: 0 0 16px color-mix(in srgb, var(--studs-accent) 40%, transparent);" %>">
+      <svg xmlns="http://www.w3.org/2000/svg"
+           class="h-5 w-5"
+           fill="none"
+           viewBox="0 0 24 24"
+           stroke="currentColor"
+           stroke-width="2"
+           style="color: <%= message_cap_reached ? "var(--studs-accent)" : "#ffffff" %>; opacity: <%= message_cap_reached ? "0.7" : "1" %>;">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 19V5m0 0l-7 7m7-7l7 7"/>
+      </svg>
+    </button>
+  <% end %>
+</div>

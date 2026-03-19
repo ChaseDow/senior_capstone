@@ -2,6 +2,9 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   submit() {
+    const submitButton = this.element.querySelector("button[type='submit']")
+    if (submitButton && submitButton.disabled) return
+
     const input = this.element.querySelector("#ai_chat_input")
     if (!input || !input.value.trim()) return
 
@@ -48,6 +51,8 @@ export default class extends Controller {
   }
 
   sendOnEnter(event) {
+    if (event.target.disabled) return
+
     if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault()
       this.element.requestSubmit()

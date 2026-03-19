@@ -38,7 +38,11 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :ai_chat, only: [ :index, :create ]
+  resources :ai_chat, only: [ :index, :create ] do
+    collection do
+      delete :reset
+    end
+  end
 
   # Admin-only pages (guarded in controllers via current_user.admin?)
   namespace :admin do

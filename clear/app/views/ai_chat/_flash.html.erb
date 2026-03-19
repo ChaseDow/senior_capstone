@@ -1,5 +1,20 @@
-<% if flash[:alert].present? %>
-  <div class="rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
-    <%= flash[:alert] %>
-  </div>
+<% has_flash = flash[:notice].present? || flash[:alert].present? %>
+<%= turbo_frame_tag "ai_chat_flash",
+  class: "shrink-0 px-6 pt-3 #{has_flash ? "" : "hidden"}" do %>
+  <% if flash[:notice].present? %>
+    <div data-controller="flash-dismiss"
+         class="rounded-2xl border px-4 py-3 text-sm text-zinc-100 flex items-start justify-between gap-3"
+         style="border-color: var(--studs-border); background-color: var(--studs-panel-header);">
+      <span><%= flash[:notice] %></span>
+      <button type="button" aria-label="Dismiss notice" data-action="flash-dismiss#close" class="shrink-0 text-zinc-100/80 hover:text-zinc-100 leading-none">×</button>
+    </div>
+  <% end %>
+  <% if flash[:alert].present? %>
+    <div data-controller="flash-dismiss"
+         class="rounded-2xl border px-4 py-3 text-sm text-zinc-100 flex items-start justify-between gap-3"
+         style="border-color: var(--studs-border); background-color: var(--studs-panel-header);">
+      <span><%= flash[:alert] %></span>
+      <button type="button" aria-label="Dismiss alert" data-action="flash-dismiss#close" class="shrink-0 text-zinc-100/80 hover:text-zinc-100 leading-none">×</button>
+    </div>
+  <% end %>
 <% end %>
