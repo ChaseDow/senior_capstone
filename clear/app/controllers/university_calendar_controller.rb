@@ -41,6 +41,7 @@ class UniversityCalendarController < ApplicationController
         location:    item[:location],
         starts_at:   item[:starts_at],
         ends_at:     item[:ends_at],
+        all_day:     item[:all_day] || false,
         color:       IMPORT_COLOR
       )
       imported += 1

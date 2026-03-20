@@ -203,9 +203,9 @@ module Syllabuses
                  y = m[:year].to_i
                  y += 2000 if y < 100
                  y
-               else
+        else
                  term_year || infer_academic_year(month_num)
-               end
+        end
         return safe_date(year, month_num, day)
       end
 
