@@ -5,7 +5,11 @@ class DashboardController < ApplicationController
   def show
     @start_date =
       begin
-        params[:start_date].present? ? Date.parse(params[:start_date]) : Date.current
+        if turbo_frame_request? && params[:start_date].present?
+          Date.parse(params[:start_date])
+        else
+          Date.current
+        end
       rescue ArgumentError
         Date.current
       end

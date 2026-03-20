@@ -38,14 +38,15 @@ module UniversityCalendar
 
         starts_at = parse_date(item, "startdate") ||
                     parse_date(item, "start") ||
-                    parse_date(item, "date") ||
-                    parse_date(item, "pubDate")
+                    parse_date(item, "date")
         next if starts_at.nil?
 
         ends_at = parse_date(item, "enddate") || parse_date(item, "end")
-        # All-day end dates from calendar feeds are often exclusive (next day at midnight),
-        # so if ends_at == midnight and > starts_at, keep as-is; otherwise nil it out if same as starts_at.
         ends_at = nil if ends_at.present? && ends_at <= starts_at
+
+        # Detect all-day events: duration spans ~24 hours (e.g. midnight to 23:59)
+        all_day = ends_at.present? && ((ends_at - starts_at) / 1.hour).round >= 23
+        ends_at = nil if all_day
 
         description = strip_html(item.at_css("description")&.text)
         location    = item.at_css("location")&.text&.strip
@@ -55,13 +56,18 @@ module UniversityCalendar
           description: description.presence,
           location:    location.presence,
           starts_at:   starts_at,
-          ends_at:     ends_at
+          ends_at:     ends_at,
+          all_day:     all_day
         }.compact
       end
     end
 
     def parse_date(item, field)
-      text = item.at_css(field)&.text&.strip
+      # Nokogiri CSS selectors are case-sensitive in XML mode, so use XPath
+      # with translate() to match regardless of casing (e.g. startDate, StartDate).
+      lower = field.downcase
+      node = item.at_xpath(".//*[translate(name(),'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz')='#{lower}']")
+      text = node&.text&.strip
       return nil if text.blank?
 
       Time.zone.parse(text)
