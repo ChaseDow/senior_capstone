@@ -43,9 +43,10 @@ class ApplicationController < ActionController::Base
   def current_user_draft
     return @current_user_draft if defined?(@current_user_draft)
 
-    @current_user_draft = if session[:calendar_draft_mode]
-      draft = CalendarDraft.find_by(user: current_user)
-      session.delete(:calendar_draft_mode) if draft.nil?
+    draft = CalendarDraft.find_by(user: current_user)
+    session.delete(:calendar_draft_mode) if session[:calendar_draft_mode] && draft.nil?
+
+    @current_user_draft = if session[:calendar_draft_mode] || draft&.operation_count.to_i.positive?
       draft
     end
   end

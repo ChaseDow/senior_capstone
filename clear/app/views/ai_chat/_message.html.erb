@@ -1,5 +1,6 @@
 <% is_user = (m["role"].to_s.downcase == "user") %>
 <% raw_text = m["content"].to_s %>
+<% animate = local_assigns.fetch(:animate, false) %>
 <div class="flex items-start <%= is_user ? "justify-end" : "justify-start" %> ai-chat-pop">
   <div
     class="self-start inline-flex flex-col max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed"
@@ -22,11 +23,15 @@
         <%= h(raw_text.strip) %>
       </div>
     <% else %>
-      <div
-        data-controller="typewriter"
-        data-typewriter-text-value="<%= raw_text %>"
-        class="prose prose-invert prose-sm max-w-none whitespace-pre-wrap"
-      ></div>
+      <% if animate %>
+        <div
+          data-controller="typewriter"
+          data-typewriter-text-value="<%= raw_text.strip %>"
+          class="prose prose-invert prose-sm max-w-none whitespace-pre-wrap"
+        ></div>
+      <% else %>
+        <div class="prose prose-invert prose-sm max-w-none whitespace-pre-wrap"><%= h(raw_text.strip) %></div>
+      <% end %>
     <% end %>
   </div>
 </div>
