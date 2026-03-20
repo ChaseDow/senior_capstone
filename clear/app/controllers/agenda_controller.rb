@@ -52,7 +52,7 @@ class AgendaController < ApplicationController
     type = params[:type].to_s
 
     base_events = current_user.events
-                              .ransack(term.present? ? { title_or_description_or_location_cont: term } : {})
+                              .ransack(term.present? ? { title_cont: term } : {})
                               .result
 
     non_recurring_events = base_events.where(recurring: false)
@@ -65,7 +65,7 @@ class AgendaController < ApplicationController
     events = non_recurring_events + recurring_events
 
     courses = current_user.courses
-                          .ransack(term.present? ? { title_or_description_or_location_cont: term } : {})
+                          .ransack(term.present? ? { title_cont: term } : {})
                           .result
                           .where("start_date <= ?", range_end.to_date)
                           .where("end_date IS NULL OR end_date >= ?", range_start.to_date)
