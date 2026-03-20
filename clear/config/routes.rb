@@ -35,6 +35,8 @@ Rails.application.routes.draw do
       get  :course_preview
       get  :course_preview_frame
       post :confirm_course
+      get  :course_items_preview
+      post :confirm_course_items
     end
   end
 

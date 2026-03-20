@@ -455,7 +455,7 @@
                 <% if is_due %>
                   <div class="flex items-center justify-between gap-2">
                     <div class="min-w-0 font-semibold truncate text-[13px]">
-                      <%= record[:title].presence || "(Untitled)" %> - <%= record.due_at.in_time_zone.strftime("%-I:%M%P") %>
+                      <%= record[:title].presence || "(Untitled)" %><%= record.due_at ? " - #{record.due_at.in_time_zone.strftime("%-I:%M%P")}" : "" %>
                     </div>
                     <span class="shrink-0 rounded-md px-2 py-0.5 text-[10px] font-semibold <%= badge_class %>">DUE</span>
                   </div>

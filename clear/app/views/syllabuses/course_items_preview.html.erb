@@ -1,0 +1,155 @@
+<% content_for :page_title, "Review Course Items" %>
+<% content_for :page_subtitle, @syllabus.title %>
+
+<% label_base   = "text-[10px] font-bold uppercase tracking-widest mb-1.5" %>
+<% label_ok     = "text-zinc-300" %>
+<% label_ok_style = "color: var(--studs-accent); opacity: 0.8;" %>
+<% label_miss   = "text-amber-200" %>
+<% input_base   = "w-full rounded-2xl px-4 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-600 bg-zinc-950/60 focus:outline-none focus:ring-2 transition-all duration-150 border" %>
+<% input_ok     = "focus:ring-[var(--studs-accent)]" %>
+<% input_ok_style = "border-color: var(--studs-border);" %>
+<% input_miss   = "bg-amber-500/20 border border-amber-300/80 shadow-[0_0_0_1px_rgba(251,191,36,0.35)] focus:ring-amber-300/50" %>
+<% color = @course&.color.presence || "#34D399" %>
+
+<div class="rounded-2xl p-6" style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg);">
+  <div class="mb-5 flex items-center justify-between gap-3">
+    <div>
+      <h1 class="text-base font-semibold text-zinc-100">
+        <%= @course&.title.presence || "Course" %> — Parsed Items
+      </h1>
+      <p class="text-sm text-zinc-400 mt-1">
+        We found <strong class="text-zinc-200"><%= @draft_items.size %></strong> item<%= @draft_items.size == 1 ? "" : "s" %> in your syllabus.
+        Review, edit, or remove items before saving. Due dates are optional.
+      </p>
+    </div>
+    <%= link_to course_path(@course), class: "studs-nav-btn", data: { turbo_frame: "_top" } do %>
+      Skip
+    <% end %>
+  </div>
+
+  <% if @draft_items.any? %>
+    <%= form_with url: confirm_course_items_syllabus_path(@syllabus),
+          method: :post,
+          data: { turbo_frame: "_top" } do %>
+
+      <div class="space-y-4">
+        <% @draft_items.each_with_index do |item, i| %>
+          <div data-controller="removable-card" class="relative">
+            <input type="hidden"
+                   name="items[<%= i %>][_remove]"
+                   value="0"
+                   data-removable-card-target="flag">
+
+            <%# Buttons live OUTSIDE the card so undo stays clickable when card is disabled %>
+            <div class="absolute top-3 right-3 z-10">
+              <button type="button"
+                      data-removable-card-target="removeBtn"
+                      data-action="removable-card#remove"
+                      class="inline-flex items-center gap-1.5 rounded-xl px-2.5 py-1.5 text-xs font-medium transition
+                             border border-red-500/30 text-red-300 hover:bg-red-500/15 hover:border-red-500/50"
+                      style="background-color: rgba(127,29,29,0.15);">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+                Remove
+              </button>
+              <button type="button"
+                      data-removable-card-target="undoBtn"
+                      data-action="removable-card#undo"
+                      class="inline-flex items-center gap-1.5 rounded-xl px-2.5 py-1.5 text-xs font-medium transition
+                             border text-emerald-300 hover:bg-emerald-500/15 hover:border-emerald-500/50"
+                      style="display: none;
+                             border-color: rgba(52,211,153,0.3);
+                             background-color: rgba(6,78,59,0.15);">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3"/>
+                </svg>
+                Undo
+              </button>
+            </div>
+
+            <div data-removable-card-target="card"
+                 class="rounded-2xl p-4 transition-opacity duration-200"
+                 style="border: 1px solid var(--studs-border);
+                        background-color: var(--studs-panel-bg-2);
+                        border-left: 4px solid <%= color %>;">
+
+              <div class="grid grid-cols-1 md:grid-cols-12 gap-3 pr-24">
+                <%# Title %>
+                <% needs = item[:title].blank? %>
+                <div class="md:col-span-5">
+                  <div class="<%= "#{label_base} #{needs ? label_miss : label_ok}" %>"
+                       style="<%= needs ? nil : label_ok_style %>">Title</div>
+                  <input type="text"
+                         name="items[<%= i %>][title]"
+                         value="<%= item[:title] %>"
+                         placeholder="e.g. Homework 3"
+                         class="<%= "#{input_base} #{needs ? input_miss : input_ok}" %>"
+                         style="<%= needs ? nil : input_ok_style %>">
+                </div>
+
+                <%# Kind %>
+                <div class="md:col-span-2">
+                  <div class="<%= label_base %> <%= label_ok %>" style="<%= label_ok_style %>">Type</div>
+                  <select name="items[<%= i %>][kind]"
+                          class="<%= input_base %> <%= input_ok %>"
+                          style="<%= input_ok_style %>">
+                    <% @valid_kinds.each do |k| %>
+                      <option value="<%= k %>" <%= "selected" if item[:kind] == k %>><%= k.humanize %></option>
+                    <% end %>
+                  </select>
+                </div>
+
+                <%# Due date (optional — no amber highlight) %>
+                <div class="md:col-span-5">
+                  <div class="<%= label_base %> <%= label_ok %>" style="<%= label_ok_style %>">Due Date</div>
+                  <input type="datetime-local"
+                         name="items[<%= i %>][due_at]"
+                         value="<%= item[:due_at].present? ? item[:due_at].to_s.gsub(" ", "T") : "" %>"
+                         class="<%= input_base %> <%= input_ok %>"
+                         style="<%= input_ok_style %>">
+                </div>
+
+                <%# Details %>
+                <div class="md:col-span-12">
+                  <div class="<%= label_base %> <%= label_ok %>" style="<%= label_ok_style %>">Details</div>
+                  <input type="text"
+                         name="items[<%= i %>][details]"
+                         value="<%= item[:details] %>"
+                         placeholder="Optional notes, point values, etc."
+                         class="<%= input_base %> <%= input_ok %>"
+                         style="<%= input_ok_style %>">
+                </div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+
+      <div class="mt-6 flex items-center gap-3">
+        <button type="submit" class="studs-btn-accent">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+          </svg>
+          Save items
+        </button>
+        <%= link_to "Skip — I'll add items later",
+              course_path(@course),
+              class: "studs-nav-btn",
+              data: { turbo_frame: "_top" } %>
+      </div>
+    <% end %>
+  <% else %>
+    <div class="flex flex-col items-center justify-center py-16 text-center">
+      <div class="mb-3 text-4xl opacity-30">📋</div>
+      <p class="text-sm font-medium text-zinc-300">No items found in this syllabus</p>
+      <p class="mt-1 text-xs text-zinc-500">You can add items manually on the course page</p>
+      <div class="mt-4">
+        <%= link_to "Go to course",
+              course_course_items_path(@course),
+              class: "studs-btn-accent",
+              data: { turbo_frame: "_top" } %>
+      </div>
+    </div>
+  <% end %>
+</div>

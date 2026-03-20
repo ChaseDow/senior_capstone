@@ -10,8 +10,10 @@ class SyllabusParseJob < ApplicationJob
 
     text  = ::Syllabuses::TextExtractor.call(syllabus)
     attrs = ::Syllabuses::CourseAttributesExtractor.call(text, fallback_title: syllabus.title)
+    items = ::Syllabuses::CourseItemsExtractor.call(text, term: attrs[:term])
 
     draft = build_course_draft(attrs)
+    draft[:course_items] = items if items.present?
 
     syllabus.update!(
       parsed_text: text,

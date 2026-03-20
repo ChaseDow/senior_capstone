@@ -52,6 +52,9 @@ application.register("poll-frame", PollFrameController)
 import RecurrenceToggleController from "./recurrence_toggle_controller"
 application.register("recurrence-toggle", RecurrenceToggleController)
 
+import RemovableCardController from "./removable_card_controller"
+application.register("removable-card", RemovableCardController)
+
 import SearchController from "./search_controller"
 application.register("search", SearchController)
 

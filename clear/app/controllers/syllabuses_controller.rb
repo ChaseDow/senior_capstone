@@ -5,6 +5,7 @@ class SyllabusesController < ApplicationController
   before_action :authenticate_user!
   before_action :set_syllabus, only: %i[
     show destroy create_course status course_preview course_preview_frame confirm_course
+    course_items_preview confirm_course_items
   ]
 
   PREVIEW_FIELDS = %i[
@@ -66,12 +67,56 @@ class SyllabusesController < ApplicationController
 
     if @course.save
       @syllabus.update!(course: @course)
-      redirect_to course_path(@course), notice: "Course created."
+      redirect_to course_items_preview_syllabus_path(@syllabus),
+                  notice: "Course created — review the items we found in your syllabus."
     else
       @draft = normalized_draft_for_form(@syllabus.course_draft || {})
       @missing_fields = missing_preview_fields(@course)
       render :course_preview, status: :unprocessable_entity
     end
+  end
+
+  def course_items_preview
+    @course = @syllabus.course
+    draft = @syllabus.course_draft || {}
+    @draft_items = (draft["course_items"] || draft[:course_items] || []).map(&:with_indifferent_access)
+    @valid_kinds = CourseItem.kinds.keys
+  end
+
+  def confirm_course_items
+    @course = @syllabus.course
+
+    unless @course
+      redirect_to course_preview_syllabus_path(@syllabus), alert: "Create the course first."
+      return
+    end
+
+    raw_items = params[:items]
+    items = case raw_items
+            when ActionController::Parameters then raw_items.values
+            when Hash then raw_items.values
+            else []
+            end
+
+    created = 0
+    items.each do |raw|
+      item = raw.is_a?(ActionController::Parameters) ? raw.permit(:title, :kind, :due_at, :details, :_remove) : raw
+      next if item[:_remove] == "1"
+      next if item[:title].blank?
+
+      kind = item[:kind].to_s
+      next unless kind.in?(CourseItem.kinds.keys)
+
+      record = @course.course_items.new(
+        title: item[:title],
+        kind: kind,
+        due_at: parse_draft_due_at(item[:due_at]),
+        details: item[:details].presence
+      )
+      created += 1 if record.save
+    end
+
+    redirect_to course_course_items_path(@course), notice: "#{created} course item#{"s" unless created == 1} saved."
   end
 
   def destroy
@@ -83,6 +128,13 @@ class SyllabusesController < ApplicationController
 
   def set_syllabus
     @syllabus = current_user.syllabuses.find(params[:id])
+  end
+
+  def parse_draft_due_at(raw)
+    return nil if raw.blank?
+    Time.zone.parse(raw.to_s)
+  rescue ArgumentError
+    nil
   end
 
   def syllabus_params
@@ -123,6 +175,8 @@ class SyllabusesController < ApplicationController
   def remap_preview_attrs(draft)
     cols = Course.column_names
     out = draft.deep_dup
+    out.delete("course_items")
+    out.delete(:course_items)
 
     if cols.include?("start_time") && out["start_time"].blank? && out["starts_at"].present?
       out["start_time"] = out["starts_at"]

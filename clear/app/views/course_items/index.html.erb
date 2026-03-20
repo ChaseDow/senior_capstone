@@ -34,7 +34,7 @@
                     style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-hover); color: var(--studs-accent);">
                 <%= item.kind.humanize %>
               </span>
-              Due <%= l(item.due_at) %>
+              <%= item.due_at ? "Due #{l(item.due_at)}" : "No due date" %>
             </p>
             <% if item.details.present? %>
               <p class="mt-1 text-sm text-zinc-500 whitespace-pre-line"><%= item.details %></p>
