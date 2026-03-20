@@ -17,7 +17,6 @@ class CourseItem < ApplicationRecord
 
   validates :title, presence: true
   validates :kind, presence: true
-  validates :due_at, presence: true
 
   def display_title
     course_name = course&.title.presence || "Course"
@@ -28,7 +27,7 @@ class CourseItem < ApplicationRecord
   end
 
   def starts_at = due_at
-  def ends_at = due_at + 30.minutes
+  def ends_at = due_at ? due_at + 30.minutes : nil
   def color = course.color
 
   def contrast_text_color

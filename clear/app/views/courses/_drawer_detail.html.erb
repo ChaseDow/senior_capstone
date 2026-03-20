@@ -108,7 +108,7 @@
                   <div class="min-w-0">
                     <p class="truncate text-sm font-medium text-zinc-100"><%= item.title %></p>
                     <p class="mt-0.5 text-xs text-zinc-400">
-                      <%= item.kind.humanize %> • <%= l(item.due_at) %>
+                      <%= item.kind.humanize %> • <%= item.due_at ? l(item.due_at) : "No due date" %>
                     </p>
                   </div>
 

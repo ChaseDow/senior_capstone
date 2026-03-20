@@ -71,6 +71,18 @@
         <%= f.date_field :end_date, class: "#{input_base} #{needs ? input_miss : input_ok}", style: (needs ? nil : input_ok_style) %>
       </div>
     </div>
+    <%# Color picker %>
+    <div class="mt-4 rounded-2xl p-4"
+         style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg-2);">
+      <div class="<%= label_base %> <%= label_ok %>" style="<%= label_ok_style %>">Course Color</div>
+      <div class="flex items-center gap-3">
+        <%= f.color_field :color,
+              value: course.color.presence || "#34D399",
+              class: "h-10 w-16 cursor-pointer rounded-xl border bg-zinc-950/40",
+              style: "border-color: var(--studs-border);" %>
+        <span class="text-xs text-zinc-500">Used as the calendar highlight for this course</span>
+      </div>
+    </div>
     <div class="mt-6">
       <%= f.submit "Create course", class: "studs-btn-accent" %>
     </div>

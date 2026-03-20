@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_12_053200) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_20_084044) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -55,7 +55,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_12_053200) do
     t.bigint "course_id", null: false
     t.datetime "created_at", null: false
     t.text "details"
-    t.datetime "due_at", null: false
+    t.datetime "due_at"
     t.integer "kind", default: 0, null: false
     t.string "title", null: false
     t.datetime "updated_at", null: false
@@ -103,6 +103,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_12_053200) do
   end
 
   create_table "events", force: :cascade do |t|
+    t.boolean "all_day", default: false, null: false
     t.string "color", default: "#34D399", null: false
     t.datetime "created_at", null: false
     t.text "description"
