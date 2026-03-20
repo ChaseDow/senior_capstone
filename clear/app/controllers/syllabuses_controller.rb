@@ -37,7 +37,7 @@ class SyllabusesController < ApplicationController
   def create_course
     unless @syllabus.parse_status.in?(%w[queued processing])
       @syllabus.update!(parse_status: "queued", parse_error: nil, course_draft: {})
-      SyllabusParseJob.perform_later(@syllabus.id)
+      SyllabusParseJob.perform_now(@syllabus.id)
     end
 
     redirect_to course_preview_syllabus_path(@syllabus), notice: "Parsing started…"
