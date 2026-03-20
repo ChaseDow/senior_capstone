@@ -93,10 +93,10 @@ class SyllabusesController < ApplicationController
 
     raw_items = params[:items]
     items = case raw_items
-            when ActionController::Parameters then raw_items.values
-            when Hash then raw_items.values
-            else []
-            end
+    when ActionController::Parameters then raw_items.values
+    when Hash then raw_items.values
+    else []
+    end
 
     created = 0
     items.each do |raw|
