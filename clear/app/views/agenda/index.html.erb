@@ -1,14 +1,25 @@
 <% content_for :page_title, "Agenda" %>
 <% content_for :page_subtitle, "Upcoming tasks" %>
+<% filter_input_style = "border-color: var(--studs-border); --tw-ring-color: var(--studs-accent);" %>
 <div class="space-y-6">
-  <%= form_with url: agenda_index_path, method: :get, local: true, html: { class: "space-y-3" } do |f| %>
+  <%= form_with url: agenda_index_path,
+                method: :get,
+                data: {
+                  controller: "search",
+                  search_target: "form"
+                },
+                html: { class: "space-y-3" } do |f| %>
     <div class="flex items-center gap-3">
       <div class="flex-1">
         <%= render Studs::SearchBarComponent.new(
           name: "q[term]",
           value: params.dig(:q, :term),
-          placeholder: "Search by description or location…",
-          class_name: "w-full"
+          placeholder: "Search by name…",
+          class_name: "w-full",
+          data: {
+            search_target: "input",
+            action: "input->search#search keydown->search#submit"
+          }
         ) %>
       </div>
       <div class="w-36">
@@ -18,28 +29,33 @@
             params[:type]
           ),
           {},
-          class: "w-full rounded-xl border border-zinc-800 bg-zinc-900/50 px-3 py-2 text-sm text-emerald-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-400/40" %>
+          class: "w-full rounded-xl border bg-zinc-900/50 px-3 py-2 text-sm text-zinc-200 focus:outline-none focus:ring-2 transition-all",
+          style: filter_input_style,
+          data: { action: "change->search#search" } %>
       </div>
       <div class="flex items-center gap-2">
         <%= f.date_field :start_date,
           value: params[:start_date],
           placeholder: "Start",
-          class: "h-[38px] w-36 rounded-xl border border-zinc-800 bg-zinc-900/50 px-3 py-2 text-sm text-zinc-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-400/40" %>
+          class: "h-[38px] w-36 rounded-xl border bg-zinc-900/50 px-3 py-2 text-sm text-zinc-200 focus:outline-none focus:ring-2 transition-all",
+          style: filter_input_style,
+          data: { action: "change->search#search" } %>
         <span class="text-sm text-zinc-500 font-medium select-none">
           :
         </span>
         <%= f.date_field :end_date,
           value: params[:end_date],
           placeholder: "End",
-          class: "h-[38px] w-36 rounded-xl border border-zinc-800 bg-zinc-900/50 px-3 py-2 text-sm text-emerald-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-400/40" %>
+          class: "h-[38px] w-36 rounded-xl border bg-zinc-900/50 px-3 py-2 text-sm text-zinc-200 focus:outline-none focus:ring-2 transition-all",
+          style: filter_input_style,
+          data: { action: "change->search#search" } %>
       </div>
-      <%= f.submit "Search",
-        class: "rounded-xl bg-green-600 px-5 py-2 text-sm font-medium text-white hover:bg-green-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-400/40 transition" %>
       <% show_clear = params.dig(:q, :term).present? || params[:start_date].present? || params[:end_date].present? || params[:type].present? %>
       <% if show_clear %>
-        <%= link_to "Clear",
+        <%= link_to "Reset",
           agenda_index_path,
-          class: "inline-block rounded-xl border border-zinc-800 bg-zinc-900/50 px-4 py-2 text-sm font-medium text-emerald-100 hover:bg-zinc-800/50 focus:outline-none transition" %>
+          class: "inline-block rounded-xl border bg-zinc-900/50 px-4 py-2 text-sm font-medium text-emerald-100 hover:bg-zinc-800/50 focus:outline-none transition",
+          style: filter_input_style %>
       <% end %>
     </div>
   <% end %>
