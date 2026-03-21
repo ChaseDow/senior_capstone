@@ -6,6 +6,7 @@ export default class extends Controller {
   static targets = ["form", "file", "image", "preview"]
 
   connect() {
+    this._active = true
     this.cropper = null
     this.objectUrl = null
 
@@ -19,11 +20,15 @@ export default class extends Controller {
   }
 
   _onInitialLoad = () => {
+    if (!this._active) return
     this.imageTarget.removeEventListener("load", this._onInitialLoad)
     this.initCropper()
   }
 
   initCropper() {
+    if (!this._active) return
+    if (!this.hasImageTarget || !this.hasPreviewTarget) return
+
     if (this.cropper) this.cropper.destroy()
 
     this.cropper = new Cropper(this.imageTarget, {
@@ -37,6 +42,7 @@ export default class extends Controller {
   }
 
   fileChanged() {
+    if (!this._active) return
     this._croppedReady = false
     const file = this.fileTarget.files?.[0]
     if (!file) return
@@ -53,8 +59,10 @@ export default class extends Controller {
     this.objectUrl = URL.createObjectURL(file)
     this.imageTarget.src = this.objectUrl
     this.imageTarget.classList.remove("hidden")
+    this.imageTarget.onload = null
 
     this.imageTarget.onload = () => {
+      if (!this._active) return
       this.initCropper()
     }
   }
@@ -76,6 +84,7 @@ export default class extends Controller {
   }
 
   submitCropped(event) {
+    if (!this._active) return
     if (this._croppedReady) return
 
     const hasNewFile = this.fileTarget.files?.length > 0
@@ -101,6 +110,11 @@ export default class extends Controller {
   }
 
   disconnect() {
+    this._active = false
+    if (this.hasImageTarget) {
+      this.imageTarget.removeEventListener("load", this._onInitialLoad)
+      this.imageTarget.onload = null
+    }
     if (this.cropper) this.cropper.destroy()
     if (this.objectUrl) URL.revokeObjectURL(this.objectUrl)
   }
