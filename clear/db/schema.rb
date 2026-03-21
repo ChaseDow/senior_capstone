@@ -129,6 +129,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_040638) do
     t.index ["user_id"], name: "index_events_on_user_id"
   end
 
+<<<<<<< HEAD
   create_table "notifications", force: :cascade do |t|
     t.string "category", null: false
     t.datetime "created_at", null: false
@@ -145,6 +146,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_040638) do
     t.index ["user_id"], name: "index_notifications_on_user_id"
   end
 
+=======
+>>>>>>> 0bfab82 (added button to the bottom right corner)
   create_table "schedules", force: :cascade do |t|
     t.boolean "active", default: true, null: false
     t.datetime "created_at", null: false
@@ -211,7 +214,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_040638) do
   add_foreign_key "documents", "users"
   add_foreign_key "event_exceptions", "events"
   add_foreign_key "events", "users"
+<<<<<<< HEAD
   add_foreign_key "notifications", "users"
+=======
+>>>>>>> 0bfab82 (added button to the bottom right corner)
   add_foreign_key "schedules", "users"
   add_foreign_key "syllabuses", "courses", on_delete: :nullify
   add_foreign_key "syllabuses", "users"
