@@ -61,5 +61,8 @@ application.register("search", SearchController)
 import SidebarController from "./sidebar_controller"
 application.register("sidebar", SidebarController)
 
+import ToastController from "./toast_controller"
+application.register("toast", ToastController)
+
 import TypewriterController from "./typewriter_controller"
 application.register("typewriter", TypewriterController)
