@@ -51,10 +51,22 @@ class AgendaController < ApplicationController
 
   def occurrences_for_range(range_start, range_end)
     term = params.dig(:q, :term).to_s.strip
+    field = params.dig(:q, :field).presence_in(%w[name location description]) || "name"
     type = params[:type].to_s
 
+    event_query =
+      if term.present?
+        case field
+        when "location" then { location_cont: term }
+        when "description" then { description_cont: term }
+        else { title_cont: term }
+        end
+      else
+        {}
+      end
+
     base_events = current_user.events
-                              .ransack(term.present? ? { title_cont: term } : {})
+                              .ransack(event_query)
                               .result
 
     non_recurring_events = base_events.where(recurring: false)
@@ -66,8 +78,19 @@ class AgendaController < ApplicationController
 
     events = non_recurring_events + recurring_events
 
+    course_query =
+      if term.present?
+        case field
+        when "location" then { location_cont: term }
+        when "description" then { description_cont: term }
+        else { title_cont: term }
+        end
+      else
+        {}
+      end
+
     courses = current_user.courses
-                          .ransack(term.present? ? { title_cont: term } : {})
+                          .ransack(course_query)
                           .result
                           .where("start_date <= ?", range_end.to_date)
                           .where("end_date IS NULL OR end_date >= ?", range_start.to_date)
@@ -86,10 +109,18 @@ class AgendaController < ApplicationController
         .includes(:course)
 
     if term.present?
-      course_items = course_items.where(
-        "course_items.title ILIKE :term OR courses.title ILIKE :term",
-        term: "%#{term}%"
-      )
+      course_items =
+        case field
+        when "location"
+          course_items.where("courses.location ILIKE :term", term: "%#{term}%")
+        when "description"
+          course_items.where("course_items.details ILIKE :term", term: "%#{term}%")
+        else
+          course_items.where(
+            "course_items.title ILIKE :term OR courses.title ILIKE :term",
+            term: "%#{term}%"
+          )
+        end
     end
 
     item_occurrences = %w[event course].include?(type) ? [] : course_items.to_a
