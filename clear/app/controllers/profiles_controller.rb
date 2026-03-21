@@ -3,15 +3,14 @@ class ProfilesController < ApplicationController
 
   def show
     @user = current_user
-
-    return unless turbo_frame_request?
-
     render partial: "profiles/drawer_detail",
            locals: { user: @user }
   end
 
   def edit
     @user = current_user
+    render partial: "profiles/drawer_detail",
+           locals: { user: @user }
   end
 
   def update
@@ -76,12 +75,27 @@ class ProfilesController < ApplicationController
     # If user hit Save without selecting a file, just show the drawer again
     unless params.dig(:user, :avatar).present?
       flash.now[:notice] = "No changes to save."
-      return render partial: "profiles/drawer_detail", locals: { user: @user }
+      return render turbo_stream: turbo_stream.replace(
+        "profile_modal",
+        partial: "profiles/drawer_detail",
+        locals: { user: @user }
+      )
     end
 
     if @user.update(avatar_params)
       flash.now[:notice] = "Successfully updated."
-      render partial: "profiles/drawer_detail", locals: { user: @user }
+      render turbo_stream: [
+        turbo_stream.replace(
+          "profile_modal",
+          partial: "profiles/drawer_detail",
+          locals: { user: @user }
+        ),
+        turbo_stream.update(
+          "left_nav_profile",
+          partial: "profiles/left_nav_profile",
+          locals: { user: @user }
+        )
+      ]
     else
       render partial: "profiles/edit_avatar_form",
         locals: { user: @user },
@@ -91,5 +105,33 @@ class ProfilesController < ApplicationController
 
   def avatar_params
     params.require(:user).permit(:avatar)
+  end
+
+  # form for deleting your account
+  def delete_account
+    @user = current_user
+    render partial: "profiles/delete_account_form", locals: { user: @user }
+  end
+
+  def delete_params
+    params.require(:user).permit(:current_password)
+  end
+
+  # deletes the account and all of its info
+  def destroy_account
+    @user = current_user
+
+    unless @user.valid_password?(password_params[:password])
+      @user.errors.add(:password, "is invalid")
+      return render turbo_stream: turbo_stream.replace(
+        "profile_modal",
+        partial: "profiles/delete_account_form",
+        locals: { user: @user }
+      ), status: :unprocessable_entity
+    end
+
+    @user.destroy!
+    sign_out(@user)
+    redirect_to root_path, notice: "Account Successfully Deleted"
   end
 end

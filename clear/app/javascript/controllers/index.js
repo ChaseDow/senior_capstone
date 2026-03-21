@@ -49,6 +49,9 @@ application.register("modal", ModalController)
 import PollFrameController from "./poll_frame_controller"
 application.register("poll-frame", PollFrameController)
 
+import ProfileNavController from "./profile_nav_controller"
+application.register("profile-nav", ProfileNavController)
+
 import RecurrenceToggleController from "./recurrence_toggle_controller"
 application.register("recurrence-toggle", RecurrenceToggleController)
 
