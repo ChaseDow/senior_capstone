@@ -15,6 +15,10 @@
           url: destroy_account_profile_path,
           method: :delete,
           data: { turbo_frame: "_top" } do |f| %>
+      <% label_classes = "block text-[10px] font-bold uppercase tracking-widest mb-1" %>
+      <% label_style = "color: color-mix(in srgb, var(--studs-accent) 80%, white 20%); opacity: 0.95;" %>
+      <% input_classes = "mt-1 w-full rounded-2xl px-4 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-600 bg-zinc-950/60 focus:outline-none focus:ring-2 transition-all duration-150 border" %>
+      <% input_style = "border-color: var(--studs-border); --tw-ring-color: var(--studs-accent);" %>
 
       <% if user.errors.any? %>
         <div class="rounded-xl border border-red-900/40 bg-red-950/30 p-3 text-sm text-red-200">
@@ -27,35 +31,42 @@
       <% end %>
 
       <div class="space-y-4">
-        <div class="rounded-xl border border-red-900/40 bg-red-950/30 px-4 py-3 text-sm leading-relaxed text-red-200">
+        <div class="rounded-xl px-4 py-2 text-sm leading-relaxed text-red-100"
+             style="border: 1px solid color-mix(in srgb, var(--studs-border) 45%, #ef4444 55%);
+                    background-color: color-mix(in srgb, var(--studs-panel-bg-2) 62%, rgba(127, 29, 29, 0.52) 38%);">
           <div class="relative">
             Are you sure you want to delete your account? This will permanently remove your account and all associated data. This action cannot be reversed. Enter your password to confirm.
           </div>
         </div>
 
         <div class="relative">
-          <%= f.label :password, "Password", class: "text-sm text-zinc-300" %>
+          <%= f.label :password, "Password",
+                class: label_classes,
+                style: label_style %>
           <%= f.password_field :password,
                 id: "password",
                 autocomplete: "password",
-                class: "mt-2 w-full rounded-xl border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-zinc-100 placeholder-zinc-500 focus:border-emerald-500/60 focus:outline-none focus:ring-2 focus:ring-emerald-500/30",
+                class: input_classes,
+                style: input_style,
                 placeholder: "your password" %>
 
           <button type="button"
             data-password-toggle
             data-target="password"
-            class="absolute right-3 top-[calc(50%+1rem)] -translate-y-1/2 rounded-md p-1 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/60 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 transition">
+            class="absolute right-3 top-[calc(50%+0.75rem)] -translate-y-1/2
+                    rounded-md p-1 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/60 studs-eye-toggle
+                    focus:outline-none focus:ring-2 focus:ring-emerald-500/40 transition">
             <span data-show>
-              <%= icon "eye-stroke-rounded", class: "h-5 w-5 text-emerald-500/40" %>
+              <%= icon "eye-stroke-rounded", class: "h-5 w-5 studs-icon-accent-soft" %>
             </span>
             <span data-hide class="hidden">
-              <%= icon "view-off-slash-stroke-rounded", class: "h-5 w-5 text-emerald-500/40" %>
+              <%= icon "view-off-slash-stroke-rounded", class: "h-5 w-5 studs-icon-accent-soft" %>
             </span>
           </button>
         </div>
 
         <%= f.submit "Delete Account",
-              class: "studs-btn-danger !mt-2 !w-full !justify-center !rounded-xl !py-2.5 !text-sm" %>
+              class: "studs-btn-accent !mt-2 !w-full !justify-center !rounded-xl !py-2.5 !text-sm" %>
 
         <%= link_to profile_path,
               data: { turbo_frame: "profile_modal", turbo_prefetch: false },
