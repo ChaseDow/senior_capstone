@@ -1,5 +1,12 @@
 <%= turbo_frame_tag "profile_modal" do %>
-  <div class="flex max-h-[85vh] flex-col">
+  <style>
+    [data-profile-nav-link].is-selected {
+      background: rgb(255 255 255 / 0.1);
+      color: rgb(244 244 245);
+    }
+  </style>
+
+  <div class="flex max-h-[85vh] flex-col" data-controller="profile-nav">
     <% if flash.now[:notice].present? %>
       <div class="mb-3 rounded-xl border border-emerald-900/40 bg-emerald-950/30 p-3 text-sm text-emerald-200">
         <%= flash.now[:notice] %>
@@ -24,13 +31,28 @@
         <!-- Left nav -->
         <aside class="col-span-3 border-r border-zinc-800 bg-zinc-950/30 p-4 flex flex-col">
           <div class="space-y-1">
-            <a href="#account" class="studs-nav-btn w-full justify-start">
+            <a href="#account"
+               class="studs-nav-btn w-full justify-start"
+               data-profile-nav-link
+               data-profile-nav-id="account"
+               data-profile-nav-target="navLink"
+               data-action="click->profile-nav#focus">
               My Account
             </a>
-            <a href="#security" class="studs-nav-btn w-full justify-start">
+            <a href="#security"
+               class="studs-nav-btn w-full justify-start"
+               data-profile-nav-link
+               data-profile-nav-id="security"
+               data-profile-nav-target="navLink"
+               data-action="click->profile-nav#focus">
               Security
             </a>
-            <a href="#preferences" class="studs-nav-btn w-full justify-start">
+            <a href="#preferences"
+               class="studs-nav-btn w-full justify-start"
+               data-profile-nav-link
+               data-profile-nav-id="preferences"
+               data-profile-nav-target="navLink"
+               data-action="click->profile-nav#focus">
               Preferences
             </a>
           </div>
@@ -45,9 +67,9 @@
           </div>
         </aside>
         <!-- Right content -->
-        <section class="col-span-9 p-6 space-y-8 overflow-y-auto">
+        <section class="col-span-9 p-6 space-y-8 overflow-y-auto" data-profile-nav-target="scroll">
           <!-- Account -->
-          <div id="account">
+          <div id="account" data-profile-nav-target="section">
             <div class="text-xs font-semibold uppercase tracking-wide text-zinc-500">User Profile</div>
             <div class="mt-3 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5">
               <div class="flex items-center justify-between">
@@ -94,7 +116,7 @@
             </div>
           </div>
           <!-- Security -->
-          <div id="security">
+          <div id="security" data-profile-nav-target="section">
             <div class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Security</div>
             <div class="mt-3 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5 space-y-4">
               <div class="flex items-center justify-between gap-4">
@@ -130,7 +152,7 @@
             </div>
           </div>
           <!-- Preferences / Theme -->
-          <div id="preferences">
+          <div id="preferences" data-profile-nav-target="section">
             <div class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Preferences</div>
             <div class="mt-3 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5">
               <div class="text-sm text-zinc-200 mb-1">Theme</div>
