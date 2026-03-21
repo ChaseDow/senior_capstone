@@ -1,7 +1,19 @@
 <% content_for :page_title, "Agenda" %>
 <% content_for :page_subtitle, "Upcoming tasks" %>
 <% filter_input_style = "border-color: var(--studs-border); --tw-ring-color: var(--studs-accent);" %>
-<div class="space-y-6">
+<% today = Time.zone.today %>
+<% entries = (@paged_agenda_by_date || {})[today] || [] %>
+<% active_filters = [params.dig(:q, :term), params[:type], params[:start_date], params[:end_date]].compact.count(&:present?) %>
+<% entries_by_date =
+  if active_filters.positive?
+    (@paged_agenda_by_date || {}).sort_by { |date, _| date }.to_h
+  elsif entries.any?
+    { today => entries }
+  else
+    {}
+  end %>
+
+<div class="space-y-4">
   <%= form_with url: agenda_index_path,
                 method: :get,
                 data: {
@@ -40,9 +52,7 @@
           class: "h-[38px] w-36 rounded-xl border bg-zinc-900/50 px-3 py-2 text-sm text-zinc-200 focus:outline-none focus:ring-2 transition-all",
           style: filter_input_style,
           data: { action: "change->search#search" } %>
-        <span class="text-sm text-zinc-500 font-medium select-none">
-          :
-        </span>
+        <span class="text-sm text-zinc-500 font-medium select-none">:</span>
         <%= f.date_field :end_date,
           value: params[:end_date],
           placeholder: "End",
@@ -50,51 +60,83 @@
           style: filter_input_style,
           data: { action: "change->search#search" } %>
       </div>
-      <% show_clear = params.dig(:q, :term).present? || params[:start_date].present? || params[:end_date].present? || params[:type].present? %>
-      <% if show_clear %>
+      <% if active_filters.positive? %>
         <%= link_to "Reset",
           agenda_index_path,
-          class: "inline-block rounded-xl border bg-zinc-900/50 px-4 py-2 text-sm font-medium text-emerald-100 hover:bg-zinc-800/50 focus:outline-none transition",
+          class: "inline-block rounded-xl border bg-zinc-900/50 px-4 py-2 text-sm font-medium text-zinc-200 hover:bg-zinc-800/50 focus:outline-none transition",
           style: filter_input_style %>
       <% end %>
     </div>
   <% end %>
-  <% today = Time.zone.today %>
-  <% entries = (@paged_agenda_by_date || {})[today] || [] %>
-  <% unless entries.empty? %>
-    <% date = today %>
-    <%= render Studs::AgendaComponent.new(
-      title: (date == Date.today ? "Today" : date.strftime("%A")),
-      subtitle: date.strftime("%B %d, %Y"),
-      mode: :panel,
-      empty_message: "Nothing scheduled for this day."
-    ) do |agenda| %>
-      <% entries.each do |entry| %>
-        <%
-          meta_bits = []
-          meta_bits << entry[:location] if entry[:location].present?
 
-          if entry[:type] == "Course"
-            meta_bits << entry[:professor] if entry[:professor].present?
-          end
-
-          meta = meta_bits.any? ? meta_bits.join(" • ") : nil
-
-          is_course = (entry[:type] == "Course")
-          tag_color = is_course ? :emerald : :blue
-        %>
-        <% agenda.with_item(
-          time: entry[:time],
-          title: entry[:title],
-          tag: entry[:type],
-          tag_color: tag_color,
-          meta: meta,
-          color: entry[:color],
-          href: entry[:href]
-        ) %>
+  <% if entries_by_date.empty? %>
+    <div class="overflow-hidden rounded-2xl"
+         style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg-2);">
+      <div class="flex flex-col items-center justify-center py-16 text-center">
+        <div class="mb-3 flex items-center justify-center">
+          <span class="text-4xl opacity-30" aria-hidden="true">🗓️</span>
+        </div>
+        <% if params.dig(:q, :term).present? || active_filters.positive? %>
+          <p class="text-sm font-medium text-zinc-300">
+            <% if params.dig(:q, :term).present? %>
+              No results for "<%= params.dig(:q, :term) %>"
+            <% else %>
+              No items match your current filters
+            <% end %>
+          </p>
+          <p class="mt-1 text-xs text-zinc-500">Try a different search term</p>
+        <% else %>
+          <p class="text-sm font-medium text-zinc-300">No agenda items yet</p>
+          <p class="mt-1 text-xs text-zinc-500">Create your first event or course to get started</p>
+          <div class="mt-4 flex items-center gap-2">
+            <%= link_to new_event_path, class: "studs-nav-btn", data: { turbo_frame: "_top" } do %>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+              </svg>
+              New event
+            <% end %>
+            <%= link_to new_course_path, class: "studs-nav-btn", data: { turbo_frame: "_top" } do %>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+              </svg>
+              New course
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% else %>
+    <div class="space-y-3">
+      <% entries_by_date.each do |date, day_entries| %>
+        <%= render Studs::AgendaComponent.new(
+          title: (date == Date.today ? "Today" : date.strftime("%A")),
+          subtitle: date.strftime("%B %d, %Y"),
+          mode: :panel,
+          empty_message: "Nothing scheduled for this day."
+        ) do |agenda| %>
+          <% day_entries.each do |entry| %>
+            <%
+              meta_bits = []
+              meta_bits << entry[:location] if entry[:location].present?
+              meta_bits << entry[:professor] if entry[:type] == "Course" && entry[:professor].present?
+              meta = meta_bits.any? ? meta_bits.join(" • ") : nil
+              tag_color = entry[:type] == "Course" ? :emerald : :blue
+            %>
+            <% agenda.with_item(
+              time: entry[:time],
+              title: entry[:title],
+              tag: entry[:type],
+              tag_color: tag_color,
+              meta: meta,
+              color: entry[:color],
+              href: entry[:href]
+            ) %>
+          <% end %>
+        <% end %>
       <% end %>
-    <% end %>
+    </div>
   <% end %>
+
   <% if @pagy&.pages.to_i > 1 %>
     <% per_chunk = 10 %>
     <% pages = @pagy.pages %>
@@ -104,34 +146,33 @@
     <% chunk_end   = [chunk_start + per_chunk - 1, pages].min %>
     <% prev_page  = page > 1 ? page - 1 : nil %>
     <% next_page  = page < pages ? page + 1 : nil %>
-    <% prev_chunk_page = chunk_start > 1 ? (chunk_start - 1) : nil %>
-    <% next_chunk_page = chunk_end < pages ? (chunk_end + 1) : nil %>
-    <div class="pt-6 flex items-center justify-center gap-2">
-      <%= link_to "Prev",
-        (prev_page ? agenda_page_url(prev_page) : "#"),
-        class: [
-          "rounded-xl border border-zinc-800 bg-zinc-900/50 px-4 py-2 text-sm font-medium transition",
-          prev_page ? "text-zinc-200 hover:bg-zinc-800/50" : "text-zinc-600 cursor-not-allowed pointer-events-none"
-        ].join(" ") %>
-      <% (chunk_start..chunk_end).each do |p| %>
-        <% is_current = (p == page) %>
-        <%= link_to p, agenda_page_url(p),
+    <div class="flex flex-wrap items-center justify-between gap-2 pt-1">
+      <div class="text-xs text-zinc-400">Pages <%= chunk_start %>–<%= chunk_end %> of <%= pages %></div>
+      <div class="flex items-center gap-1.5">
+        <%= link_to "Prev",
+          (prev_page ? agenda_page_url(prev_page) : "#"),
           class: [
-            "rounded-xl border px-3 py-2 text-sm font-medium transition",
-            is_current ?
-              "border-green-500/40 bg-green-600/20 text-green-200" :
-              "border-zinc-800 bg-zinc-900/50 text-emerald-200 hover:bg-zinc-800/50"
-          ].join(" ") %>
-      <% end %>
-      <%= link_to "Next",
-        (next_page ? agenda_page_url(next_page) : "#"),
-        class: [
-          "rounded-xl border border-zinc-800 bg-zinc-900/50 px-4 py-2 text-sm font-medium transition",
-          next_page ? "text-emerald-200 hover:bg-zinc-800/50" : "text-zinc-600 cursor-not-allowed pointer-events-none"
-        ].join(" ") %>
-    </div>
-    <div class="pt-2 text-center text-xs text-zinc-500">
-      Pages <%= chunk_start %>–<%= chunk_end %> of <%= pages %>
+            "rounded-xl border px-3 py-1.5 text-xs transition",
+            prev_page ? "text-zinc-200 hover:bg-zinc-800/50" : "text-zinc-600 opacity-50 pointer-events-none"
+          ].join(" "),
+          style: "border-color: var(--studs-border);" %>
+        <% (chunk_start..chunk_end).each do |p| %>
+          <% is_current = (p == page) %>
+          <%= link_to p, agenda_page_url(p),
+            class: [
+              "rounded-xl border px-2.5 py-1.5 text-xs transition",
+              is_current ? "text-zinc-100 font-semibold" : "text-zinc-300 hover:bg-zinc-800/50"
+            ].join(" "),
+            style: (is_current ? "border-color: var(--studs-accent); background-color: var(--studs-panel-hover);" : "border-color: var(--studs-border);") %>
+        <% end %>
+        <%= link_to "Next",
+          (next_page ? agenda_page_url(next_page) : "#"),
+          class: [
+            "rounded-xl border px-3 py-1.5 text-xs transition",
+            next_page ? "text-zinc-200 hover:bg-zinc-800/50" : "text-zinc-600 opacity-50 pointer-events-none"
+          ].join(" "),
+          style: "border-color: var(--studs-border);" %>
+      </div>
     </div>
   <% end %>
 </div>
