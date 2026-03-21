@@ -1,13 +1,18 @@
 # frozen_string_literal: true
 
 class Studs::LeftNavComponent < ViewComponent::Base
-  def initialize(brand: nil, items:, class_name: nil)
+  def initialize(brand: nil, items:, settings_items: [], class_name: nil)
     @brand = brand
     @items = items
+    @settings_items = settings_items
     @class_name = class_name
   end
 
   private
+
+  def current_user
+    helpers.current_user rescue nil
+  end
 
   def current_path
     helpers.request.path
@@ -25,15 +30,15 @@ class Studs::LeftNavComponent < ViewComponent::Base
 
   def link_classes(active)
     base =
-      "group flex items-center gap-3 rounded-xl px-3 py-2.5 " \
-      "text-base font-medium transition " \
+      "group/link flex items-center gap-3 rounded-xl px-3 py-2.5 " \
+      "text-sm font-medium transition-all duration-200 relative overflow-hidden " \
       "group-data-[collapsed=true]/sidebar:justify-center " \
       "group-data-[collapsed=true]/sidebar:px-2"
 
     if active
-      "#{base} bg-white/10 text-zinc-50"
+      "#{base} studs-nav-link--active-pill text-white"
     else
-      "#{base} text-zinc-200 hover:bg-white/5 hover:text-zinc-50"
+      "#{base} text-zinc-400 hover:text-zinc-100 hover:bg-white/5"
     end
   end
 
@@ -41,7 +46,20 @@ class Studs::LeftNavComponent < ViewComponent::Base
     if active
       "studs-icon--active"
     else
-      "studs-icon--inactive group-hover:text-zinc-50"
+      "studs-icon--inactive group-hover/link:text-zinc-100"
     end
+  end
+
+  def user_initials
+    user = current_user
+    return "?" unless user
+    name = user.try(:name) || user.try(:first_name) || user.email
+    name.to_s.strip.split(/\s+/).map { |w| w[0] }.first(2).join.upcase
+  end
+
+  def user_display_name
+    user = current_user
+    return "" unless user
+    user.try(:name) || user.try(:first_name) || user.email.to_s.split("@").first
   end
 end

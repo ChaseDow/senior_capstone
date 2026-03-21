@@ -14,6 +14,7 @@ body[data-theme="green"] {
   --studs-border-subtle: rgba(47, 169, 140, 0.12);
   --studs-divider: rgba(47, 169, 140, 0.16);
   --studs-accent: #10b981;
+  --studs-accent-secondary: #10b981;
   --studs-sidebar-bg: #15261d;
 }
 
@@ -26,6 +27,7 @@ body[data-theme="blue"] {
   --studs-border-subtle: rgba(96, 165, 250, 0.12);
   --studs-divider: rgba(96, 165, 250, 0.16);
   --studs-accent: #3b82f6;
+  --studs-accent-secondary: #3b82f6;
   --studs-sidebar-bg: #0f1e3a;
 }
 
@@ -38,6 +40,7 @@ body[data-theme="purple"] {
   --studs-border-subtle: rgba(167, 139, 250, 0.12);
   --studs-divider: rgba(167, 139, 250, 0.16);
   --studs-accent: #8b5cf6;
+  --studs-accent-secondary: #8b5cf6;
   --studs-sidebar-bg: #1a1035;
 }
 
@@ -50,6 +53,7 @@ body[data-theme="rose"] {
   --studs-border-subtle: rgba(251, 113, 133, 0.12);
   --studs-divider: rgba(251, 113, 133, 0.16);
   --studs-accent: #f43f5e;
+  --studs-accent-secondary: #f43f5e;
   --studs-sidebar-bg: #2d1020;
 }
 
@@ -62,6 +66,7 @@ body[data-theme="amber"] {
   --studs-border-subtle: rgba(251, 191, 36, 0.12);
   --studs-divider: rgba(251, 191, 36, 0.16);
   --studs-accent: #f59e0b;
+  --studs-accent-secondary: #f59e0b;
   --studs-sidebar-bg: #2d1a05;
 }
 
@@ -74,6 +79,7 @@ body[data-theme="cyan"] {
   --studs-border-subtle: rgba(34, 211, 238, 0.12);
   --studs-divider: rgba(34, 211, 238, 0.16);
   --studs-accent: #06b6d4;
+  --studs-accent-secondary: #06b6d4;
   --studs-sidebar-bg: #061e26;
 }
 
@@ -86,6 +92,7 @@ body[data-theme="pink"] {
   --studs-border-subtle: rgba(244, 114, 182, 0.12);
   --studs-divider: rgba(244, 114, 182, 0.16);
   --studs-accent: #ec4899;
+  --studs-accent-secondary: #ec4899;
   --studs-sidebar-bg: #2d0a1e;
 }
 
@@ -98,6 +105,7 @@ body[data-theme="red"] {
   --studs-border-subtle: rgba(248, 113, 113, 0.12);
   --studs-divider: rgba(248, 113, 113, 0.16);
   --studs-accent: #ef4444;
+  --studs-accent-secondary: #ef4444;
   --studs-sidebar-bg: #2d0a0a;
 }
 
@@ -110,6 +118,7 @@ body[data-theme="lime"] {
   --studs-border-subtle: rgba(163, 230, 53, 0.12);
   --studs-divider: rgba(163, 230, 53, 0.16);
   --studs-accent: #84cc16;
+  --studs-accent-secondary: #84cc16;
   --studs-sidebar-bg: #141f05;
 }
 
@@ -122,6 +131,7 @@ body[data-theme="slate"] {
   --studs-border-subtle: rgba(148, 163, 184, 0.12);
   --studs-divider: rgba(148, 163, 184, 0.16);
   --studs-accent: #94a3b8;
+  --studs-accent-secondary: #94a3b8;
   --studs-sidebar-bg: #0f172a;
 }
 
@@ -134,7 +144,313 @@ body[data-theme="orange"] {
   --studs-border-subtle: rgba(251, 146, 60, 0.12);
   --studs-divider: rgba(251, 146, 60, 0.16);
   --studs-accent: #f97316;
+  --studs-accent-secondary: #f97316;
   --studs-sidebar-bg: #2d1200;
+}
+
+body[data-theme="mono"] {
+  --studs-panel-bg: rgba(255, 255, 255, 0.08);
+  --studs-panel-bg-2: rgba(255, 255, 255, 0.05);
+  --studs-panel-hover: rgba(255, 255, 255, 0.12);
+  --studs-panel-header: rgba(255, 255, 255, 0.15);
+  --studs-border: rgba(255, 255, 255, 0.18);
+  --studs-border-subtle: rgba(255, 255, 255, 0.10);
+  --studs-divider: rgba(255, 255, 255, 0.12);
+  --studs-accent: #ffffff;
+  --studs-accent-secondary: #ffffff;
+  --studs-sidebar-bg: #111111;
+}
+
+/* ══════════════════════════════════════════════════════════
+   Space Themes — each has a unique visual personality
+   ══════════════════════════════════════════════════════════ */
+
+/* ── Nebula: deep purple-pink cosmic nebula ────────────── */
+body[data-theme="nebula"] {
+  --studs-panel-bg: rgba(30, 15, 60, 0.60);
+  --studs-panel-bg-2: rgba(30, 15, 60, 0.40);
+  --studs-panel-hover: rgba(50, 25, 80, 0.55);
+  --studs-panel-header: rgba(40, 18, 70, 0.65);
+  --studs-border: rgba(147, 90, 240, 0.15);
+  --studs-border-subtle: rgba(147, 90, 240, 0.08);
+  --studs-divider: rgba(147, 90, 240, 0.10);
+  --studs-accent: #935AF0;
+  --studs-accent-secondary: #F897FE;
+  --studs-sidebar-bg: rgba(15, 10, 26, 0.82);
+}
+
+/* ── Aurora: icy teal northern lights ──────────────────── */
+body[data-theme="aurora"] {
+  --studs-panel-bg: rgba(8, 30, 50, 0.60);
+  --studs-panel-bg-2: rgba(8, 30, 50, 0.40);
+  --studs-panel-hover: rgba(12, 45, 70, 0.55);
+  --studs-panel-header: rgba(10, 35, 58, 0.65);
+  --studs-border: rgba(92, 192, 227, 0.12);
+  --studs-border-subtle: rgba(92, 192, 227, 0.06);
+  --studs-divider: rgba(92, 192, 227, 0.08);
+  --studs-accent: #5A7DF0;
+  --studs-accent-secondary: #5CC0E3;
+  --studs-sidebar-bg: rgba(6, 17, 28, 0.85);
+}
+
+/* ── Sunset: warm desert-to-space burgundy ─────────────── */
+body[data-theme="sunset"] {
+  --studs-panel-bg: rgba(40, 12, 25, 0.60);
+  --studs-panel-bg-2: rgba(40, 12, 25, 0.40);
+  --studs-panel-hover: rgba(55, 18, 35, 0.55);
+  --studs-panel-header: rgba(45, 14, 30, 0.65);
+  --studs-border: rgba(212, 121, 144, 0.12);
+  --studs-border-subtle: rgba(212, 121, 144, 0.06);
+  --studs-divider: rgba(212, 121, 144, 0.08);
+  --studs-accent: #D47990;
+  --studs-accent-secondary: #8C3572;
+  --studs-sidebar-bg: rgba(17, 6, 16, 0.85);
+}
+
+/* ══════════════════════════════════════════════════════════
+   School Spirit Themes
+   ══════════════════════════════════════════════════════════ */
+
+/* ── LaTech: Bold collegiate — stadium at night ──────── */
+body[data-theme="latech"] {
+  --studs-panel-bg: #0E1525;
+  --studs-panel-bg-2: #0E1525;
+  --studs-panel-hover: #131D30;
+  --studs-panel-header: #002F8B;
+  --studs-border: rgba(0, 47, 139, 0.40);
+  --studs-border-subtle: rgba(0, 47, 139, 0.10);
+  --studs-divider: rgba(0, 47, 139, 0.15);
+  --studs-accent: #E31B23;
+  --studs-accent-secondary: #002F8B;
+  --studs-sidebar-bg: #0A0F1A;
+}
+
+/* ── Space theme gradient backgrounds ─────────────────── */
+body[data-theme="nebula"] {
+  background:
+    radial-gradient(ellipse 80% 60% at 70% 20%, rgba(147, 90, 240, 0.12), transparent 60%),
+    radial-gradient(ellipse 60% 50% at 20% 80%, rgba(248, 151, 254, 0.06), transparent 55%),
+    linear-gradient(160deg, #0B0015 0%, #1a0533 40%, #0d0020 100%) !important;
+}
+
+body[data-theme="aurora"] {
+  background:
+    radial-gradient(ellipse 80% 60% at 60% 15%, rgba(92, 192, 227, 0.10), transparent 55%),
+    radial-gradient(ellipse 50% 50% at 15% 75%, rgba(90, 125, 240, 0.06), transparent 55%),
+    linear-gradient(160deg, #020B14 0%, #091B2A 50%, #040E18 100%) !important;
+}
+
+body[data-theme="sunset"] {
+  background:
+    radial-gradient(ellipse 70% 60% at 75% 25%, rgba(140, 53, 114, 0.10), transparent 55%),
+    radial-gradient(ellipse 60% 40% at 20% 70%, rgba(212, 121, 144, 0.05), transparent 55%),
+    linear-gradient(135deg, #0D0208 0%, #1A0A14 50%, #0A0306 100%) !important;
+}
+
+body[data-theme="latech"] {
+  background: #0C1220 !important;
+}
+
+/* ── Space theme sidebar: semi-transparent + blur ─────── */
+body[data-theme="nebula"] [data-sidebar-target="sidebar"],
+body[data-theme="aurora"] [data-sidebar-target="sidebar"],
+body[data-theme="sunset"] [data-sidebar-target="sidebar"] {
+  backdrop-filter: blur(16px) saturate(130%);
+  -webkit-backdrop-filter: blur(16px) saturate(130%);
+}
+
+/* ── Space theme topbar: semi-transparent + blur ──────── */
+body[data-theme="nebula"] .studs-topbar,
+body[data-theme="aurora"] .studs-topbar,
+body[data-theme="sunset"] .studs-topbar {
+  background-color: transparent;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* ── Space theme ambient glow on main content ─────────── */
+body[data-theme="nebula"] main {
+  box-shadow: inset 0 0 80px rgba(147, 90, 240, 0.06);
+}
+
+body[data-theme="aurora"] main {
+  box-shadow: inset 0 0 80px rgba(92, 192, 227, 0.04);
+}
+
+body[data-theme="sunset"] main {
+  box-shadow: inset 0 0 80px rgba(140, 53, 114, 0.05);
+}
+
+/* ── LaTech: solid opaque overrides (no glassmorphism) ─── */
+body[data-theme="latech"] main {
+  box-shadow: none;
+}
+
+body[data-theme="latech"] [data-sidebar-target="sidebar"] {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+body[data-theme="latech"] .studs-topbar {
+  background-color: #0A0F1A;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+/* ── Space theme hover glow on nav buttons ────────────── */
+body[data-theme="nebula"] .studs-nav-btn:hover {
+  box-shadow:
+    0 0 20px rgba(147, 90, 240, 0.30),
+    0 0 0 1px var(--studs-accent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.10);
+}
+
+body[data-theme="aurora"] .studs-nav-btn:hover {
+  box-shadow:
+    0 0 20px rgba(92, 192, 227, 0.25),
+    0 0 0 1px var(--studs-accent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.10);
+}
+
+body[data-theme="sunset"] .studs-nav-btn:hover {
+  box-shadow:
+    0 0 20px rgba(212, 121, 144, 0.25),
+    0 0 0 1px var(--studs-accent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.10);
+}
+
+body[data-theme="latech"] .studs-nav-btn {
+  background-color: #131D30;
+  border-color: rgba(0, 47, 139, 0.40);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+body[data-theme="latech"] .studs-nav-btn::before {
+  display: none;
+}
+
+body[data-theme="latech"] .studs-nav-btn:hover {
+  background-color: #002F8B;
+  border-color: #002F8B;
+  box-shadow: 0 4px 12px rgba(0, 47, 139, 0.25);
+}
+
+/* ── Space theme event popover ────────────────────────── */
+body[data-theme="nebula"] [data-event-popover-target="popover"] {
+  background-color: rgba(30, 15, 60, 0.85) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-color: rgba(147, 90, 240, 0.20) !important;
+}
+
+body[data-theme="aurora"] [data-event-popover-target="popover"] {
+  background-color: rgba(8, 30, 50, 0.85) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-color: rgba(92, 192, 227, 0.15) !important;
+}
+
+body[data-theme="sunset"] [data-event-popover-target="popover"] {
+  background-color: rgba(40, 12, 25, 0.85) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-color: rgba(212, 121, 144, 0.15) !important;
+}
+
+body[data-theme="latech"] [data-event-popover-target="popover"] {
+  background-color: #111827 !important;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-color: rgba(0, 47, 139, 0.25) !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 47, 139, 0.10) !important;
+}
+
+/* ── Space theme drawer panel ─────────────────────────── */
+body[data-theme="nebula"] [data-drawer-target="panel"] {
+  background-color: rgba(15, 10, 26, 0.92) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+body[data-theme="aurora"] [data-drawer-target="panel"] {
+  background-color: rgba(6, 17, 28, 0.92) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+body[data-theme="sunset"] [data-drawer-target="panel"] {
+  background-color: rgba(17, 6, 16, 0.92) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+body[data-theme="latech"] [data-drawer-target="panel"] {
+  background-color: #0A0F1A !important;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+/* ── Space theme profile modal ────────────────────────── */
+body[data-theme="nebula"] [data-modal-target="panel"] > div {
+  background-color: rgba(15, 10, 26, 0.92) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+body[data-theme="aurora"] [data-modal-target="panel"] > div {
+  background-color: rgba(6, 17, 28, 0.92) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+body[data-theme="sunset"] [data-modal-target="panel"] > div {
+  background-color: rgba(17, 6, 16, 0.92) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+body[data-theme="latech"] [data-modal-target="panel"] > div {
+  background-color: #111827 !important;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-color: rgba(0, 47, 139, 0.20) !important;
+}
+
+/* ── LaTech: active nav — solid blue with red left border ── */
+body[data-theme="latech"] .studs-nav-link--active-pill {
+  background: #002F8B !important;
+  border: none !important;
+  border-left: 3px solid #E31B23 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: 0 2px 8px rgba(0, 47, 139, 0.30) !important;
+}
+
+body[data-theme="latech"] .studs-avatar-circle {
+  background: #002F8B;
+}
+
+body[data-theme="latech"] .studs-today-badge {
+  background: #E31B23 !important;
+}
+
+body[data-theme="latech"] .studs-btn-accent {
+  background: linear-gradient(135deg, #002F8B, #1A4CAF) !important;
+  border-color: #002F8B !important;
+  box-shadow: 0 0 12px rgba(0, 47, 139, 0.35), 0 1px 3px rgba(0, 0, 0, 0.25) !important;
+}
+
+body[data-theme="latech"] .studs-btn-accent:hover {
+  box-shadow: 0 0 22px rgba(0, 47, 139, 0.50), 0 4px 14px rgba(0, 0, 0, 0.35), 0 2px 0 0 #E31B23 !important;
+}
+
+/* ── Smooth theme transition ──────────────────────────── */
+body {
+  transition:
+    background 0.4s ease,
+    background-color 0.4s ease,
+    color 0.3s ease;
 }
 
 /* ── Theme-aware utilities ──────────────────────────────── */
@@ -163,6 +479,9 @@ body[data-theme="orange"] {
 .studs-topbar {
   background-color: var(--studs-sidebar-bg);
   border-bottom: 1px solid var(--studs-border);
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease;
 }
 
 /* ── Nav buttons (ghost/outline pill) ───────────────────── */
@@ -231,7 +550,7 @@ body[data-theme="orange"] {
   gap: 0.375rem;
   border-radius: 9999px;
   border: 1px solid var(--studs-accent);
-  background-color: var(--studs-accent);
+  background: linear-gradient(135deg, var(--studs-accent), var(--studs-accent-secondary));
   color: white;
   padding: 0.4rem 1.1rem;
   font-size: 0.8rem;
@@ -339,9 +658,59 @@ body[data-theme="orange"] {
     inset 0 1px 0 rgba(255, 255, 255, 0.10);
 }
 
+/* ── Avatar circle (theme-aware text contrast) ─────────── */
+.studs-avatar-circle {
+  background: linear-gradient(135deg, var(--studs-accent), var(--studs-accent-secondary));
+  color: #ffffff;
+  transition: background 0.3s ease;
+}
+
+body[data-theme="mono"] .studs-avatar-circle {
+  color: #111111;
+}
+
+body[data-theme="mono"] .studs-btn-accent {
+  color: #111111;
+}
+
+/* ── Today badge (calendar header) ─────────────────────── */
+.studs-today-badge {
+  background: linear-gradient(135deg, var(--studs-accent), var(--studs-accent-secondary));
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  transition: background 0.3s ease;
+}
+
+body[data-theme="mono"] .studs-today-badge,
+body[data-theme="amber"] .studs-today-badge,
+body[data-theme="lime"] .studs-today-badge,
+body[data-theme="cyan"] .studs-today-badge {
+  color: #09090b;
+  text-shadow: none;
+}
+
 /* ── Active nav link ────────────────────────────────────── */
 .studs-nav-link--active {
   color: #f4f4f5;
+}
+
+/* ── Active nav pill (glassmorphic, theme-aware) ───────── */
+.studs-nav-link--active-pill {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--studs-accent) 22%, transparent) 0%,
+    color-mix(in srgb, var(--studs-accent-secondary) 10%, transparent) 100%
+  );
+  border: 1px solid color-mix(in srgb, var(--studs-accent) 30%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow:
+    0 0 12px color-mix(in srgb, var(--studs-accent) 15%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transition:
+    background 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 /* ── Icon colors ────────────────────────────────────────── */
@@ -406,6 +775,26 @@ body[data-theme="orange"] {
 
 .theme-swatch--orange {
   background-color: #f97316;
+}
+
+.theme-swatch--mono {
+  background: linear-gradient(135deg, #ffffff 50%, #111111 50%);
+}
+
+.theme-swatch--nebula {
+  background: linear-gradient(135deg, #935AF0, #F897FE);
+}
+
+.theme-swatch--aurora {
+  background: linear-gradient(135deg, #5A7DF0, #5CC0E3);
+}
+
+.theme-swatch--sunset {
+  background: linear-gradient(135deg, #8C3572, #D47990);
+}
+
+.theme-swatch--latech {
+  background: linear-gradient(135deg, #002F8B 50%, #E31B23 50%);
 }
 
 /* ── FilePond (theme-aware dropzone) ────────────────────── */
