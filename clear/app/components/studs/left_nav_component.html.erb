@@ -1,54 +1,93 @@
 <div class="<%= class_names('flex h-full min-h-0 flex-col', @class_name) %>">
-  <nav class="flex-1 min-h-0 p-2 space-y-1">
-    <% @items.each do |item| %>
-      <% active = active_path?(item[:path]) %>
-      <%= link_to item[:path],
-          title: item[:label],
-          aria: (active ? { current: "page" } : {}),
-          class: link_classes(active) do %>
-        <span class="shrink-0 <%= icon_classes(active) %>">
-          <span class="shrink-0 <%= icon_classes(active) %>
-             [&_svg]:text-current
-             [&_svg]:w-6 [&_svg]:h-6
-             [&_svg_*]:stroke-current">
-            <%= helpers.icon item[:icon_name] %>
-          </span>
-        </span>
-        <span class="truncate group-data-[collapsed=true]/sidebar:hidden">
-          <%= item[:label] %>
-        </span>
-      <% end %>
-    <% end %>
-  </nav>
-  <div class="shrink-0 border-t border-white/10 p-2">
-    <% user = (helpers.current_user rescue nil) %>
-    <% if user&.respond_to?(:email) %>
+  <%# ── User profile section ── %>
+  <div class="shrink-0 px-3 pt-2 pb-1 group-data-[collapsed=true]/sidebar:px-2">
+    <% user = current_user %>
+    <% if user %>
       <%= link_to profile_path,
         data: {turbo_frame: "profile_modal", turbo_prefetch: false, action: "click->modal#start"},
-        class: "px-3 py-2 text-xs text-zinc-400 hover:text-zinc-200
-            transition block
-            group-data-[collapsed=true]/sidebar:hidden
-            hover:bg-white/5 rounded-lg" do %>
-        <%= user.email %>
+        class: "flex items-center gap-3 rounded-xl px-2 py-2.5
+               hover:bg-white/5 transition-all duration-200 group/profile" do %>
+        <div class="shrink-0 flex h-9 w-9 items-center justify-center rounded-full
+                    text-xs font-bold studs-avatar-circle">
+          <%= user_initials %>
+        </div>
+        <div class="min-w-0 group-data-[collapsed=true]/sidebar:hidden">
+          <div class="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Welcome</div>
+          <div class="text-sm font-semibold text-zinc-100 truncate"><%= user_display_name %></div>
+        </div>
       <% end %>
     <% end %>
-    <%= button_to destroy_user_session_path,
-    method: :delete,
-    form: { class: "w-full" },
-    title: "Sign out",
-    class: "w-full group flex items-center gap-3 rounded-xl border border-white/10
-            bg-zinc-950/40 px-3 py-2.5 text-base font-medium
-            text-zinc-100 hover:bg-white/5 transition
-            group-data-[collapsed=true]/sidebar:justify-center
-            group-data-[collapsed=true]/sidebar:px-2" do %>
-      <span class="shrink-0 text-zinc-200 hover:text-zinc-50
-               [&_svg]:w-6 [&_svg]:h-6
-               [&_svg]:text-current
-               [&_svg_*]:stroke-current
-               [&_svg_*]:fill-none">
-        <%= helpers.icon "logout-01-stroke-rounded" %>
-      </span>
-      <span class="truncate group-data-[collapsed=true]/sidebar:hidden">Sign out</span>
-    <% end %>
+  </div>
+
+  <%# ── Menu section ── %>
+  <nav class="flex-1 min-h-0 overflow-y-auto px-3 pt-3 group-data-[collapsed=true]/sidebar:px-2">
+    <div class="mb-2 group-data-[collapsed=true]/sidebar:hidden">
+      <span class="px-3 text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-500">Menu</span>
+    </div>
+    <div class="space-y-0.5">
+      <% @items.each do |item| %>
+        <% active = active_path?(item[:path]) %>
+        <%= link_to item[:path],
+            title: item[:label],
+            aria: (active ? { current: "page" } : {}),
+            class: link_classes(active) do %>
+          <span class="shrink-0 <%= icon_classes(active) %>
+                 [&_svg]:text-current
+                 [&_svg]:w-5 [&_svg]:h-5
+                 [&_svg_*]:stroke-current">
+            <%= helpers.icon item[:icon_name] %>
+          </span>
+          <span class="truncate group-data-[collapsed=true]/sidebar:hidden">
+            <%= item[:label] %>
+          </span>
+        <% end %>
+      <% end %>
+    </div>
+  </nav>
+
+  <%# ── Settings section ── %>
+  <div class="shrink-0 px-3 pb-3 pt-2 group-data-[collapsed=true]/sidebar:px-2">
+    <div class="mb-2 group-data-[collapsed=true]/sidebar:hidden">
+      <span class="px-3 text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-500">Settings</span>
+    </div>
+    <div class="space-y-0.5">
+      <% @settings_items.each do |item| %>
+        <% active = active_path?(item[:path]) %>
+        <%= link_to item[:path],
+            title: item[:label],
+            aria: (active ? { current: "page" } : {}),
+            data: item[:data] || {},
+            class: link_classes(active) do %>
+          <span class="shrink-0 <%= icon_classes(active) %>
+                 [&_svg]:text-current
+                 [&_svg]:w-5 [&_svg]:h-5
+                 [&_svg_*]:stroke-current">
+            <%= helpers.icon item[:icon_name] %>
+          </span>
+          <span class="truncate group-data-[collapsed=true]/sidebar:hidden">
+            <%= item[:label] %>
+          </span>
+        <% end %>
+      <% end %>
+
+      <%= button_to destroy_user_session_path,
+      method: :delete,
+      form: { class: "w-full" },
+      title: "Sign out",
+      class: "w-full group/link flex items-center gap-3 rounded-xl px-3 py-2.5
+              text-sm font-medium text-zinc-400 hover:text-zinc-100
+              hover:bg-white/5 transition-all duration-200
+              group-data-[collapsed=true]/sidebar:justify-center
+              group-data-[collapsed=true]/sidebar:px-2" do %>
+        <span class="shrink-0 text-zinc-400 group-hover/link:text-zinc-100
+                 [&_svg]:w-5 [&_svg]:h-5
+                 [&_svg]:text-current
+                 [&_svg_*]:stroke-current
+                 [&_svg_*]:fill-none">
+          <%= helpers.icon "logout-01-stroke-rounded" %>
+        </span>
+        <span class="truncate group-data-[collapsed=true]/sidebar:hidden">Sign out</span>
+      <% end %>
+    </div>
   </div>
 </div>
