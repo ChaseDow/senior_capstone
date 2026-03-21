@@ -761,6 +761,20 @@ body[data-theme="cyan"] .studs-today-badge {
   color: color-mix(in srgb, var(--studs-accent) 55%, transparent);
 }
 
+.studs-eye-toggle {
+  border: 1px solid var(--studs-border);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--studs-accent) 22%, transparent),
+    0 0 12px color-mix(in srgb, var(--studs-accent) 18%, transparent);
+}
+
+.studs-eye-toggle:hover {
+  border-color: color-mix(in srgb, var(--studs-accent) 55%, var(--studs-border));
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--studs-accent) 34%, transparent),
+    0 0 16px color-mix(in srgb, var(--studs-accent) 26%, transparent);
+}
+
 /* ── Theme swatches ─────────────────────────────────────── */
 .theme-swatch--green {
   background-color: #10b981;
