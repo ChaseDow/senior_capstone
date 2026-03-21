@@ -22,12 +22,13 @@
                   turbo_frame: "agenda_list"
                 },
                 html: { class: "space-y-3" } do |f| %>
-    <div class="flex items-center gap-3">
-      <div class="flex-1">
+    <div class="flex flex-wrap items-center gap-2 rounded-2xl p-2"
+         style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg-2);">
+      <div class="min-w-[240px] flex-1">
         <%= render Studs::SearchBarComponent.new(
           name: "q[term]",
           value: params.dig(:q, :term),
-          placeholder: "Search by name…",
+          placeholder: "Search by filter option (first button to the right)…",
           class_name: "w-full",
           data: {
             search_target: "input",
@@ -35,6 +36,18 @@
           }
         ) %>
       </div>
+      <div class="mx-1 hidden h-5 w-px rounded-full md:block" style="background-color: var(--studs-border);"></div>
+      <div class="w-40">
+        <%= select_tag "q[field]",
+          options_for_select(
+            [["Name", "name"], ["Location", "location"], ["Description", "description"]],
+            params.dig(:q, :field).presence || "name"
+          ),
+          class: "w-full rounded-xl border bg-zinc-900/50 px-3 py-2 text-sm text-zinc-200 focus:outline-none focus:ring-2 transition-all",
+          style: filter_input_style,
+          data: { action: "change->search#search" } %>
+      </div>
+      <div class="mx-1 hidden h-5 w-px rounded-full md:block" style="background-color: var(--studs-border);"></div>
       <div class="w-36">
         <%= f.select :type,
           options_for_select(
@@ -46,6 +59,7 @@
           style: filter_input_style,
           data: { action: "change->search#search" } %>
       </div>
+      <div class="mx-1 hidden h-5 w-px rounded-full md:block" style="background-color: var(--studs-border);"></div>
       <div class="flex items-center gap-2">
         <%= f.date_field :start_date,
           value: params[:start_date],
@@ -62,6 +76,7 @@
           data: { action: "change->search#search" } %>
       </div>
       <% if active_filters.positive? %>
+        <div class="mx-1 hidden h-5 w-px rounded-full md:block" style="background-color: var(--studs-border);"></div>
         <%= link_to "Reset",
           agenda_index_path,
           class: "inline-block rounded-xl border bg-zinc-900/50 px-4 py-2 text-sm font-medium text-zinc-200 hover:bg-zinc-800/50 focus:outline-none transition",
