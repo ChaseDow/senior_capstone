@@ -1,4 +1,8 @@
-<%= turbo_frame_tag "profile_modal" do %>
+<%= turbo_frame_tag "profile_modal",
+      data: {
+        modal_target: "frame",
+        action: "turbo:frame-load->modal#frameLoaded turbo:submit-end->modal#submitEnded"
+      } do %>
   <div class="flex max-h-[85vh] flex-col" data-controller="avatar-crop">
     <!-- Header -->
     <div class="flex items-start justify-between border-b border-zinc-800 bg-zinc-950/50 px-6 py-4">
@@ -8,7 +12,7 @@
       </div>
 
       <div class="flex items-center gap-4">
-        <div class="h-16 w-16 overflow-hidden rounded-full bg-zinc-900 ring-2 ring-emerald-900/30">
+        <div class="h-16 w-16 overflow-hidden rounded-full bg-zinc-900 ring-2" style="--tw-ring-color: var(--studs-border);">
           <!-- LIVE PREVIEW TARGET (must be inside the controller) -->
           <div data-avatar-crop-target="preview" class="h-full w-full"></div>
         </div>
