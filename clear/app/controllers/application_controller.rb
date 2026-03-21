@@ -28,6 +28,12 @@ class ApplicationController < ActionController::Base
     course_occurrences =
       base_courses.flat_map { |c| c.occurrences_between(range_start, range_end) }
 
+    base_work_shifts = current_user.work_shifts.active
+      .where("repeat_until IS NULL OR repeat_until >= ?", range_start.to_date)
+
+    work_shift_occurrences =
+      base_work_shifts.flat_map { |ws| ws.occurrences_between(range_start, range_end) }
+
     course_items =
       CourseItem
         .joins(:course)
@@ -35,7 +41,7 @@ class ApplicationController < ActionController::Base
         .where(due_at: range_start..range_end)
         .includes(:course)
 
-    result = (event_occurrences + course_occurrences + course_items.to_a).sort_by(&:starts_at)
+    result = (event_occurrences + course_occurrences + work_shift_occurrences + course_items.to_a).sort_by(&:starts_at)
 
     draft&.operation_count&.positive? ? draft.build_preview_occurrences(result, range_start, range_end) : result
   end

@@ -19,6 +19,8 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :work_shifts
+
   scope :university_calendar do
     get  "preview", to: "university_calendar#preview", as: :university_calendar_preview
     post "import",  to: "university_calendar#import",  as: :university_calendar_import

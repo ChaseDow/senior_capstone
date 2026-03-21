@@ -441,6 +441,13 @@
               " background-blend-mode: overlay;" \
               " border-left-style: solid; border-left-width: 6px; border-left-color: rgba(255,255,255,0.70);"
             %>
+            <% work_shift_css =
+              "background-image:" \
+              " linear-gradient(to right, rgba(255,255,255,0.50) 0px, rgba(255,255,255,0.50) 6px, rgba(255,255,255,0.0) 6px)," \
+              " repeating-linear-gradient(90deg, rgba(255,255,255,0.10) 0px, rgba(255,255,255,0.10) 4px, rgba(255,255,255,0.0) 4px, rgba(255,255,255,0.0) 8px);" \
+              " background-blend-mode: overlay;" \
+              " border-left-style: dashed; border-left-width: 6px; border-left-color: rgba(255,255,255,0.60);"
+            %>
             <% due_css =
               "border-left-style: solid; border-left-width: 6px;" \
               " border-left-color: rgba(0,0,0,0.25);" \
@@ -449,7 +456,7 @@
             <% segments.each do |seg| %>
               <% record    = seg[:record]; model = seg[:model] %>
               <% draft_status = seg[:draft_status] %>
-              <% is_course = (model == "course"); is_due = (model == "course_item") %>
+              <% is_course = (model == "course"); is_due = (model == "course_item"); is_work_shift = (model == "work_shift") %>
               <% is_draft_created = (draft_status == "created") %>
               <% is_draft_updated = (draft_status == "updated") %>
               <% is_draft_deleted = (draft_status == "deleted") %>
@@ -474,7 +481,7 @@
                   "bg-sky-400/80 text-black/90"
                 elsif is_draft_deleted
                   "bg-red-400/80 text-white/95"
-                elsif is_course || is_due
+                elsif is_course || is_due || is_work_shift
                   "bg-white/40 text-black/90"
                 else
                   "bg-black/25 text-white/95"
@@ -489,6 +496,8 @@
                   "REMOVED"
                 elsif is_due
                   "DUE"
+                elsif is_work_shift
+                  "SHIFT"
                 elsif is_course
                   "COURSE"
                 else
@@ -516,7 +525,7 @@
                 "color: #{base_text}; " \
                 "border-color: rgba(0,0,0,0.22); " \
                 "z-index: #{z}; " \
-                "#{is_course ? course_css : (is_due ? due_css : "")}" \
+                "#{is_course ? course_css : (is_work_shift ? work_shift_css : (is_due ? due_css : ""))}" \
                 "#{draft_style_extra}"
               %>
               <% highlight_id = "#{model}-#{record.id}-#{seg[:seg_start].to_date.iso8601}" %>
