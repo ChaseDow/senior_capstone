@@ -124,9 +124,12 @@
                 "#{start_at.strftime("%-I:%M %p")} – #{end_at.strftime("%-I:%M %p")}"
               end
             %>
+            <% is_work_shift = (model == "work_shift") %>
             <% type_label =
               if is_due
                 "Due"
+              elsif is_work_shift
+                "Shift"
               elsif is_course
                 "Course"
               else

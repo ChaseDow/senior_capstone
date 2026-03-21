@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_20_084044) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_21_035210) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -176,6 +176,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_20_084044) do
     t.index ["role"], name: "index_users_on_role"
   end
 
+  create_table "work_shifts", force: :cascade do |t|
+    t.string "color", default: "#34D399", null: false
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.time "end_time"
+    t.string "location"
+    t.boolean "recurring", default: true, null: false
+    t.string "repeat_days", default: [], null: false, array: true
+    t.date "repeat_until"
+    t.time "start_time"
+    t.string "title"
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id"], name: "index_work_shifts_on_user_id"
+  end
+
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "calendar_drafts", "users"
@@ -189,4 +205,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_20_084044) do
   add_foreign_key "schedules", "users"
   add_foreign_key "syllabuses", "courses", on_delete: :nullify
   add_foreign_key "syllabuses", "users"
+  add_foreign_key "work_shifts", "users"
 end

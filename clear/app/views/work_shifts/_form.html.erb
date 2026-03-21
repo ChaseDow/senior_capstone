@@ -1,0 +1,112 @@
+<% turbo_enabled = local_assigns.key?(:turbo) ? local_assigns[:turbo] : true %>
+<% form_url = work_shift.persisted? ? work_shift_path(work_shift) : work_shifts_path %>
+<%= form_with model: work_shift,
+              url: form_url,
+              class: "space-y-5",
+              data: { turbo: turbo_enabled } do |f| %>
+  <% if work_shift.errors.any? %>
+    <div class="rounded-2xl p-4 text-red-300"
+         style="border: 1px solid rgba(239,68,68,0.3); background-color: rgba(127,29,29,0.2);">
+      <p class="text-sm font-semibold mb-1">Please fix the following:</p>
+      <ul class="list-disc pl-5 text-sm space-y-0.5">
+        <% work_shift.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <% label_classes = "block text-[10px] font-bold uppercase tracking-widest mb-1.5" %>
+  <% label_style   = "color: var(--studs-accent); opacity: 0.8;" %>
+  <% input_classes = "w-full rounded-2xl px-4 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-600 " \
+                     "bg-zinc-950/60 focus:outline-none focus:ring-2 transition-all duration-150 border" %>
+  <% input_style   = "border-color: var(--studs-border); --tw-ring-color: var(--studs-accent);" %>
+  <!-- Title -->
+  <div>
+    <%= f.label :title, "Shift name *", class: label_classes, style: label_style %>
+    <%= f.text_field :title,
+          class: input_classes,
+          style: input_style,
+          placeholder: "e.g. Starbucks Morning, Target Closing…" %>
+  </div>
+  <!-- Times -->
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+    <div>
+      <%= f.label :start_time, "Start time", class: label_classes, style: label_style %>
+      <%= f.time_field :start_time, class: input_classes, style: input_style %>
+    </div>
+    <div>
+      <%= f.label :end_time, "End time", class: label_classes, style: label_style %>
+      <%= f.time_field :end_time, class: input_classes, style: input_style %>
+    </div>
+  </div>
+  <!-- Location -->
+  <div>
+    <%= f.label :location, class: label_classes, style: label_style %>
+    <%= f.text_field :location,
+          class: input_classes,
+          style: input_style,
+          placeholder: "e.g. 123 Main St, Ruston" %>
+  </div>
+  <!-- Description -->
+  <div>
+    <%= f.label :description, class: label_classes, style: label_style %>
+    <%= f.text_area :description,
+          rows: 3,
+          class: input_classes,
+          style: "#{input_style} resize: vertical;",
+          placeholder: "Optional notes…" %>
+  </div>
+  <!-- Repeat + Color -->
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 items-start">
+    <!-- Repeat card -->
+    <div class="relative rounded-2xl p-4"
+         style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg-2);">
+      <%= f.check_box :recurring,
+            class: "peer absolute top-4 right-4 h-5 w-5 rounded cursor-pointer",
+            style: "accent-color: var(--studs-accent);" %>
+      <div class="pr-10">
+        <div class="text-sm font-semibold text-zinc-200">Repeat</div>
+        <div class="text-xs text-zinc-500 mt-0.5">Repeat on selected weekdays</div>
+      </div>
+      <div class="mt-4 space-y-3 hidden peer-checked:block">
+        <div class="text-[10px] font-bold uppercase tracking-widest"
+             style="color: var(--studs-accent); opacity: 0.8;">Days</div>
+        <div class="grid grid-cols-7 gap-1.5">
+          <% [["Su", 0], ["Mo", 1], ["Tu", 2], ["We", 3], ["Th", 4], ["Fr", 5], ["Sa", 6]].each do |lbl, wday| %>
+            <label class="relative cursor-pointer">
+              <%= f.check_box :repeat_days, { multiple: true, class: "peer sr-only" }, wday, nil %>
+              <div class="flex h-9 items-center justify-center rounded-xl border text-xs font-semibold transition-all
+                          border-zinc-700 bg-zinc-900/40 text-zinc-400
+                          hover:border-zinc-500 hover:text-zinc-200
+                          peer-checked:border-white/40 peer-checked:bg-white/10 peer-checked:text-white">
+                <%= lbl %>
+              </div>
+            </label>
+          <% end %>
+        </div>
+        <div>
+          <%= f.label :repeat_until, "Repeat until", class: label_classes, style: label_style %>
+          <%= f.date_field :repeat_until, class: input_classes, style: input_style %>
+        </div>
+      </div>
+    </div>
+    <!-- Color picker -->
+    <div class="rounded-2xl p-4"
+         style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg-2);">
+      <%= f.label :color, "Shift color", class: label_classes, style: label_style %>
+      <%= f.color_field :color,
+            class: "w-full h-10 rounded-xl border cursor-pointer bg-transparent",
+            style: "border-color: var(--studs-border);" %>
+    </div>
+  </div>
+  <!-- Actions -->
+  <div class="flex items-center gap-3 pt-2" style="border-top: 1px solid var(--studs-divider);">
+    <button type="submit" class="studs-btn-accent">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+      </svg>
+      <%= work_shift.persisted? ? "Update shift" : "Create shift" %>
+    </button>
+    <%= link_to "Cancel", work_shifts_path, class: "studs-nav-btn" %>
+  </div>
+<% end %>
