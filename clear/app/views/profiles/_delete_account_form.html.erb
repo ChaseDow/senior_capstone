@@ -1,7 +1,14 @@
-<%= turbo_frame_tag "profile_modal" do %>
-  <div class="p-5 space-y-4">
+<%= turbo_frame_tag "profile_modal",
+      data: {
+        modal_target: "frame",
+        action: "turbo:frame-load->modal#frameLoaded turbo:submit-end->modal#submitEnded"
+      } do %>
+  <div class="p-5">
+    <div class="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5">
+      <div class="space-y-4">
     <div>
       <h2 class="text-lg font-semibold text-zinc-50">Delete Account</h2>
+      <p class="mt-1 text-sm text-zinc-500">This action is permanent and cannot be undone.</p>
     </div>
 
     <%= form_with model: user,
@@ -20,14 +27,11 @@
       <% end %>
 
       <div class="space-y-4">
-        <div
-          class="w-full rounded-2xl px-4 py-3 text-md leading-relaxed border bg-green-500/10 border-green-400/40 text-zinc-100"
-        >
-        <div class="relative">
-            Are you sure you want to delete your account? This will permanently remove your account and all associated data. This action cannot be reversed. Enter your
-            password to confirm. 
+        <div class="rounded-xl border border-red-900/40 bg-red-950/30 px-4 py-3 text-sm leading-relaxed text-red-200">
+          <div class="relative">
+            Are you sure you want to delete your account? This will permanently remove your account and all associated data. This action cannot be reversed. Enter your password to confirm.
+          </div>
         </div>
-      </div>
 
         <div class="relative">
           <%= f.label :password, "Password", class: "text-sm text-zinc-300" %>
@@ -51,14 +55,16 @@
         </div>
 
         <%= f.submit "Delete Account",
-              class: "mt-2 w-full rounded-xl bg-red-500 px-4 py-2 text-sm font-medium text-white-950 hover:bg-red-400" %>
+              class: "studs-btn-danger !mt-2 !w-full !justify-center !rounded-xl !py-2.5 !text-sm" %>
 
         <%= link_to profile_path,
               data: { turbo_frame: "profile_modal", turbo_prefetch: false },
-              class: "block w-full text-center rounded-xl border border-zinc-800 px-4 py-2 text-sm text-zinc-200 hover:bg-zinc-800/40" do %>
+              class: "studs-nav-btn !w-full !justify-center !rounded-xl !py-2.5 !text-sm" do %>
           Cancel
         <% end %>
       </div>
     <% end %>
+      </div>
+    </div>
   </div>
 <% end %>

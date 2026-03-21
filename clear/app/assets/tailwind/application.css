@@ -419,25 +419,25 @@ body[data-theme="latech"] [data-drawer-target="panel"] {
 }
 
 /* ── Space theme profile modal ────────────────────────── */
-body[data-theme="nebula"] [data-modal-target="panel"] > div {
+body[data-theme="nebula"] [data-modal-target="panel"]>div {
   background-color: rgba(15, 10, 26, 0.92) !important;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
 }
 
-body[data-theme="aurora"] [data-modal-target="panel"] > div {
+body[data-theme="aurora"] [data-modal-target="panel"]>div {
   background-color: rgba(6, 17, 28, 0.92) !important;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
 }
 
-body[data-theme="sunset"] [data-modal-target="panel"] > div {
+body[data-theme="sunset"] [data-modal-target="panel"]>div {
   background-color: rgba(17, 6, 16, 0.92) !important;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
 }
 
-body[data-theme="latech"] [data-modal-target="panel"] > div {
+body[data-theme="latech"] [data-modal-target="panel"]>div {
   background-color: #111827 !important;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
@@ -723,11 +723,9 @@ body[data-theme="cyan"] .studs-today-badge {
 
 /* ── Active nav pill (glassmorphic, theme-aware) ───────── */
 .studs-nav-link--active-pill {
-  background: linear-gradient(
-    135deg,
-    color-mix(in srgb, var(--studs-accent) 22%, transparent) 0%,
-    color-mix(in srgb, var(--studs-accent-secondary) 10%, transparent) 100%
-  );
+  background: linear-gradient(135deg,
+      color-mix(in srgb, var(--studs-accent) 22%, transparent) 0%,
+      color-mix(in srgb, var(--studs-accent-secondary) 10%, transparent) 100%);
   border: 1px solid color-mix(in srgb, var(--studs-accent) 30%, transparent);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -757,6 +755,10 @@ body[data-theme="cyan"] .studs-today-badge {
 .studs-icon--inactive [stroke],
 .studs-icon--inactive *[stroke] {
   stroke: #d4d4d8 !important;
+}
+
+.studs-icon-accent-soft {
+  color: color-mix(in srgb, var(--studs-accent) 55%, transparent);
 }
 
 /* ── Theme swatches ─────────────────────────────────────── */
@@ -995,6 +997,7 @@ body[data-theme="cyan"] .studs-today-badge {
   }
 }
 
+/* Old Scrollbar Styles (kept for easy rollback)
 @layer base {
   :root {
     --sb-track: #f4f4f5;
@@ -1038,5 +1041,71 @@ body[data-theme="cyan"] .studs-today-badge {
 
   *::-webkit-scrollbar-thumb:hover {
     background: var(--sb-thumb-hover) !important;
+  }
+}
+*/
+
+@layer base {
+  :root {
+    --sb-track: color-mix(in srgb, var(--studs-panel-bg-2) 75%, #09090b 25%);
+    --sb-thumb: color-mix(in srgb, var(--studs-accent) 35%, #71717a 65%);
+    --sb-thumb-hover: color-mix(in srgb, var(--studs-accent) 55%, #71717a 45%);
+    --sb-size: 10px;
+    --sb-radius: 9999px;
+    --sb-border: 2px;
+  }
+
+  body[data-theme] {
+    --sb-track: color-mix(in srgb, var(--studs-panel-bg-2) 75%, #09090b 25%);
+    --sb-thumb: color-mix(in srgb, var(--studs-accent) 35%, #71717a 65%);
+    --sb-thumb-hover: color-mix(in srgb, var(--studs-accent) 55%, #71717a 45%);
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--sb-thumb) var(--sb-track);
+  }
+
+  *::-webkit-scrollbar {
+    width: var(--sb-size);
+    height: var(--sb-size);
+  }
+
+  *::-webkit-scrollbar-track {
+    background: var(--sb-track) !important;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background: var(--sb-thumb) !important;
+    border-radius: var(--sb-radius);
+    border: var(--sb-border) solid var(--sb-track);
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background: var(--sb-thumb-hover) !important;
+  }
+
+  .scrollbars {
+    scrollbar-width: thin;
+    scrollbar-color: var(--sb-thumb) var(--sb-track);
+  }
+
+  .scrollbars::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+  }
+
+  .scrollbars::-webkit-scrollbar-track {
+    background: linear-gradient(180deg, var(--sb-track), color-mix(in srgb, var(--sb-track) 70%, #09090b 30%)) !important;
+  }
+
+  .scrollbars::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, var(--sb-thumb), color-mix(in srgb, var(--sb-thumb) 80%, #18181b 20%)) !important;
+    border: 2px solid var(--sb-track);
+    border-radius: var(--sb-radius);
+  }
+
+  .scrollbars::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, var(--sb-thumb-hover), var(--sb-thumb)) !important;
   }
 }
