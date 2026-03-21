@@ -16,7 +16,7 @@ class User < ApplicationRecord
   has_one_attached :avatar
 
   # ── Theme ────────────────────────────────────────────────
-  THEMES = %w[green blue purple rose amber cyan pink red lime slate orange].freeze
+  THEMES = %w[green blue purple rose amber cyan pink red lime slate orange mono nebula aurora sunset latech].freeze
   THEME_DEFAULT = "green".freeze
 
   def theme
