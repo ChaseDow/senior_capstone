@@ -3,15 +3,14 @@ class ProfilesController < ApplicationController
 
   def show
     @user = current_user
-
-    return unless turbo_frame_request?
-
     render partial: "profiles/drawer_detail",
            locals: { user: @user }
   end
 
   def edit
     @user = current_user
+    render partial: "profiles/drawer_detail",
+           locals: { user: @user }
   end
 
   def update
