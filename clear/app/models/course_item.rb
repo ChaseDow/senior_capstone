@@ -2,6 +2,7 @@
 
 class CourseItem < ApplicationRecord
   belongs_to :course
+  has_many :notifications, as: :notifiable, dependent: :destroy
 
   enum :kind, {
     assignment: 0,
@@ -18,6 +19,8 @@ class CourseItem < ApplicationRecord
   validates :title, presence: true
   validates :kind, presence: true
 
+  after_create_commit :create_assignment_notification
+
   def display_title
     course_name = course&.title.presence || "Course"
     kind_name   = kind.present? ? kind.humanize : "Item"
@@ -25,6 +28,19 @@ class CourseItem < ApplicationRecord
 
     base ? "#{course_name} — #{kind_name}: #{base}" : "#{course_name} — #{kind_name}"
   end
+
+  private
+
+  def create_assignment_notification
+    Notification.create!(
+      user: course.user,
+      notifiable: self,
+      category: "assignment_due",
+      message: "#{kind.humanize} due: #{title}"
+    )
+  end
+
+  public
 
   def starts_at = due_at
   def ends_at = due_at ? due_at + 30.minutes : nil
