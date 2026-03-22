@@ -9,7 +9,8 @@ class WorkShiftsController < ApplicationController
   def index
     @q = params[:q].to_s.strip
     @work_shifts = current_user.work_shifts.ordered
-    @work_shifts = @work_shifts.where("title ILIKE :q OR location ILIKE :q", q: "%#{@q}%") if @q.present?
+    @work_shifts = @work_shifts.where("title ILIKE ? OR location ILIKE ? OR description ILIKE ?",
+                                      "%#{@q}%", "%#{@q}%", "%#{@q}%") if @q.present?
   end
 
   def show
@@ -56,7 +57,7 @@ class WorkShiftsController < ApplicationController
 
   def work_shift_params
     params.require(:work_shift).permit(
-      :title, :location, :start_time, :end_time,
+      :title, :location, :start_time, :end_time, :start_date,
       :color, :description, :recurring, :repeat_until,
       repeat_days: []
     )

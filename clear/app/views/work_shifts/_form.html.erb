@@ -31,21 +31,28 @@
   <!-- Times -->
   <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
     <div>
-      <%= f.label :start_time, "Start time", class: label_classes, style: label_style %>
+      <%= f.label :start_time, "Start Time *", class: label_classes, style: label_style %>
       <%= f.time_field :start_time, class: input_classes, style: input_style %>
     </div>
     <div>
-      <%= f.label :end_time, "End time", class: label_classes, style: label_style %>
+      <%= f.label :end_time, "End Time *", class: label_classes, style: label_style %>
       <%= f.time_field :end_time, class: input_classes, style: input_style %>
     </div>
   </div>
-  <!-- Location -->
-  <div>
-    <%= f.label :location, class: label_classes, style: label_style %>
-    <%= f.text_field :location,
-          class: input_classes,
-          style: input_style,
-          placeholder: "e.g. 123 Main St, Ruston" %>
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+  <!-- Starting Date --> 
+    <div>
+      <%= f.label :start_date, "Start Date *", class: label_classes, style: label_style %>
+      <%= f.date_field :start_date, class: input_classes, style: input_style %>
+    </div>
+    <!-- Location -->
+    <div>
+      <%= f.label :location, class: label_classes, style: label_style %>
+      <%= f.text_field :location,
+            class: input_classes,
+            style: input_style,
+            placeholder: "e.g. 123 Main St, Ruston" %>
+    </div>
   </div>
   <!-- Description -->
   <div>
@@ -93,10 +100,14 @@
     <!-- Color picker -->
     <div class="rounded-2xl p-4"
          style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg-2);">
-      <%= f.label :color, "Shift color", class: label_classes, style: label_style %>
-      <%= f.color_field :color,
-            class: "w-full h-10 rounded-xl border cursor-pointer bg-transparent",
-            style: "border-color: var(--studs-border);" %>
+      <div class="text-sm font-semibold text-zinc-200">Work Shift Color</div>
+      <div class="text-xs text-zinc-500 mt-0.5 mb-4">Used as the calendar highlight</div>
+      <div class="flex items-center gap-3">
+        <%= f.color_field :color,
+              class: "h-12 w-20 cursor-pointer rounded-xl border bg-zinc-950/40",
+              style: "border-color: var(--studs-border);" %>
+        <span class="text-xs text-zinc-500">Click to pick a color</span>
+      </div>
     </div>
   </div>
   <!-- Actions -->
