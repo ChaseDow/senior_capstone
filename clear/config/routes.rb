@@ -95,6 +95,11 @@ Rails.application.routes.draw do
   patch  "dashboard/draft/apply",   to: "draft#apply",   as: :apply_draft
   delete "dashboard/draft",         to: "draft#discard", as: :discard_draft
 
+  post   "dashboard/draft",         to: "draft#enter",   as: :enter_draft
+  patch  "dashboard/draft/apply",   to: "draft#apply",   as: :apply_draft
+  delete "dashboard/draft",         to: "draft#discard", as: :discard_draft
+
+  get "projects/join", to: "projects#join", as: :join_project
   get "/ui",             to: "ui#show"
   get "/schedule",       to: "schedule#week"
   get "/schedule/week",  to: "schedule#week"

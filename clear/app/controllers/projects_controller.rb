@@ -114,6 +114,21 @@ class ProjectsController < ApplicationController
 
   private
 
+    def join
+      project = Project.find_by(invite_token: params[:token])
+
+      if project.nil?
+        redirect_to root_path, alert: "Invalid invite link"
+        return
+      end
+
+      unless project.users.include?(current_user)
+        project.users << current_user
+      end
+
+      redirect_to project_path(project), notice: "You joined the project!"
+    end
+
     def occurrences_for_range(range_start, range_end)
       base_events = current_user.events
 
