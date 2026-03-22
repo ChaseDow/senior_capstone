@@ -22,7 +22,7 @@ class Event < ApplicationRecord
   before_validation :normalize_recurrence_fields
   before_validation :normalize_color
 
-  after_create_commit :create_priority_notification, if: -> { priority.present? && priority > 0 }
+  after_create_commit :create_notification
 
   Occurrence = Struct.new(:event, :starts_at, :ends_at, :draft_status, keyword_init: true) do
     delegate :id, :title, :location, :description, :color, :contrast_text_color, to: :event
@@ -111,12 +111,12 @@ class Event < ApplicationRecord
     errors.add(:repeat_until, "must be on/after the start date")
   end
 
-  def create_priority_notification
+  def create_notification
     Notification.create!(
       user: user,
       notifiable: self,
-      category: "high_priority",
-      message: "High priority event: #{title}"
+      category: (priority.present? && priority > 0) ? "high_priority" : "event_created",
+      message: title
     )
   end
 

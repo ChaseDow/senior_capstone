@@ -36,7 +36,7 @@ class CourseItem < ApplicationRecord
       user: course.user,
       notifiable: self,
       category: "assignment_due",
-      message: "#{kind.humanize} due: #{title}"
+      message: due_at ? "#{title} due: #{due_at.strftime("%-b %-d at %-I:%M %p")}" : "#{title} due: No date set"
     )
   end
 

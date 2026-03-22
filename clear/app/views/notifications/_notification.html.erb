@@ -11,13 +11,16 @@
    when "course_added"
      notifiable.is_a?(Course) ? notifiable.next_occurrence_at : nil
    end %>
-<% category_label = {
-     "event_created"  => "Event added",
-     "course_added"   => "Course added",
-     "high_priority"  => "High priority",
-     "assignment_due" => "Assignment due",
-     "group"          => "Group"
-   }.fetch(notification.category, notification.category.humanize) %>
+<% category_label = if notification.category == "assignment_due" && notifiable.is_a?(CourseItem)
+     "#{notifiable.kind.humanize} added"
+   else
+     {
+       "event_created" => "Event added",
+       "course_added"  => "Course added",
+       "high_priority" => "High priority",
+       "group"         => "Group"
+     }.fetch(notification.category, notification.category.humanize)
+   end %>
 <div id="<%= dom_id(notification) %>"
      class="rounded-2xl border px-3 py-3 transition <%= notification.read? ? 'opacity-60' : '' %>"
      style="border-color: var(--studs-border); background-color: var(--studs-panel-header);">

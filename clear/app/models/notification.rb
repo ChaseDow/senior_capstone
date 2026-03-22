@@ -4,7 +4,7 @@ class Notification < ApplicationRecord
   belongs_to :user
   belongs_to :notifiable, polymorphic: true, optional: true
 
-  CATEGORIES = %w[assignment_due high_priority group].freeze
+  CATEGORIES = %w[assignment_due high_priority event_created course_added group].freeze
 
   validates :category, inclusion: { in: CATEGORIES }
 
