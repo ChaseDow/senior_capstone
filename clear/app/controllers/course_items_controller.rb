@@ -38,13 +38,27 @@ class CourseItemsController < ApplicationController
   end
 
   def show
+    # return unless turbo_frame_request?
+
+    # render partial: "course_items/popover_detail",
+    #       locals: { course_item: @course_item, course: @course, start_date: params[:start_date] }
     return unless turbo_frame_request?
 
-    render partial: "course_items/popover_detail",
+    partial = if request.headers["Turbo-Frame"] == "event_popover"
+                "course_items/popover_detail"
+    else
+                "course_items/drawer_detail"
+    end
+
+    render partial: partial,
            locals: { course_item: @course_item, course: @course, start_date: params[:start_date] }
   end
 
-  def edit; end
+  def edit
+    return unless turbo_frame_request?
+
+    render partial: "course_items/drawer_edit", locals: { course_item: @course_item, course: @course, start_date: params[:start_date] }
+  end
 
   def update
     if @course_item.update(course_item_params)
