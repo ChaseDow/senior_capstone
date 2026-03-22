@@ -5,12 +5,6 @@
    elsif %w[high_priority event_created].include?(notification.category) && notifiable.is_a?(Event)
      event_path(notifiable)
    end %>
-<% target_time = case notification.category
-   when "event_created", "high_priority"
-     notifiable.is_a?(Event) ? notifiable.starts_at : nil
-   when "course_added"
-     notifiable.is_a?(Course) ? notifiable.next_occurrence_at : nil
-   end %>
 <% category_label = if notification.category == "assignment_due" && notifiable.is_a?(CourseItem)
      "#{notifiable.kind.humanize} added"
    else
@@ -33,16 +27,7 @@
           form: { class: "flex-1 min-w-0" } do %>
       <span class="mt-1.5 h-2 w-2 shrink-0 rounded-full <%= notification.read? ? 'bg-zinc-600' : 'bg-rose-500' %>"></span>
       <div class="min-w-0 flex-1">
-        <div class="flex items-baseline gap-1.5 min-w-0">
-          <span class="text-sm font-medium text-zinc-100 truncate"><%= notification.message %></span>
-          <% if target_time&.future? %>
-            <span class="shrink-0 text-xs text-zinc-400"
-                  data-controller="countdown"
-                  data-countdown-event-time-value="<%= target_time.iso8601 %>">
-              <span data-countdown-display></span>
-            </span>
-          <% end %>
-        </div>
+        <div class="text-sm font-medium text-zinc-100 truncate"><%= notification.message %></div>
         <div class="mt-0.5 flex items-center gap-1.5 text-xs text-zinc-400">
           <span><%= notification.created_at.strftime("%-b %-d at %-I:%M %p") %></span>
           <span class="text-zinc-600">•</span>

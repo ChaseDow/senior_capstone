@@ -102,7 +102,7 @@ class Course < ApplicationRecord
       user: user,
       notifiable: self,
       category: "course_added",
-      message: title
+      message: start_time ? "#{title} at #{start_time.strftime("%-I:%M %p")}" : title
     )
   end
 

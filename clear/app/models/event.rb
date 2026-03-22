@@ -116,7 +116,7 @@ class Event < ApplicationRecord
       user: user,
       notifiable: self,
       category: (priority.present? && priority > 0) ? "high_priority" : "event_created",
-      message: title
+      message: starts_at ? "#{title} at #{starts_at.strftime("%-b %-d at %-I:%M %p")}" : title
     )
   end
 
