@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_21_035210) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_21_203938) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -73,7 +73,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_21_035210) do
     t.time "end_time"
     t.time "ends_at"
     t.string "instructor"
-    t.bigint "label_id"
     t.string "location"
     t.string "meeting_days"
     t.string "professor"
@@ -87,10 +86,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_21_035210) do
     t.string "title"
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
-    t.index ["label_id"], name: "index_courses_on_label_id"
     t.index ["user_id", "repeat_until"], name: "index_courses_on_user_id_and_repeat_until"
     t.index ["user_id", "start_date"], name: "index_courses_on_user_id_and_start_date"
     t.index ["user_id"], name: "index_courses_on_user_id"
+  end
+
+  create_table "documents", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id"], name: "index_documents_on_user_id"
   end
 
   create_table "event_exceptions", force: :cascade do |t|
@@ -109,7 +115,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_21_035210) do
     t.text "description"
     t.integer "duration_minutes"
     t.datetime "ends_at"
-    t.bigint "label_id"
     t.string "location"
     t.integer "priority"
     t.boolean "recurring", default: false, null: false
@@ -119,20 +124,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_21_035210) do
     t.string "title"
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
-    t.index ["label_id"], name: "index_events_on_label_id"
     t.index ["user_id", "repeat_until"], name: "index_events_on_user_id_and_repeat_until"
     t.index ["user_id", "starts_at"], name: "index_events_on_user_id_and_starts_at"
     t.index ["user_id"], name: "index_events_on_user_id"
-  end
-
-  create_table "labels", force: :cascade do |t|
-    t.string "color", default: "#78866B", null: false
-    t.datetime "created_at", null: false
-    t.string "name", null: false
-    t.datetime "updated_at", null: false
-    t.bigint "user_id", null: false
-    t.index ["user_id", "name"], name: "index_labels_on_user_id_and_name", unique: true
-    t.index ["user_id"], name: "index_labels_on_user_id"
   end
 
   create_table "schedules", force: :cascade do |t|
@@ -196,12 +190,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_21_035210) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "calendar_drafts", "users"
   add_foreign_key "course_items", "courses"
-  add_foreign_key "courses", "labels"
   add_foreign_key "courses", "users"
+  add_foreign_key "documents", "users"
   add_foreign_key "event_exceptions", "events"
-  add_foreign_key "events", "labels"
   add_foreign_key "events", "users"
-  add_foreign_key "labels", "users"
   add_foreign_key "schedules", "users"
   add_foreign_key "syllabuses", "courses", on_delete: :nullify
   add_foreign_key "syllabuses", "users"

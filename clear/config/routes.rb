@@ -30,6 +30,8 @@ Rails.application.routes.draw do
   end
   resources :agenda
 
+  resources :documents
+
   resources :syllabuses do
     member do
       post :create_course
