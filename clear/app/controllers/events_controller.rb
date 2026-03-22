@@ -31,6 +31,11 @@ class EventsController < ApplicationController
   def new
     start_time = params[:start_time].present? ? Time.zone.parse(params[:start_time]) : nil
     @event = current_user.events.new(starts_at: start_time)
+
+    if params[:project_id].present?
+      @project = current_user.projects.find(params[:project_id])
+      @event.project = @project
+    end
   end
 
   def create
@@ -40,6 +45,9 @@ class EventsController < ApplicationController
     end
 
     @event = current_user.events.new(event_params)
+    if params[:event][:project_id].present?
+      @event.project = current_user.projects.find(params[:event][:project_id])
+    end
 
     if @event.save
       respond_to do |format|
@@ -238,7 +246,7 @@ class EventsController < ApplicationController
   def event_params
     params.require(:event).permit(
       :title, :starts_at, :ends_at, :duration_minutes, :location, :priority,
-      :description, :color, :recurring, :repeat_until,
+      :description, :color, :recurring, :repeat_until, :project_id,
       repeat_days: []
     )
   end

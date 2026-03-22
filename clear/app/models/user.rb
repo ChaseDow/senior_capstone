@@ -7,6 +7,8 @@ class User < ApplicationRecord
   has_many :notifications, dependent: :destroy
   has_many :projects, dependent: :destroy
   has_many :courses, dependent: :destroy
+  has_many :project_memberships, dependent: :destroy
+  has_many :projects, through: :project_memberships
 
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable

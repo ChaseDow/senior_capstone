@@ -2,6 +2,7 @@
 
 class Course < ApplicationRecord
   belongs_to :user
+  belongs_to :project, optional: true
   has_many :course_items, dependent: :destroy
   has_many :syllabuses, dependent: :nullify
   has_many :notifications, as: :notifiable, dependent: :destroy

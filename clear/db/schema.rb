@@ -94,6 +94,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_040638) do
     t.string "location"
     t.string "meeting_days"
     t.string "professor"
+    t.bigint "project_id"
     t.boolean "recurring", default: false, null: false
     t.integer "repeat_days", default: [], null: false, array: true
     t.date "repeat_until"
@@ -104,6 +105,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_040638) do
     t.string "title"
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
+    t.index ["project_id"], name: "index_courses_on_project_id"
     t.index ["user_id", "repeat_until"], name: "index_courses_on_user_id_and_repeat_until"
     t.index ["user_id", "start_date"], name: "index_courses_on_user_id_and_start_date"
     t.index ["user_id"], name: "index_courses_on_user_id"
@@ -135,6 +137,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_040638) do
     t.datetime "ends_at"
     t.string "location"
     t.integer "priority"
+    t.bigint "project_id"
     t.boolean "recurring", default: false, null: false
     t.integer "repeat_days", default: [], null: false, array: true
     t.date "repeat_until"
@@ -142,6 +145,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_040638) do
     t.string "title"
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
+    t.index ["project_id"], name: "index_events_on_project_id"
     t.index ["user_id", "repeat_until"], name: "index_events_on_user_id_and_repeat_until"
     t.index ["user_id", "starts_at"], name: "index_events_on_user_id_and_starts_at"
     t.index ["user_id"], name: "index_events_on_user_id"
@@ -163,12 +167,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_040638) do
     t.index ["user_id"], name: "index_notifications_on_user_id"
   end
 
+  create_table "project_memberships", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "project_id", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["project_id"], name: "index_project_memberships_on_project_id"
+    t.index ["user_id"], name: "index_project_memberships_on_user_id"
+  end
+
   create_table "projects", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "description"
+    t.string "invite_token"
     t.string "title", null: false
     t.datetime "updated_at", null: false
-    t.bigint "user_id", null: false
+    t.bigint "user_id"
   end
 
   create_table "schedules", force: :cascade do |t|
@@ -235,11 +249,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_040638) do
   add_foreign_key "ai_conversations", "users"
   add_foreign_key "calendar_drafts", "users"
   add_foreign_key "course_items", "courses"
+  add_foreign_key "courses", "projects"
   add_foreign_key "courses", "users"
   add_foreign_key "documents", "users"
   add_foreign_key "event_exceptions", "events"
+  add_foreign_key "events", "labels"
+  add_foreign_key "events", "projects"
   add_foreign_key "events", "users"
   add_foreign_key "notifications", "users"
+  add_foreign_key "project_memberships", "projects"
+  add_foreign_key "project_memberships", "users"
   add_foreign_key "projects", "users"
   add_foreign_key "schedules", "users"
   add_foreign_key "syllabuses", "courses", on_delete: :nullify

@@ -13,6 +13,7 @@ class ApplicationController < ActionController::Base
 
   def calendar_occurrences_for_range(range_start, range_end, draft: nil)
     base_events = current_user.events
+      .where(project_id: nil)
       .where("starts_at <= ?", range_end)
       .where("recurring = FALSE OR repeat_until >= ?", range_start.to_date)
       .order(starts_at: :asc)

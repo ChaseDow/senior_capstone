@@ -1,10 +1,9 @@
 <% content_for :title, "Editing project" %>
-
-<div class="md:w-2/3 w-full">
-  <h1 class="font-bold text-4xl">Editing project</h1>
-
+<div class="rounded-2xl p-6"
+     style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg);">
+  <div class="mb-6 pb-4" style="border-bottom: 1px solid var(--studs-divider);">
+    <div class="text-base font-semibold text-zinc-100">Edit event</div>
+    <div class="mt-0.5 text-sm text-zinc-500">Update the details below and save.</div>
+  </div>
   <%= render "form", project: @project %>
-
-  <%= link_to "Show this project", @project, class: "w-full sm:w-auto text-center mt-2 sm:mt-0 sm:ml-2 rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-  <%= link_to "Back to projects", projects_path, class: "w-full sm:w-auto text-center mt-2 sm:mt-0 sm:ml-2 rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
 </div>
