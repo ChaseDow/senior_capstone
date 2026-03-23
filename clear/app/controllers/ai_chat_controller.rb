@@ -3,7 +3,7 @@ class AiChatController < ApplicationController
   before_action :authenticate_user!
 
   def index
-    @messages = []
+    @messages = previous_messages
     @rate = GeminiRateTracker.usage
   end
 
@@ -13,7 +13,7 @@ class AiChatController < ApplicationController
 
   def create
     user_text = params[:content].to_s.strip
-    history   = parse_history(params[:history])
+    history   = previous_messages
 
     if user_text.blank?
       respond_to do |format|
@@ -49,6 +49,7 @@ class AiChatController < ApplicationController
       return
     end
 
+    ai_conversation.ai_chat_messages.create!(role: "user", content: user_text)
     history << { "role" => "user", "content" => user_text }
 
     chat_history = trim_for_api(history)
@@ -78,6 +79,7 @@ class AiChatController < ApplicationController
       assistant_text = result[:text]
     end
 
+    ai_conversation.ai_chat_messages.create!(role: "assistant", content: assistant_text.to_s)
     history << { "role" => "assistant", "content" => assistant_text }
     updated_rate = GeminiRateTracker.usage
 
@@ -149,13 +151,14 @@ class AiChatController < ApplicationController
     trimmed
   end
 
-  def parse_history(raw)
-    return [] if raw.blank?
-    arr = JSON.parse(raw)
-    return [] unless arr.is_a?(Array)
-    arr = arr.select { |m| m.is_a?(Hash) && m["role"].present? && m["content"].present? }
-    arr.last(50)
-  rescue JSON::ParserError
-    []
+  def ai_conversation
+    @ai_conversation ||= current_user.ai_conversation || current_user.create_ai_conversation!
+  end
+
+  def previous_messages
+    ai_conversation.ai_chat_messages
+      .order(:created_at)
+      .last(API_HISTORY_LIMIT)
+      .map { |m| { "role" => m.role, "content" => m.content } }
   end
 end
