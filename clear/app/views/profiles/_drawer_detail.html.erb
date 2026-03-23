@@ -212,8 +212,12 @@
                 </div>
                 <div class="mt-5 flex items-center justify-between">
                   <%= link_to reset_theme_path,
-              data: { turbo_method: :delete, turbo_confirm: "Reset to default green theme?" },
-              class: "studs-nav-btn" do %>
+                        data: {
+                          turbo_method: :delete,
+                          turbo_confirm: "Reset to default green theme?",
+                          turbo_frame: "_top"
+                        },
+                        class: "studs-nav-btn" do %>
                     Reset to default
                   <% end %>
                   <%= render Studs::PrimaryButtonComponent.new(label: "Save Theme", color: :accent, type: "submit") %>
