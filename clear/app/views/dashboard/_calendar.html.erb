@@ -131,7 +131,7 @@
   <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
     <div>
       <div class="text-2xl font-bold tracking-tight text-zinc-100">
-<% week_end_date = week_start_date + 6.days %>
+        <% week_end_date = week_start_date + 6.days %>
         <% if week_start_date.month == week_end_date.month %>
           <%= week_start_date.strftime("%B %Y") %>
         <% elsif week_start_date.year == week_end_date.year %>
@@ -266,6 +266,7 @@
           </div>
           <% days.each_with_index do |day, di| %>
             <% is_today = (day == Date.current) %>
+            <% is_weekend = day.saturday? || day.sunday? %>
             <div style="grid-column: <%= di + 2 %>; grid-row: 1 / span <%= [all_day_spans.size, 1].max %>;
                         border-right: 1px solid var(--studs-divider);
                         <%= is_today ? "background-color: color-mix(in srgb, var(--studs-accent) 14%, transparent);" : "" %>
