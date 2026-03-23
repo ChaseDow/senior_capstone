@@ -11,11 +11,6 @@
   </style>
 
   <div class="flex max-h-[85vh] flex-col" data-controller="profile-nav">
-    <% if flash.now[:notice].present? %>
-      <div class="mb-3 rounded-xl border border-emerald-900/40 bg-emerald-950/30 p-3 text-sm text-emerald-200">
-        <%= flash.now[:notice] %>
-      </div>
-    <% end %>
     <!-- Header -->
     <div class="flex items-start justify-between border-b border-zinc-800 bg-zinc-950/50 px-6 py-4">
       <div>
