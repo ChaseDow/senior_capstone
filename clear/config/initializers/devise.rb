@@ -275,7 +275,7 @@ Devise.setup do |config|
   config.omniauth :google_oauth2,
     Rails.application.credentials.google[:client_id],
     Rails.application.credentials.google[:client_secret],
-    scope: 'email, profile'
+    scope: "email, profile"
 
   # ==> Warden configuration
   # If you want to use other strategies, that are not supported by Devise, or
