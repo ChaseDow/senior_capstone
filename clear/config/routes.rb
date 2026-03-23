@@ -1,7 +1,10 @@
 Rails.application.routes.draw do
   resources :projects do
-  get :agenda, on: :member
+    get :agenda, on: :member
+    get :join, on: :collection
+    resources :project_invitations, only: %i[new create]
   end
+  get "project_invitations/accept", to: "project_invitations#accept", as: :accept_project_invitation
   devise_for :users
 
   resource :profile, only: [ :show, :edit, :update ] do
@@ -92,11 +95,6 @@ Rails.application.routes.draw do
   patch  "dashboard/draft/apply",   to: "draft#apply",   as: :apply_draft
   delete "dashboard/draft",         to: "draft#discard", as: :discard_draft
 
-  post   "dashboard/draft",         to: "draft#enter",   as: :enter_draft
-  patch  "dashboard/draft/apply",   to: "draft#apply",   as: :apply_draft
-  delete "dashboard/draft",         to: "draft#discard", as: :discard_draft
-
-  get "projects/join", to: "projects#join", as: :join_project
   get "/ui",             to: "ui#show"
   get "/schedule",       to: "schedule#week"
   get "/schedule/week",  to: "schedule#week"

@@ -91,6 +91,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_040638) do
     t.time "end_time"
     t.time "ends_at"
     t.string "instructor"
+    t.bigint "label_id"
     t.string "location"
     t.string "meeting_days"
     t.string "professor"
@@ -105,6 +106,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_040638) do
     t.string "title"
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
+    t.index ["label_id"], name: "index_courses_on_label_id"
     t.index ["project_id"], name: "index_courses_on_project_id"
     t.index ["user_id", "repeat_until"], name: "index_courses_on_user_id_and_repeat_until"
     t.index ["user_id", "start_date"], name: "index_courses_on_user_id_and_start_date"
@@ -135,6 +137,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_040638) do
     t.text "description"
     t.integer "duration_minutes"
     t.datetime "ends_at"
+    t.bigint "label_id"
     t.string "location"
     t.integer "priority"
     t.bigint "project_id"
@@ -145,10 +148,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_040638) do
     t.string "title"
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
+    t.index ["label_id"], name: "index_events_on_label_id"
     t.index ["project_id"], name: "index_events_on_project_id"
     t.index ["user_id", "repeat_until"], name: "index_events_on_user_id_and_repeat_until"
     t.index ["user_id", "starts_at"], name: "index_events_on_user_id_and_starts_at"
     t.index ["user_id"], name: "index_events_on_user_id"
+  end
+
+  create_table "labels", force: :cascade do |t|
+    t.string "color", default: "#78866B", null: false
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id", "name"], name: "index_labels_on_user_id_and_name", unique: true
+    t.index ["user_id"], name: "index_labels_on_user_id"
   end
 
   create_table "notifications", force: :cascade do |t|
@@ -165,6 +179,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_040638) do
     t.index ["notifiable_type", "notifiable_id"], name: "index_notifications_on_notifiable"
     t.index ["user_id", "read_at"], name: "index_notifications_on_user_id_and_read_at"
     t.index ["user_id"], name: "index_notifications_on_user_id"
+  end
+
+  create_table "project_invitations", force: :cascade do |t|
+    t.datetime "accepted_at"
+    t.datetime "created_at", null: false
+    t.string "email"
+    t.bigint "project_id", null: false
+    t.bigint "sender_id", null: false
+    t.string "token"
+    t.datetime "updated_at", null: false
+    t.index ["project_id"], name: "index_project_invitations_on_project_id"
+    t.index ["sender_id"], name: "index_project_invitations_on_sender_id"
+    t.index ["token"], name: "index_project_invitations_on_token", unique: true
   end
 
   create_table "project_memberships", force: :cascade do |t|
@@ -215,6 +242,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_040638) do
     t.datetime "created_at", null: false
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
+    t.datetime "invitation_accepted_at"
+    t.datetime "invitation_created_at"
+    t.integer "invitation_limit"
+    t.datetime "invitation_sent_at"
+    t.string "invitation_token"
+    t.integer "invitations_count", default: 0
+    t.bigint "invited_by_id"
+    t.string "invited_by_type"
     t.datetime "remember_created_at"
     t.datetime "reset_password_sent_at"
     t.string "reset_password_token"
@@ -222,6 +257,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_040638) do
     t.string "theme", default: "green", null: false
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["invitation_token"], name: "index_users_on_invitation_token", unique: true
+    t.index ["invited_by_id"], name: "index_users_on_invited_by_id"
+    t.index ["invited_by_type", "invited_by_id"], name: "index_users_on_invited_by"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["role"], name: "index_users_on_role"
   end
@@ -249,6 +287,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_040638) do
   add_foreign_key "ai_conversations", "users"
   add_foreign_key "calendar_drafts", "users"
   add_foreign_key "course_items", "courses"
+  add_foreign_key "courses", "labels"
   add_foreign_key "courses", "projects"
   add_foreign_key "courses", "users"
   add_foreign_key "documents", "users"
@@ -256,7 +295,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_040638) do
   add_foreign_key "events", "labels"
   add_foreign_key "events", "projects"
   add_foreign_key "events", "users"
+  add_foreign_key "labels", "users"
   add_foreign_key "notifications", "users"
+  add_foreign_key "project_invitations", "projects"
+  add_foreign_key "project_invitations", "users", column: "sender_id"
   add_foreign_key "project_memberships", "projects"
   add_foreign_key "project_memberships", "users"
   add_foreign_key "projects", "users"

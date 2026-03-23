@@ -1,5 +1,6 @@
 class ProjectsController < ApplicationController
   layout "app_shell"
+  before_action :authenticate_user!
   before_action :set_project, only: %i[ show edit update destroy ]
 
   # GET /projects or /projects.json
@@ -30,7 +31,7 @@ class ProjectsController < ApplicationController
 
   # GET /projects/new
   def new
-    @project = current_user.projects.new
+    @project = Project.new
   end
 
   # GET /projects/1/edit
@@ -96,22 +97,22 @@ class ProjectsController < ApplicationController
     render "dashboard/agenda"
   end
 
-  private
+  def join
+    project = Project.find_by(invite_token: params[:token])
 
-    def join
-      project = Project.find_by(invite_token: params[:token])
-
-      if project.nil?
-        redirect_to root_path, alert: "Invalid invite link"
-        return
-      end
-
-      unless project.users.include?(current_user)
-        project.users << current_user
-      end
-
-      redirect_to project_path(project), notice: "You joined the project!"
+    if project.nil?
+      redirect_to root_path, alert: "Invalid invite link"
+      return
     end
+
+    unless project.users.include?(current_user)
+      project.users << current_user
+    end
+
+    redirect_to project_path(project), notice: "You joined the project!"
+  end
+
+  private
 
     def occurrences_for_range(range_start, range_end)
       base_events = current_user.events
