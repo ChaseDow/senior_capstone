@@ -4,6 +4,8 @@ class AgendaController < ApplicationController
   include Pagy::Method
 
   def index
+    session[:agenda_index_url] = request.fullpath
+
     @target_date = params[:date].present? ? Date.parse(params[:date]) : Date.current
 
     start_date =
@@ -49,10 +51,22 @@ class AgendaController < ApplicationController
 
   def occurrences_for_range(range_start, range_end)
     term = params.dig(:q, :term).to_s.strip
+    field = params.dig(:q, :field).presence_in(%w[name location description]) || "name"
     type = params[:type].to_s
 
+    event_query =
+      if term.present?
+        case field
+        when "location" then { location_cont: term }
+        when "description" then { description_cont: term }
+        else { title_cont: term }
+        end
+      else
+        {}
+      end
+
     base_events = current_user.events
-                              .ransack(term.present? ? { title_or_description_or_location_cont: term } : {})
+                              .ransack(event_query)
                               .result
 
     non_recurring_events = base_events.where(recurring: false)
@@ -64,17 +78,28 @@ class AgendaController < ApplicationController
 
     events = non_recurring_events + recurring_events
 
+    course_query =
+      if term.present?
+        case field
+        when "location" then { location_cont: term }
+        when "description" then { description_cont: term }
+        else { title_cont: term }
+        end
+      else
+        {}
+      end
+
     courses = current_user.courses
-                          .ransack(term.present? ? { title_or_description_or_location_cont: term } : {})
+                          .ransack(course_query)
                           .result
                           .where("start_date <= ?", range_end.to_date)
                           .where("end_date IS NULL OR end_date >= ?", range_start.to_date)
 
     event_occurrences =
-      type == "course" ? [] : events.flat_map { |e| e.occurrences_between(range_start, range_end) }
+      %w[course course_item].include?(type) ? [] : events.flat_map { |e| e.occurrences_between(range_start, range_end) }
 
     course_occurrences =
-      type == "event" ? [] : courses.flat_map { |c| c.occurrences_between(range_start, range_end) }
+      %w[event course_item].include?(type) ? [] : courses.flat_map { |c| c.occurrences_between(range_start, range_end) }
 
     course_items =
       CourseItem
@@ -83,34 +108,70 @@ class AgendaController < ApplicationController
         .where(due_at: range_start..range_end)
         .includes(:course)
 
-    event_occurrences + course_occurrences
+    if term.present?
+      course_items =
+        case field
+        when "location"
+          course_items.where("courses.location ILIKE :term", term: "%#{term}%")
+        when "description"
+          course_items.where("course_items.details ILIKE :term", term: "%#{term}%")
+        else
+          course_items.where(
+            "course_items.title ILIKE :term OR courses.title ILIKE :term",
+            term: "%#{term}%"
+          )
+        end
+    end
+
+    item_occurrences = %w[event course].include?(type) ? [] : course_items.to_a
+
+    (event_occurrences + course_occurrences + item_occurrences).sort_by(&:starts_at)
   end
 
   def agenda_entry_for(occ)
     item =
-      if occ.respond_to?(:item)
+      if occ.is_a?(CourseItem)
+        occ
+      elsif occ.respond_to?(:item)
         occ.item
       elsif occ.respond_to?(:event)
         occ.event
       elsif occ.respond_to?(:course)
         occ.course
-      elsif occ.respond_to?(:color)
-        occ.course
       end
 
-    is_course = item.is_a?(Course)
+    is_course_item = item.is_a?(CourseItem)
+    is_course = item.is_a?(Course) || is_course_item
+
+    href =
+      if is_course_item
+        course_course_item_path(item.course, item, start_date: occ.starts_at.in_time_zone.to_date)
+      else
+        polymorphic_path(item, start_date: occ.starts_at.in_time_zone.to_date)
+      end
+
+    type_label = if is_course_item
+      item&.kind&.humanize.presence || "Course Item"
+    elsif is_course
+      "Course"
+    else
+      "Event"
+    end
 
     {
       item: item,
-      type: is_course ? "Course" : "Event",
+      type: type_label,
+      is_course_item: is_course_item,
       time: occ.starts_at.strftime("%I:%M %p"),
       time_sortable: occ.starts_at,
       title: item&.title.presence || (is_course ? "(Untitled Course)" : "(Untitled Event)"),
-      location: item&.location,
-      description: item&.description,
-      professor: is_course ? item&.professor : nil,
+      kind: is_course_item ? item&.kind&.humanize : nil,
+      course_title: is_course_item ? item.course&.title : nil,
+      location: is_course_item ? nil : item&.location,
+      description: is_course_item ? item&.details : item&.description,
+      professor: is_course_item ? nil : (is_course ? item&.professor : nil),
       color: occ.color,
-      href: polymorphic_path(item)
+      href: href
     }
   end
 end

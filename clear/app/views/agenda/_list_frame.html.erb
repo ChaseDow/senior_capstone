@@ -1,0 +1,106 @@
+<% if entries_by_date.empty? %>
+  <div class="overflow-hidden rounded-2xl"
+       style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg-2);">
+    <div class="flex flex-col items-center justify-center py-16 text-center">
+      <div class="mb-3 flex items-center justify-center">
+        <span class="text-4xl opacity-30" aria-hidden="true">🗓️</span>
+      </div>
+      <% if params.dig(:q, :term).present? || active_filters.positive? %>
+        <p class="text-sm font-medium text-zinc-300">
+          <% if params.dig(:q, :term).present? %>
+            No results for "<%= params.dig(:q, :term) %>"
+          <% else %>
+            No items match your current filters
+          <% end %>
+        </p>
+        <p class="mt-1 text-xs text-zinc-500">Try a different search term</p>
+      <% else %>
+        <p class="text-sm font-medium text-zinc-300">No agenda items yet</p>
+        <p class="mt-1 text-xs text-zinc-500">Create your first event or course to get started</p>
+        <div class="mt-4 flex items-center gap-2">
+          <%= link_to new_event_path, class: "studs-nav-btn", data: { turbo_frame: "_top" } do %>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+            </svg>
+            New event
+          <% end %>
+          <%= link_to new_course_path, class: "studs-nav-btn", data: { turbo_frame: "_top" } do %>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+            </svg>
+            New course
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% else %>
+  <div class="space-y-3">
+    <% entries_by_date.each do |date, day_entries| %>
+      <%= render Studs::AgendaComponent.new(
+        title: (date == Date.today ? "Today" : date.strftime("%A")),
+        subtitle: date.strftime("%B %d, %Y"),
+        mode: :panel,
+        empty_message: "Nothing scheduled for this day."
+      ) do |agenda| %>
+        <% day_entries.each do |entry| %>
+          <%
+            meta_bits = []
+            if entry[:is_course_item]
+              meta_bits << entry[:course_title] if entry[:course_title].present?
+            else
+              meta_bits << entry[:location] if entry[:location].present?
+              meta_bits << entry[:professor] if entry[:type] == "Course" && entry[:professor].present?
+            end
+            meta = meta_bits.any? ? meta_bits.join(" • ") : nil
+            tag_color = (entry[:is_course_item] || entry[:type] == "Course") ? :emerald : :blue
+          %>
+          <% agenda.with_item(
+            time: entry[:time],
+            title: entry[:title],
+            tag: entry[:type],
+            tag_color: tag_color,
+            meta: meta,
+            color: entry[:color],
+            href: entry[:href]
+          ) %>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+<% end %>
+
+<% if @pagy&.pages.to_i > 1 %>
+  <% per_chunk = 10 %>
+  <% pages = @pagy.pages %>
+  <% page  = @pagy.page %>
+  <% chunk_index = (page - 1) / per_chunk %>
+  <% chunk_start = (chunk_index * per_chunk) + 1 %>
+  <% chunk_end   = [chunk_start + per_chunk - 1, pages].min %>
+  <% prev_page  = chunk_start > 1 ? [chunk_start - per_chunk, 1].max : nil %>
+  <% next_page  = chunk_end < pages ? chunk_end + 1 : nil %>
+  <div class="flex items-center justify-between px-1 py-2">
+    <p class="text-xs text-zinc-500">Page <%= page %> of <%= pages %></p>
+    <div class="flex items-center gap-1.5">
+      <%= link_to "← Prev",
+        (prev_page ? agenda_page_url(prev_page) : "#"),
+        class: [
+          "studs-nav-btn",
+          prev_page ? "" : "opacity-40 pointer-events-none"
+        ].join(" ") %>
+      <% (chunk_start..chunk_end).each do |p| %>
+        <%= link_to p, agenda_page_url(p),
+          class: [
+            "studs-nav-btn",
+            p == page ? "font-bold" : ""
+          ].join(" ") %>
+      <% end %>
+      <%= link_to "Next →",
+        (next_page ? agenda_page_url(next_page) : "#"),
+        class: [
+          "studs-nav-btn",
+          next_page ? "" : "opacity-40 pointer-events-none"
+        ].join(" ") %>
+    </div>
+  </div>
+<% end %>
