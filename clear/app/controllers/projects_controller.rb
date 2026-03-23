@@ -69,10 +69,10 @@ class ProjectsController < ApplicationController
 
   # DELETE /projects/1 or /projects/1.json
   def destroy
-    @project.destroy!
+    current_user.project_memberships.find_by(project: @project)&.destroy
 
     respond_to do |format|
-      format.html { redirect_to projects_path, notice: "Project was successfully destroyed.", status: :see_other }
+      format.html { redirect_to projects_path, notice: "You have left the project.", status: :see_other }
       format.json { head :no_content }
     end
   end
