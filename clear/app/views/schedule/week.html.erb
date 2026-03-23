@@ -1,63 +1,61 @@
 <% content_for :page_title, "Schedule" %>
-<% content_for :page_subtitle, "A week at a glance"%>
-<div class="mb-6 flex items-center justify-center">
-  <div class="flex items-center gap-155">
-    <%= render Studs::PrimaryButtonComponent.new(
-          label: "← Prev",
-          href: schedule_week_path(date: @week_start - 7.days),
-          color: :emerald
-        ) %>
-    <div class="text-center">
+<% content_for :page_subtitle, "Your week at a glance"%>
+<div class="rounded-2xl p-6" style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg);">
+  <div class="mb-6 flex items-center justify-between relative">
+    <!-- Left button -->
+    <%= link_to schedule_week_path(date: @week_start - 7.days), class: "studs-nav-btn" do %>
+      ← Prev
+    <% end %>
+    <!-- Center content (absolute so it doesn't affect layout) -->
+    <div class="absolute left-1/2 -translate-x-1/2 text-center">
       <h1 class="text-xl font-semibold text-zinc-100">
         Schedule
       </h1>
-      <p class="text-sm text-zinc-400">
-        <span class="whitespace-nowrap">
-          <%= @week_start.strftime("Week of %B %d, %Y") %>
-        </span>
+      <p class="text-sm text-zinc-400 whitespace-nowrap">
+        <%= @week_start.strftime("Week of %B %d, %Y") %>
       </p>
     </div>
-    <%= render Studs::PrimaryButtonComponent.new(
-          label: "Next →",
-          href: schedule_week_path(date: @week_start + 7.days),
-          color: :emerald
-        ) %>
+    <!-- Right button -->
+    <%= link_to schedule_week_path(date: @week_start + 7.days), class: "studs-nav-btn" do %>
+      Next →
+    <% end %>
   </div>
-</div>
-<%# ================== Week Grid ================== %>
-<div class="grid grid-cols-7 gap-4 h-170">
-  <% @days.each do |day| %>
-    <div class="flex flex-col rounded-2xl border border-zinc-800 bg-emerald-950/40 p-3 min-h-0">
-      <%# Day header %>
-      <div class="mb-3">
-        <div class="text-sm font-semibold text-zinc-200">
-          <%= day.strftime("%A") %>
+  <%# ================== Week Grid ================== %>
+  <div class="grid grid-cols-7 gap-4 h-170">
+    <% @days.each do |day| %>
+      <div class="overflow-hidden rounded-2xl"
+         style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg-2);">
+        <%# Day header %>
+        <div class="mb-3 text-center">
+          <div class="text-sm font-semibold text-zinc-200">
+            <%= day.strftime("%A") %>
+          </div>
+          <div class="text-xs text-zinc-500">
+            <%= day.strftime("%b %d") %>
+          </div>
         </div>
-        <div class="text-xs text-zinc-500">
-          <%= day.strftime("%b %d") %>
-        </div>
-      </div>
-      <%# Items %>
-      <div class="flex-1 space-y-2 overflow-y-auto">
-        <% if @items_by_day[day].present? %>
-          <% @items_by_day[day].each do |item| %>
-            <div class="rounded-xl p-3 text-sm" style="background-color: <%= item.color %>;">
-              <div class="font-medium text-zinc-200">
-                <%= item.title %>
-              </div>
-              <% if item.starts_at.present? %>
-                <div class="text-xs text-zinc-200">
-                  <%= item.starts_at.strftime("%I:%M %p") %>
+        <%# Items %>
+        <div class="flex-1 space-y-2 overflow-y-auto p-2">
+          <% if @items_by_day[day].present? %>
+            <% @items_by_day[day].each do |item| %>
+              <div class="rounded-xl px-2 py-2 text-sm" style="background-color: <%= item.color %>;">
+                <div class="font-medium text-zinc-200">
+                  <%= item.title %>
                 </div>
-              <% end %>
+                <% if item.starts_at.present? %>
+                  <div class="text-xs text-zinc-200">
+                    <%= item.starts_at.strftime("%I:%M %p") %>
+                  </div>
+                <% end %>
+              </div>
+            <% end %>
+          <% else %>
+            <div class="mt-6 text-center text-xs text-zinc-200 italic">
+              Nothing scheduled for this day.
             </div>
           <% end %>
-        <% else %>
-          <div class="mt-6 text-center text-xs text-zinc-200 italic">
-            Nothing scheduled for this day.
-          </div>
-        <% end %>
+        </div>
       </div>
-    </div>
-  <% end %>
+    <% end %>
+  </div>
 </div>
