@@ -1,15 +1,16 @@
 
 <%= link_to profile_path, 
-    data: {turbo_frame: "profile_modal", turbo_prefetch: false},
-        class: "flex items-center gap-3 rounded-xl px-1 py-2 hover:bg-white/5 transition group-data-[collapsed=true]/sidebar:justify-center group-data-[collapsed=true]/sidebar:px-0" do %>
-        <div class="h-12 w-12 rounded-full overflow-hidden ring-2 shadow-lg bg-zinc-900" style="--tw-ring-color: var(--studs-border);">
-          <% if user.avatar.attached? %>
-            <%= image_tag user.avatar, class: "h-full w-full object-cover", alt: "Profile avatar" %>
-          <% else %>
-            <%= image_tag "default_icon.png", class: "h-full w-full object-cover", alt: "Profile avatar" %>
-          <% end %>
-        </div>
-    <span class="text-xs text-zinc-400 truncate group-data-[collapsed=true]/sidebar:hidden">
-      <%= user.email %>
-    </span>
-  <% end %>
+  data: { turbo_frame: "profile_modal", turbo_prefetch: false, action: "click->modal#start" },
+  class: "flex items-center gap-3 rounded-xl px-2 py-2.5 hover:bg-white/5 transition-all duration-200 group/profile" do %>
+  <div class="h-12 w-12 shrink-0 rounded-full overflow-hidden ring-2 shadow-lg bg-zinc-900" style="--tw-ring-color: var(--studs-border);">
+    <% if user.avatar.attached? %>
+      <%= image_tag user.avatar, class: "h-full w-full object-cover", alt: "Profile avatar" %>
+    <% else %>
+      <%= image_tag "default_icon.png", class: "h-full w-full object-cover", alt: "Profile avatar" %>
+    <% end %>
+  </div>
+  <div class="min-w-0 group-data-[collapsed=true]/sidebar:hidden">
+    <div class="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Welcome</div>
+    <div class="text-sm font-semibold text-zinc-100 truncate"><%= user.try(:name) || user.try(:first_name) || user.email.to_s.split("@").first %></div>
+  </div>
+<% end %>
