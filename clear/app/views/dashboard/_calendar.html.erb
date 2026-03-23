@@ -110,9 +110,18 @@
     .cal-header-corner {
       display: none !important;
     }
-    /* Grids only have 7 day columns, each = full width of scroll area */
+    /* Body grid: 7 columns each = 100% of the scroll container's visible width */
     .cal-grid {
-      grid-template-columns: repeat(7, var(--mobile-col-w, 85vw)) !important;
+      grid-template-columns: repeat(7, 100%) !important;
+    }
+    /* Sticky header must span the full scroll width so it scrolls with the body */
+    .cal-sticky-header {
+      width: 700% !important;
+      overflow: visible !important;
+    }
+    /* Header grid is inside the 700%-wide header, so 100%/7 = one visible width per cell */
+    .cal-sticky-header .cal-grid {
+      grid-template-columns: repeat(7, calc(100% / 7)) !important;
     }
     /* The scroll wrapper is a flex row: fixed time col + scrollable days */
     .cal-mobile-times {
@@ -121,8 +130,15 @@
     .cal-scroll-container {
       scrollbar-width: none;
       -ms-overflow-style: none;
+      scroll-snap-type: x mandatory;
     }
     .cal-scroll-container::-webkit-scrollbar {
+      display: none;
+    }
+    .cal-snap-col {
+      scroll-snap-align: start;
+    }
+    .cal-mobile-times::-webkit-scrollbar {
       display: none;
     }
     /* Agenda drawer: full-screen overlay on mobile */
@@ -225,17 +241,17 @@
   <div class="min-h-0 flex-1 flex rounded-2xl shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)]"
        style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg-2);">
     <%# Mobile-only fixed time column — always visible, never scrolls horizontally %>
-    <div class="cal-mobile-times hidden shrink-0 overflow-hidden"
-         style="width: 48px; border-right: 1px solid var(--studs-border); background-color: var(--studs-panel-bg-2);">
+    <div class="cal-mobile-times hidden shrink-0"
+         style="width: 60px; overflow-y: auto; scrollbar-width: none; border-right: 1px solid var(--studs-border); background-color: var(--studs-panel-bg-2);">
       <%# Empty header spacer to align with sticky day headers %>
       <div style="height: <%= header_height_px %>px; border-bottom: 1px solid var(--studs-border); background-color: var(--studs-panel-header);"></div>
       <% 24.times do |h| %>
-        <div class="px-1 pt-2 text-right text-[10px] font-semibold text-zinc-200"
+        <div class="px-1 pt-2 text-right text-xs font-semibold text-zinc-300"
              style="height: <%= hour_height_px %>px; border-bottom: 1px solid var(--studs-border-subtle);">
-          <% label = if h == 0 then "12a"
-                     elsif h < 12 then "#{h}a"
-                     elsif h == 12 then "12p"
-                     else "#{h - 12}p"
+          <% label = if h == 0 then "12 AM"
+                     elsif h < 12 then "#{h} AM"
+                     elsif h == 12 then "12 PM"
+                     else "#{h - 12} PM"
                      end %>
           <%= label %>
         </div>
@@ -287,7 +303,7 @@
     </template>
     <!-- Sticky header row -->
     <div
-      class="sticky top-0 z-20 overflow-hidden"
+      class="cal-sticky-header sticky top-0 z-20 overflow-hidden"
       style="height: <%= header_height_px %>px; border-bottom: 1px solid var(--studs-border); background-color: var(--studs-panel-bg-2);"
     >
       <div class="cal-grid grid h-full" style="grid-template-columns: <%= time_col_px %>px repeat(7, minmax(0, 1fr));">
@@ -396,7 +412,7 @@
         <% day_end   = day_start.end_of_day %>
         <% is_today   = (day == Date.current) %>
         <% is_weekend = day.saturday? || day.sunday? %>
-        <div class="relative"
+        <div class="cal-snap-col relative"
              data-action="click->agenda-highlight#clearFromDay"
           style="border-right: 1px solid var(--studs-divider);">
           <!-- Clickable time slots -->
@@ -665,10 +681,6 @@
       var scroller = document.querySelector(".cal-scroll-container");
       if (!times || !scroller) return;
 
-      // Set day column width = scroll container's visible width
-      var colW = scroller.clientWidth;
-      scroller.style.setProperty("--mobile-col-w", colW + "px");
-
       // Sync vertical scroll from main scroller to time column
       scroller.addEventListener("scroll", function() {
         times.scrollTop = scroller.scrollTop;
@@ -676,11 +688,5 @@
     }
     document.addEventListener("DOMContentLoaded", setupMobileCal);
     document.addEventListener("turbo:load", setupMobileCal);
-    window.addEventListener("resize", function() {
-      if (window.matchMedia("(min-width: 768px)").matches) return;
-      var scroller = document.querySelector(".cal-scroll-container");
-      if (!scroller) return;
-      scroller.style.setProperty("--mobile-col-w", scroller.clientWidth + "px");
-    });
   })();
 </script>
