@@ -1,32 +1,33 @@
 <% content_for :page_title, "Schedule" %>
 <% content_for :page_subtitle, "Your week at a glance"%>
-<div class="rounded-2xl p-6" style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg);">
-  <div class="mb-6 flex items-center justify-between relative">
-    <!-- Left button -->
-    <%= link_to schedule_week_path(date: @week_start - 7.days), class: "studs-nav-btn" do %>
-      ← Prev
-    <% end %>
-    <!-- Center content (absolute so it doesn't affect layout) -->
-    <div class="absolute left-1/2 -translate-x-1/2 text-center">
-      <h1 class="text-xl font-semibold text-zinc-100">
+<div class="rounded-2xl p-3 md:p-6" style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg);">
+  <div class="mb-4 md:mb-6 grid grid-cols-3 items-center gap-2">
+    <div>
+      <%= link_to schedule_week_path(date: @week_start - 7.days), class: "studs-nav-btn" do %>
+        &larr; Prev
+      <% end %>
+    </div>
+    <div class="text-center">
+      <h1 class="text-base md:text-xl font-semibold text-zinc-100 leading-tight">
         Schedule
       </h1>
-      <p class="text-sm text-zinc-400 whitespace-nowrap">
-        <%= @week_start.strftime("Week of %B %d, %Y") %>
+      <p class="text-xs md:text-sm text-zinc-400">
+        <%= @week_start.strftime("Week of %b %d, %Y") %>
       </p>
     </div>
-    <!-- Right button -->
-    <%= link_to schedule_week_path(date: @week_start + 7.days), class: "studs-nav-btn" do %>
-      Next →
-    <% end %>
+    <div class="flex justify-end">
+      <%= link_to schedule_week_path(date: @week_start + 7.days), class: "studs-nav-btn" do %>
+        Next &rarr;
+      <% end %>
+    </div>
   </div>
   <%# ================== Week Grid ================== %>
-  <div class="grid grid-cols-7 gap-4 h-170">
+  <div class="grid grid-cols-1 md:grid-cols-7 gap-3 md:gap-4 md:h-170">
     <% @days.each do |day| %>
-      <div class="overflow-hidden rounded-2xl"
-         style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg-2);">
+      <div class="flex flex-col overflow-hidden rounded-2xl"
+           style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg-2);">
         <%# Day header %>
-        <div class="mb-3 text-center">
+        <div class="p-2 md:p-3 text-center border-b" style="border-color: var(--studs-border);">
           <div class="text-sm font-semibold text-zinc-200">
             <%= day.strftime("%A") %>
           </div>
@@ -50,7 +51,7 @@
               </div>
             <% end %>
           <% else %>
-            <div class="mt-6 text-center text-xs text-zinc-200 italic">
+            <div class="mt-6 text-center text-xs text-zinc-500 italic">
               Nothing scheduled for this day.
             </div>
           <% end %>

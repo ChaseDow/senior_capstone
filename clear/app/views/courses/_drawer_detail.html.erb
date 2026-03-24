@@ -3,7 +3,7 @@
 
   <div class="flex h-full flex-col">
     <!-- Header -->
-    <div class="flex items-start justify-between border-b border-zinc-800 px-6 py-4">
+    <div class="flex items-start justify-between border-b border-zinc-800 px-4 py-3 md:px-6 md:py-4">
       <div class="min-w-0">
         <div class="flex items-center gap-2">
           <span class="h-3 w-3 rounded-full" style="background-color: <%= course.color.presence || "#34D399" %>"></span>
@@ -23,7 +23,7 @@
     </div>
 
     <!-- Body -->
-    <div class="scrollbars min-h-0 flex-1 overflow-y-auto px-6 py-6 space-y-4">
+    <div class="scrollbars min-h-0 flex-1 overflow-y-auto px-4 py-4 md:px-6 md:py-6 space-y-4">
       <div class="rounded-2xl border border-zinc-800 bg-zinc-950/40 p-4">
         <% if course.professor.present? %>
           <div>
@@ -135,7 +135,7 @@
     </div>
 
     <!-- Footer -->
-    <div class="shrink-0 border-t border-zinc-800 bg-zinc-950/60 px-6 py-4">
+    <div class="shrink-0 border-t border-zinc-800 bg-zinc-950/60 px-4 py-3 md:px-6 md:py-4">
       <div class="flex items-center justify-between gap-3">
         <div class="flex items-center gap-2">
           <%= link_to "Edit",

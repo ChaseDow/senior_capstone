@@ -24,7 +24,7 @@
                 html: { class: "space-y-3" } do |f| %>
     <div class="flex flex-wrap items-center gap-2 rounded-2xl p-2"
          style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg-2);">
-      <div class="min-w-[240px] flex-1">
+      <div class="min-w-0 flex-1">
         <%= render Studs::SearchBarComponent.new(
           name: "q[term]",
           value: params.dig(:q, :term),
@@ -37,7 +37,7 @@
         ) %>
       </div>
       <div class="mx-1 hidden h-5 w-px rounded-full md:block" style="background-color: var(--studs-border);"></div>
-      <div class="w-40">
+      <div class="w-full md:w-40">
         <%= select_tag "q[field]",
           options_for_select(
             [["Name", "name"], ["Location", "location"], ["Description", "description"]],
@@ -48,7 +48,7 @@
           data: { action: "change->search#search" } %>
       </div>
       <div class="mx-1 hidden h-5 w-px rounded-full md:block" style="background-color: var(--studs-border);"></div>
-      <div class="w-36">
+      <div class="w-full md:w-36">
         <%= f.select :type,
           options_for_select(
             [["All Types", ""], ["Events", "event"], ["Courses", "course"], ["Course Items", "course_item"]],
@@ -60,18 +60,18 @@
           data: { action: "change->search#search" } %>
       </div>
       <div class="mx-1 hidden h-5 w-px rounded-full md:block" style="background-color: var(--studs-border);"></div>
-      <div class="flex items-center gap-2">
+      <div class="flex flex-wrap items-center gap-2">
         <%= f.date_field :start_date,
           value: params[:start_date],
           placeholder: "Start",
-          class: "h-[38px] w-36 rounded-xl border bg-zinc-900/50 px-3 py-2 text-sm text-zinc-200 focus:outline-none focus:ring-2 transition-all",
+          class: "h-[38px] w-full md:w-36 rounded-xl border bg-zinc-900/50 px-3 py-2 text-sm text-zinc-200 focus:outline-none focus:ring-2 transition-all",
           style: filter_input_style,
           data: { action: "change->search#search" } %>
         <span class="text-sm text-zinc-500 font-medium select-none">:</span>
         <%= f.date_field :end_date,
           value: params[:end_date],
           placeholder: "End",
-          class: "h-[38px] w-36 rounded-xl border bg-zinc-900/50 px-3 py-2 text-sm text-zinc-200 focus:outline-none focus:ring-2 transition-all",
+          class: "h-[38px] w-full md:w-36 rounded-xl border bg-zinc-900/50 px-3 py-2 text-sm text-zinc-200 focus:outline-none focus:ring-2 transition-all",
           style: filter_input_style,
           data: { action: "change->search#search" } %>
       </div>

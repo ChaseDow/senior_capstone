@@ -1,6 +1,6 @@
 <%= turbo_frame_tag "event_drawer" do %>
   <div class="flex h-full flex-col">
-    <div class="flex items-start justify-between border-b border-zinc-800 px-6 py-4">
+    <div class="flex items-start justify-between border-b border-zinc-800 px-4 py-3 md:px-6 md:py-4">
       <div class="min-w-0">
         <div class="text-sm font-semibold text-zinc-100 truncate">Edit event</div>
         <div class="mt-1 text-xs text-zinc-500">Update details without leaving the dashboard</div>
@@ -14,7 +14,7 @@
         </button>
       </div>
     </div>
-    <div class="scrollbars min-h-0 flex-1 overflow-y-auto px-6 py-6">
+    <div class="scrollbars min-h-0 flex-1 overflow-y-auto px-4 py-4 md:px-6 md:py-6">
       <%= render "events/form", event: event, start_date: start_date, cancel_drawer: true %>
     </div>
   </div>
