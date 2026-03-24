@@ -89,7 +89,7 @@ class WorkShift < ApplicationRecord
 
   def repeat_days_are_valid_weekdays
     return if repeat_days.blank?
-    invalid = repeat_days.reject { |d| d.is_a?(Integer) && d.between?(0, 6) }
+    invalid = Array(repeat_days).reject { |d| d.to_s.match?(/\A[0-6]\z/) }
     errors.add(:repeat_days, "contains invalid weekday values") if invalid.any?
   end
 
@@ -104,7 +104,8 @@ class WorkShift < ApplicationRecord
 
   def repeat_days_present_if_recurring
     return unless recurring?
-    errors.add(:repeat_days, "pick at least one day") if repeat_days.blank?
+    selected_days = Array(repeat_days).reject(&:blank?)
+    errors.add(:repeat_days, "pick at least one day") if selected_days.empty?
   end
 
   private
