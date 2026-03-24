@@ -1,7 +1,8 @@
 module AiTools
   class Registry
     TOOL_CLASSES = [
-      AiTools::MutateEvent
+      AiTools::DraftEvent,
+      AiTools::DraftCourse
     ].freeze
 
     def self.declarations

@@ -26,7 +26,7 @@ module AiTools
 
       if courses.any?
         course_lines = courses.map do |c|
-          line = "- #{c.title}"
+          line = "- [ID:#{c.id}] #{c.title}"
           line += " (#{c.code})" if c.code.present?
           line += " with #{c.professor || c.instructor}" if c.professor.present? || c.instructor.present?
           line += ", #{c.meeting_days}" if c.meeting_days.present?
@@ -58,14 +58,10 @@ module AiTools
       parts << "\nUse this context to give personalized advice, reminders, and insights. " \
                "You can suggest study strategies, flag busy days, warn about upcoming deadlines, " \
                "and help with time management. Keep responses concise and friendly."
-      # parts << "\nYou can create events using create_event and edit existing events using edit_event. " \
-      #          "When the user asks to schedule or add something, use create_event. " \
-      #          "When the user asks to change, move, reschedule, or update an event, use edit_event with the event's ID. " \
-      #          "Each event listed above has an [ID:...] you can use. Always confirm what was created or changed."
-      parts << "\nYou can mutate events using mutate_event. " \
-               "When the user asks to schedule or add something, use mutate_event with action=create. " \
-               "When the user asks to change, move, reschedule, or update an event, use mutate_event with action=update and the event's ID. " \
-               "Each event listed above has an [ID:...] you can use. Always confirm what was created or changed."
+       parts << "\nWhen the user wants to draft an event, use draft_event. They can create, edit, and delete using it with the event ID. " \
+                "When the user wants to draft a course, use draft_course. They can create, edit, and delete using it with the course ID. " \
+                "Each course and event listed above has an [ID:...] you can use. Draft-created records may return temporary IDs (temp_id). " \
+                "Always confirm what was created or changed."
 
       parts.join("\n")
     end
