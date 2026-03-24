@@ -9,13 +9,13 @@
         <button
           type="button"
           data-action="drawer#close"
-          class="inline-flex items-center rounded-xl border border-zinc-800 bg-zinc-950/40 px-3 py-1.5 text-sm text-zinc-200 hover:bg-zinc-800/40 transition">
+          class="studs-nav-btn">
           ✕
         </button>
       </div>
     </div>
     <div class="scrollbars min-h-0 flex-1 overflow-y-auto px-6 py-6">
-      <%= render "course_items/form", course_items: course_items, start_date: start_date, cancel_drawer: true %>
+      <%= render "course_items/form", course: course, course_item: course_item, start_date: start_date, cancel_drawer: true %>
     </div>
   </div>
 <% end %>

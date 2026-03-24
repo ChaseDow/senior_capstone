@@ -16,8 +16,14 @@ class WorkShiftsController < ApplicationController
   def show
     return unless turbo_frame_request?
 
-    render partial: "work_shifts/popover_detail",
-           locals: { work_shift: @work_shift }
+    partial = if request.headers["Turbo-Frame"] == "event_popover"
+                "work_shifts/popover_detail"
+    else
+                "work_shifts/drawer_detail"
+    end
+
+    render partial: partial,
+           locals: { work_shift: @work_shift, start_date: params[:start_date] }
   end
 
   def new
@@ -34,19 +40,85 @@ class WorkShiftsController < ApplicationController
     end
   end
 
-  def edit; end
+  def edit
+    return unless turbo_frame_request?
+
+    render partial: "work_shifts/drawer_edit",
+           locals: { work_shift: @work_shift, start_date: params[:start_date] }
+  end
 
   def update
     if @work_shift.update(work_shift_params)
-      redirect_to work_shifts_path, notice: "Shift updated."
+      respond_to do |format|
+        format.html { redirect_to dashboard_path, notice: "Shift updated." }
+
+        format.turbo_stream do
+          if turbo_frame_request?
+            start_date  = parse_start_date(params[:start_date])
+            week_start  = start_date.beginning_of_week
+            range_start = week_start.beginning_of_day
+            range_end   = (week_start + 6.days).end_of_day
+            occurrences = calendar_occurrences_for_range(range_start, range_end)
+
+            render turbo_stream: [
+              turbo_stream.replace(
+                "dashboard_calendar",
+                partial: "dashboard/calendar_frame",
+                locals: { events: occurrences, start_date: start_date }
+              ),
+              turbo_stream.replace("agenda_list", partial: "agenda/list"),
+              turbo_stream.update("event_drawer", ""),
+              turbo_stream.update("event_popover", "")
+            ]
+          else
+            redirect_to work_shifts_path, notice: "Shift updated.", status: :see_other
+          end
+        end
+      end
     else
-      render :edit, status: :unprocessable_entity
+      respond_to do |format|
+        format.html { render :edit, status: :unprocessable_entity }
+
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.replace(
+            "event_drawer",
+            partial: "work_shifts/drawer_edit",
+            locals: { work_shift: @work_shift, start_date: params[:start_date] }
+          ), status: :unprocessable_entity
+        end
+      end
     end
   end
 
   def destroy
     @work_shift.destroy!
-    redirect_to work_shifts_path, notice: "Shift deleted."
+
+    respond_to do |format|
+      format.html { redirect_to work_shifts_path, notice: "Shift deleted." }
+
+      format.turbo_stream do
+        if turbo_frame_request?
+          start_date  = parse_start_date(params[:start_date])
+          week_start  = start_date.beginning_of_week
+          range_start = week_start.beginning_of_day
+          range_end   = (week_start + 6.days).end_of_day
+          occurrences = calendar_occurrences_for_range(range_start, range_end)
+
+          render turbo_stream: [
+            turbo_stream.replace(
+              "dashboard_calendar",
+              partial: "dashboard/calendar_frame",
+              locals: { events: occurrences, start_date: start_date }
+            ),
+            turbo_stream.replace("agenda_list", partial: "agenda/list"),
+            turbo_stream.update("event_drawer", ""),
+            turbo_stream.update("event_popover", "")
+          ]
+        else
+          redirect_to work_shifts_path, notice: "Shift deleted.", status: :see_other
+        end
+      end
+    end
   end
 
   private
@@ -61,5 +133,11 @@ class WorkShiftsController < ApplicationController
       :color, :description, :recurring, :repeat_until,
       repeat_days: []
     )
+  end
+
+  def parse_start_date(raw)
+    raw.present? ? Date.parse(raw) : Date.current
+  rescue ArgumentError
+    Date.current
   end
 end
