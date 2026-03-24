@@ -2,6 +2,8 @@ class AiChatController < ApplicationController
   layout "app_shell"
   before_action :authenticate_user!
 
+  MAX_MESSAGES = 200
+
   def index
     @messages = previous_messages
     @rate = GeminiRateTracker.usage
@@ -18,8 +20,7 @@ class AiChatController < ApplicationController
     if user_text.blank?
       respond_to do |format|
         format.turbo_stream do
-          flash.now[:alert] = "Message can't be blank."
-          render turbo_stream: turbo_stream.replace("ai_chat_flash", partial: "ai_chat/flash")
+          redirect_to ai_chat_index_path, alert: "Message can't be blank.", status: :see_other
         end
         format.html { redirect_to ai_chat_index_path, alert: "Message can't be blank." }
       end
@@ -30,8 +31,9 @@ class AiChatController < ApplicationController
     if rate[:rpd] >= rate[:rpd_limit]
       respond_to do |format|
         format.turbo_stream do
-          flash.now[:alert] = "Daily AI limit reached (#{rate[:rpd_limit]} requests). Resets at midnight."
-          render turbo_stream: turbo_stream.replace("ai_chat_flash", partial: "ai_chat/flash")
+          redirect_to ai_chat_index_path,
+                      alert: "Daily AI limit reached (#{rate[:rpd_limit]} requests). Resets at midnight.",
+                      status: :see_other
         end
         format.html { redirect_to ai_chat_index_path, alert: "Daily AI limit reached." }
       end
@@ -41,10 +43,26 @@ class AiChatController < ApplicationController
     if rate[:rpm] >= rate[:rpm_limit]
       respond_to do |format|
         format.turbo_stream do
-          flash.now[:alert] = "Slow down — rate limit is #{rate[:rpm_limit]} requests per minute. Wait a moment and try again."
-          render turbo_stream: turbo_stream.replace("ai_chat_flash", partial: "ai_chat/flash")
+          redirect_to ai_chat_index_path,
+                      alert: "Slow down — rate limit is #{rate[:rpm_limit]} requests per minute. Wait a moment and try again.",
+                      status: :see_other
         end
         format.html { redirect_to ai_chat_index_path, alert: "Rate limit reached, try again shortly." }
+      end
+      return
+    end
+
+    if ai_conversation.ai_chat_messages.count >= MAX_MESSAGES
+      respond_to do |format|
+        format.turbo_stream do
+          redirect_to ai_chat_index_path,
+                      alert: "Message limit reached (#{MAX_MESSAGES}). Reset chat to continue.",
+                      status: :see_other
+        end
+        format.html do
+          redirect_to ai_chat_index_path,
+                      alert: "Message limit reached (#{MAX_MESSAGES}). Reset chat to continue."
+        end
       end
       return
     end
@@ -92,10 +110,9 @@ class AiChatController < ApplicationController
           ),
           turbo_stream.append("ai_chat_messages",
             partial: "ai_chat/message",
-            locals: { m: { "role" => "assistant", "content" => assistant_text } }
+            locals: { m: { "role" => "assistant", "content" => assistant_text }, animate: true }
           ),
           turbo_stream.update("ai_chat_history", history.to_json),
-          turbo_stream.replace("ai_chat_flash", partial: "ai_chat/flash"),
           turbo_stream.update("ai_chat_input", ""),
           turbo_stream.replace("ai_chat_usage", partial: "ai_chat/usage", locals: { rate: updated_rate })
         ]
@@ -111,18 +128,25 @@ class AiChatController < ApplicationController
     GeminiRateTracker.record!
     respond_to do |format|
       format.turbo_stream do
-        flash.now[:alert] = e.message
-        render turbo_stream: turbo_stream.replace("ai_chat_flash", partial: "ai_chat/flash")
+        redirect_to ai_chat_index_path, alert: e.message, status: :see_other
       end
       format.html { redirect_to ai_chat_index_path, alert: e.message }
     end
   rescue => e
     respond_to do |format|
       format.turbo_stream do
-        flash.now[:alert] = "AI error: #{e.message}"
-        render turbo_stream: turbo_stream.replace("ai_chat_flash", partial: "ai_chat/flash")
+        redirect_to ai_chat_index_path, alert: "AI error: #{e.message}", status: :see_other
       end
       format.html { redirect_to ai_chat_index_path, alert: "AI error: #{e.message}" }
+    end
+  end
+
+  def reset
+    ai_conversation.ai_chat_messages.delete_all
+
+    respond_to do |format|
+      format.turbo_stream { redirect_to ai_chat_index_path, notice: "Chat reset.", status: :see_other }
+      format.html { redirect_to ai_chat_index_path, notice: "Chat reset." }
     end
   end
 

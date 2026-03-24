@@ -56,6 +56,7 @@ Rails.application.routes.draw do
   resources :ai_chat, only: [ :index, :create ] do
     collection do
       get :usage
+      delete :reset
     end
   end
 
