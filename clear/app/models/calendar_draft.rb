@@ -150,8 +150,13 @@ class CalendarDraft < ApplicationRecord
             e
           end
 
-          if record.recurring?
+          if updated.recurring?
             occ_date      = occ.starts_at.to_date
+            next if updated.starts_at.blank?
+            next if updated.repeat_until.blank?
+            next if occ_date < updated.starts_at.to_date || occ_date > updated.repeat_until
+            next unless Array(updated.repeat_days).map(&:to_i).include?(occ_date.wday)
+
             new_time      = updated.starts_at.in_time_zone
             new_start     = Time.zone.local(occ_date.year, occ_date.month, occ_date.day,
                                             new_time.hour, new_time.min, new_time.sec)
@@ -189,6 +194,10 @@ class CalendarDraft < ApplicationRecord
           # Courses are always recurring — keep the occurrence calendar date,
           # update time-of-day and other attributes in the preview.
           occ_date  = occ.starts_at.to_date
+          next if updated.start_date.blank? || updated.end_date.blank?
+          next if occ_date < updated.start_date || occ_date > updated.end_date
+          next unless Array(updated.repeat_days).map(&:to_i).include?(occ_date.wday)
+
           new_start = Time.zone.local(occ_date.year, occ_date.month, occ_date.day,
                                       updated.start_time.hour, updated.start_time.min, updated.start_time.sec)
           new_end   = if updated.end_time.present?
@@ -203,14 +212,52 @@ class CalendarDraft < ApplicationRecord
       occ
     end.compact
 
+    event_update_ops.each do |id, update_op|
+      updated = updated_event_cache[id]
+      unless updated
+        source_event = user.events.find_by(id: id)
+        next unless source_event
+
+        updated = Event.new(source_event.attributes.except("id", "created_at", "updated_at").merge(update_op["data"]))
+        updated.id = source_event.id
+        updated.instance_variable_set(:@new_record, false)
+        updated_event_cache[id] = updated
+      end
+
+      next unless updated.recurring?
+
+      updated.occurrences_between(range_start, range_end).each do |updated_occurrence|
+        exists = result.any? do |occ|
+          record = occ.respond_to?(:event) ? occ.event : occ
+          record.model_name.singular == "event" &&
+            record.id == updated.id &&
+            occ.starts_at == updated_occurrence.starts_at &&
+            occ.respond_to?(:draft_status) &&
+            occ.draft_status == "updated"
+        end
+        next if exists
+
+        result << Event::Occurrence.new(
+          event: updated,
+          starts_at: updated_occurrence.starts_at,
+          ends_at: updated_occurrence.ends_at,
+          draft_status: "updated"
+        )
+      end
+    end
+
     # ── Draft-created events ──
     event_create_ops.each do |op|
       data = op["data"].symbolize_keys
       starts_at = Time.zone.parse(data[:starts_at].to_s) rescue nil
       next unless starts_at
-      next if starts_at < range_start || starts_at > range_end
 
       ends_at = data[:ends_at].present? ? (Time.zone.parse(data[:ends_at].to_s) rescue nil) : nil
+      duration_minutes = data[:duration_minutes].to_i if data[:duration_minutes].present?
+      ends_at ||= (starts_at + duration_minutes.minutes) if ends_at.blank? && duration_minutes.present?
+      recurring = Event.new(recurring: data[:recurring]).recurring?
+      repeat_days = Array(data[:repeat_days]).reject(&:blank?).map(&:to_i)
+      repeat_until = data[:repeat_until].present? ? (Date.parse(data[:repeat_until].to_s) rescue nil) : nil
 
       proxy = DraftEventProxy.new(
         temp_id: op["temp_id"],
@@ -222,10 +269,33 @@ class CalendarDraft < ApplicationRecord
         description: data[:description]
       )
 
-      result << Event::Occurrence.new(
-        event: proxy, starts_at: starts_at, ends_at: ends_at,
-        draft_status: "created"
-      )
+      if recurring && repeat_days.any? && repeat_until.present?
+        window_start = [ range_start.to_date, starts_at.to_date ].max
+        window_end   = [ range_end.to_date, repeat_until ].min
+        next if window_end < window_start
+
+        start_time = starts_at.in_time_zone
+        duration_seconds = ends_at.present? ? (ends_at - starts_at) : nil
+
+        d = window_start
+        while d <= window_end
+          if repeat_days.include?(d.wday)
+            occ_start = Time.zone.local(d.year, d.month, d.day, start_time.hour, start_time.min, start_time.sec)
+            occ_end   = duration_seconds.present? ? (occ_start + duration_seconds) : nil
+
+            result << Event::Occurrence.new(
+              event: proxy, starts_at: occ_start, ends_at: occ_end,
+              draft_status: "created"
+            )
+          end
+          d += 1.day
+        end
+      elsif starts_at >= range_start && starts_at <= range_end
+        result << Event::Occurrence.new(
+          event: proxy, starts_at: starts_at, ends_at: ends_at,
+          draft_status: "created"
+        )
+      end
     end
 
     # ── Draft-created courses ──
