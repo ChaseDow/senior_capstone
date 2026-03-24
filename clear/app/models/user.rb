@@ -7,7 +7,8 @@ class User < ApplicationRecord
   has_one :calendar_draft, dependent: :destroy
 
   devise :database_authenticatable, :registerable,
-         :recoverable, :rememberable, :validatable
+         :recoverable, :rememberable, :validatable, :confirmable,
+         :omniauthable, omniauth_providers: [ :google_oauth2 ]
 
   enum :role, { user: 0, admin: 1 }
   has_one_attached :avatar
@@ -28,5 +29,29 @@ class User < ApplicationRecord
 
   def avatar_thumbnail
     avatar.variant(resize: "150x150!").processed
+  end
+
+  def self.from_omniauth(auth)
+    return nil unless auth.info.email_verified
+
+    user = find_by(provider: auth.provider, uid: auth.uid)
+    user ||= find_by(email: auth.info.email)
+
+    if user
+      user.update(provider: auth.provider, uid: auth.uid)
+    else
+      user = create(
+        email:    auth.info.email,
+        password: Devise.friendly_token[0, 20],
+        provider: auth.provider,
+        uid:      auth.uid
+      )
+    end
+
+    user
+  end
+
+  def password_required?
+    super && provider.blank?
   end
 end
