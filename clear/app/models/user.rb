@@ -10,8 +10,6 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable, :confirmable,
          :omniauthable, omniauth_providers: [ :google_oauth2 ]
 
-  ALLOWED_DOMAINS = %w[email.latech.edu].freeze
-
   enum :role, { user: 0, admin: 1 }
   has_one_attached :avatar
 
@@ -36,9 +34,6 @@ class User < ApplicationRecord
   def self.from_omniauth(auth)
     return nil unless auth.info.email_verified
 
-    domain = auth.info.email.downcase.split("@").last
-    return :unauthorized unless ALLOWED_DOMAINS.include?(domain)
-
     user = find_by(provider: auth.provider, uid: auth.uid)
     user ||= find_by(email: auth.info.email)
 
@@ -60,12 +55,4 @@ class User < ApplicationRecord
     super && provider.blank?
   end
 
-  validate :email_domain_allowed
-
-  def email_domain_allowed
-    domain = email.to_s.downcase.split("@").last
-    unless ALLOWED_DOMAINS.include?(domain)
-      errors.add(:email, "is not associated with a supported university or is not a valid institutional email")
-    end
-  end
 end

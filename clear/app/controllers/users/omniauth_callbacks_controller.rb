@@ -2,9 +2,7 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
   def google_oauth2
     user = User.from_omniauth(request.env["omniauth.auth"])
 
-    if user == :unauthorized
-      redirect_to new_user_session_path, alert: "The email address used is not associated with a supported university or is not a valid institutional email."
-    elsif user.nil?
+    if user.nil?
       redirect_to new_user_session_path, alert: "Google account email is not verified."
     elsif user.persisted?
       if user.confirmed?
