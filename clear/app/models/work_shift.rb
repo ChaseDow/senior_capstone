@@ -9,7 +9,7 @@ class WorkShift < ApplicationRecord
 
   validate :end_time_after_start_time, if: -> { start_time.present? && end_time.present? }
   validate :repeat_until_after_start_date, if: -> { start_date.present? && repeat_until.present? }
-  validate :repeat_days_present_if_recurring 
+  validate :repeat_days_present_if_recurring
   validate :repeat_days_are_valid_weekdays
 
   before_validation :normalize_recurrence_fields
