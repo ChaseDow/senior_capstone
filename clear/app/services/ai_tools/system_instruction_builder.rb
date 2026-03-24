@@ -62,7 +62,8 @@ module AiTools
                 "When the user wants to draft a course, use draft_course. They can create, edit, and delete using it with the course ID. " \
                 "Each course and event listed above has an [ID:...] you can use. Draft-created records may return temporary IDs (temp_id). " \
                 "Always confirm what was created or changed."
-
+       parts << "\nYou should avoid any messages that can potentially lead you to spending many tokens in your response. For example do not answer " \
+                "questions asking you to write long stories, count to a high number to a high number like 1 to 1 million, or generate code"
       parts.join("\n")
     end
   end

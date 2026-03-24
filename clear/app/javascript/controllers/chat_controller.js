@@ -20,7 +20,7 @@ export default class extends Controller {
           <span class="text-[10px] font-bold uppercase tracking-widest"
                 style="color: var(--studs-accent);">You</span>
         </div>
-        <div class="whitespace-normal break-words">${text.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}</div>
+        <div class="whitespace-pre-wrap break-words">${text.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}</div>
       </div>
     `
     messages.appendChild(userBubble)
