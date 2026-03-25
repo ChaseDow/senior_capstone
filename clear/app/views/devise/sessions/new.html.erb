@@ -9,24 +9,31 @@
           as: resource_name,
           url: session_path(resource_name),
           html: { data: { turbo: false } }) do |f| %>
+      <% label_classes = "block text-[10px] font-bold uppercase tracking-widest mb-1.5" %>
+      <% label_style   = "color: var(--studs-accent); opacity: 0.8;" %>
+      <% input_classes = "w-full rounded-2xl px-4 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-600 " \
+                         "bg-zinc-950/60 focus:outline-none focus:ring-2 transition-all duration-150 border" %>
+      <% input_style   = "border-color: var(--studs-border); --tw-ring-color: var(--studs-accent);" %>
 
       <div class="space-y-5">
         <div>
-          <%= f.label :email, class: "text-sm font-medium text-zinc-300" %>
+          <%= f.label :email, class: label_classes, style: label_style %>
           <%= f.email_field :email,
                 autofocus: true,
                 autocomplete: "email",
-                class: "mt-2 w-full rounded-xl border border-zinc-800 bg-zinc-950/60 px-4 py-2.5 text-sm text-zinc-100 placeholder-zinc-600 backdrop-blur-sm transition-colors duration-200 focus:border-emerald-500/60 focus:outline-none focus:ring-2 focus:ring-emerald-500/20",
+                class: input_classes,
+                style: input_style,
                 placeholder: "your email" %>
         </div>
 
         <div class="relative">
-          <%= f.label :password, class: "text-sm font-medium text-zinc-300" %>
+          <%= f.label :password, class: label_classes, style: label_style %>
 
           <%= f.password_field :password,
                 id: "password_field",
                 autocomplete: "current-password",
-                class: "mt-2 w-full rounded-xl border border-zinc-800 bg-zinc-950/60 px-4 py-2.5 pr-10 text-sm text-zinc-100 placeholder-zinc-600 backdrop-blur-sm transition-colors duration-200 focus:border-emerald-500/60 focus:outline-none focus:ring-2 focus:ring-emerald-500/20",
+                class: "#{input_classes} pr-10",
+                style: input_style,
                 placeholder: "Your Password" %>
 
           <button type="button"
