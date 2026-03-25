@@ -5,10 +5,11 @@ export default class extends Controller {
     const input = this.element.querySelector("#ai_chat_input")
     if (!input || !input.value.trim()) return
 
+    const text = input.value.trim()
+    input.value = ""
+
     const messages = document.getElementById("ai_chat_messages")
     if (!messages) return
-
-    const text = input.value.trim()
 
     const userBubble = document.createElement("div")
     userBubble.id = "ai_chat_user_pending"
@@ -20,7 +21,7 @@ export default class extends Controller {
           <span class="text-[10px] font-bold uppercase tracking-widest"
                 style="color: var(--studs-accent);">You</span>
         </div>
-        <div class="whitespace-normal break-words">${text.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}</div>
+        <div class="whitespace-pre-wrap break-words">${text.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}</div>
       </div>
     `
     messages.appendChild(userBubble)

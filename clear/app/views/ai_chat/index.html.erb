@@ -10,27 +10,26 @@
       <h1 class="text-base font-semibold text-zinc-100">Assistant</h1>
       <p class="text-xs text-zinc-400 mt-0.5">Ask questions, explore scenarios, and compare schedule what-ifs.</p>
     </div>
-    <span class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium"
-          style="border: 1px solid rgba(34, 197, 94, 0.3);
-                 background-color: rgba(34, 197, 94, 0.1);
-                 color: #86efac;">
-      <span class="h-1.5 w-1.5 rounded-full"
-            style="background-color: #22c55e;
-                   box-shadow: 0 0 8px rgba(34, 197, 94, 0.7);"></span>
-      Online
-    </span>
+    <div class="flex items-center gap-2">
+      <%= button_to "Reset chat",
+            reset_ai_chat_index_path,
+            method: :delete,
+            data: { turbo_confirm: "Reset this chat history?" },
+            class: "studs-nav-btn" %>
+      <span class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium"
+            style="border: 1px solid rgba(34, 197, 94, 0.3);
+                   background-color: rgba(34, 197, 94, 0.1);
+                   color: #86efac;">
+        <span class="h-1.5 w-1.5 rounded-full"
+              style="background-color: #22c55e;
+                     box-shadow: 0 0 8px rgba(34, 197, 94, 0.7);"></span>
+        Online
+      </span>
+    </div>
   </div>
   <!-- Usage -->
   <div class="shrink-0 px-6 pt-3">
     <%= render "ai_chat/usage", rate: @rate || { rpm: 0, rpm_limit: 10, rpd: 0, rpd_limit: 250 } %>
-  </div>
-  <!-- Flash -->
-  <div id="ai_chat_flash" class="shrink-0 px-6 pt-3 empty:hidden">
-    <% if flash[:alert].present? %>
-      <div class="rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
-        <%= flash[:alert] %>
-      </div>
-    <% end %>
   </div>
   <!-- Messages -->
   <div
