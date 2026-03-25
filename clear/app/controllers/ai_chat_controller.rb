@@ -159,7 +159,11 @@ class AiChatController < ApplicationController
   end
 
   def execute_function(name, args)
-    AiTools::Registry.execute(name: name, user: current_user, args: args)
+    result = AiTools::Registry.execute(name: name, user: current_user, args: args)
+    if %w[draft_event draft_course].include?(name) && (result[:success] || result["success"])
+      session[:calendar_draft_mode] = true
+    end
+    result
   end
 
   API_HISTORY_LIMIT = 20

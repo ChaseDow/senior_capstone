@@ -5,10 +5,11 @@ export default class extends Controller {
     const input = this.element.querySelector("#ai_chat_input")
     if (!input || !input.value.trim()) return
 
+    const text = input.value.trim()
+    input.value = ""
+
     const messages = document.getElementById("ai_chat_messages")
     if (!messages) return
-
-    const text = input.value.trim()
 
     const userBubble = document.createElement("div")
     userBubble.id = "ai_chat_user_pending"

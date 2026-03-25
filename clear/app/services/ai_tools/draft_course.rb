@@ -44,6 +44,9 @@ module AiTools
     end
 
     def self.create_course(user, args)
+      clarify = clarify_time(args["start_time"], "start_time") || clarify_time(args["end_time"], "end_time")
+      return clarify if clarify
+
       course_attrs = build_course_attrs(args).compact
       missing_fields = missing_create_fields(course_attrs)
       return required_fields_clarification_response(missing_fields) if missing_fields.any?
@@ -61,6 +64,9 @@ module AiTools
     def self.update_course(user, args)
       course = user.courses.find_by(id: args["course_id"])
       return { success: false, errors: [ "Course not found" ] } unless course
+
+      clarify = clarify_time(args["start_time"], "start_time") || clarify_time(args["end_time"], "end_time")
+      return clarify if clarify
 
       updates = build_course_updates(args)
       invalid = invalid_course_update_response(user, course, updates)
@@ -221,5 +227,14 @@ module AiTools
       }
     end
     private_class_method :invalid_course_update_response
+
+    def self.clarify_time(value, field)
+      text = value.to_s.strip
+      return nil if text.blank? || text.match?(/\b(?:am|pm|a\.?\s*m\.?|p\.?\s*m\.?)\b/i) || text.match?(/\A\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/i)
+      m = text.match(/(?:\A|[ T])(\d{1,2}):(\d{2})(?::\d{2})?(?:\b|$)/)
+      return nil unless m && m[1].to_i.between?(1, 12)
+      { success: false, needs_clarification: true, errors: [ "clarify_time: #{field}" ], question: "Clarify time: provide the full #{field} with AM/PM (for example, #{text} AM or #{text} PM)." }
+    end
+    private_class_method :clarify_time
   end
 end
