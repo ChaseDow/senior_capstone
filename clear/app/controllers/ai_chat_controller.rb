@@ -160,7 +160,7 @@ class AiChatController < ApplicationController
 
   def execute_function(name, args)
     result = AiTools::Registry.execute(name: name, user: current_user, args: args)
-    if %w[draft_event draft_course].include?(name) && (result[:success] || result["success"])
+    if %w[draft_event draft_course draft_course_item].include?(name) && (result[:success] || result["success"])
       session[:calendar_draft_mode] = true
     end
     result
