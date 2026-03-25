@@ -511,6 +511,70 @@ body {
     border-color 0.3s ease;
 }
 
+/* ── Top bar icon buttons ───────────────────────────────── */
+.studs-topbar-icon-btn {
+  position: relative;
+  display: inline-flex;
+  height: 2.25rem;
+  width: 2.25rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.75rem;
+  border: 1px solid var(--studs-border);
+  background-color: var(--studs-panel-bg);
+  color: #e4e4e7;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.studs-topbar-icon-btn:hover {
+  background-color: var(--studs-panel-hover);
+  border-color: var(--studs-accent);
+  color: #fafafa;
+}
+
+.studs-topbar-icon-btn [stroke],
+.studs-topbar-icon-btn *[stroke] {
+  stroke: currentColor;
+}
+
+.studs-topbar-icon-btn--ai {
+  background-color: var(--studs-accent);
+  border-color: transparent;
+  color: #ffffff;
+  transform: scale(1);
+  box-shadow: 0 0 20px color-mix(in srgb, var(--studs-accent) 40%, transparent);
+  transition:
+    transform 0.15s ease,
+    filter 0.15s ease,
+    box-shadow 0.15s ease,
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.studs-topbar-icon-btn--ai:hover {
+  background-color: var(--studs-accent);
+  border-color: transparent;
+  transform: scale(1.05);
+  filter: brightness(1.1);
+}
+
+.studs-topbar-icon-btn--ai:active {
+  transform: scale(0.95);
+}
+
+body[data-theme="mono"] .studs-topbar-icon-btn--ai {
+  color: #000000;
+}
+
+body[data-theme="mono"] .studs-topbar-icon-btn--ai [stroke],
+body[data-theme="mono"] .studs-topbar-icon-btn--ai *[stroke] {
+  stroke: #000000 !important;
+}
+
 /* ── Nav buttons (ghost/outline pill) ───────────────────── */
 .studs-nav-btn {
   display: inline-flex;
