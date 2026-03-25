@@ -2,10 +2,10 @@ require "test_helper"
 
 class ProjectInvitationMailerTest < ActionMailer::TestCase
   test "invite" do
-    mail = ProjectInvitationMailer.invite
-    assert_equal "Invite", mail.subject
-    assert_equal [ "to@example.org" ], mail.to
-    assert_equal [ "from@example.com" ], mail.from
-    assert_match "Hi", mail.body.encoded
+    invitation = project_invitations(:one)
+    mail = ProjectInvitationMailer.invite(invitation)
+    assert_equal "You've been invited to \"#{invitation.project.title}\"", mail.subject
+    assert_equal [ invitation.email ], mail.to
+    assert_match invitation.token, mail.body.encoded
   end
 end

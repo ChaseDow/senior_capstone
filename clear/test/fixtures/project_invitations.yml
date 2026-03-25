@@ -3,13 +3,13 @@
 one:
   project: one
   sender: one
-  email: MyString
-  token: MyString
+  email: invite_one@example.com
+  token: token_one
   accepted_at: 2026-03-22 22:15:02
 
 two:
   project: two
   sender: two
-  email: MyString
-  token: MyString
+  email: invite_two@example.com
+  token: token_two
   accepted_at: 2026-03-22 22:15:02
