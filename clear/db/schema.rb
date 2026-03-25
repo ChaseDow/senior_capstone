@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_21_203938) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_25_040638) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -136,8 +136,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_21_203938) do
     t.bigint "notifiable_id"
     t.string "notifiable_type"
     t.datetime "read_at"
+    t.datetime "scheduled_for"
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
+    t.index ["notifiable_type", "notifiable_id", "category", "scheduled_for"], name: "idx_notifications_reminder_dedup", unique: true, where: "(scheduled_for IS NOT NULL)"
     t.index ["notifiable_type", "notifiable_id"], name: "index_notifications_on_notifiable"
     t.index ["user_id", "read_at"], name: "index_notifications_on_user_id_and_read_at"
     t.index ["user_id"], name: "index_notifications_on_user_id"

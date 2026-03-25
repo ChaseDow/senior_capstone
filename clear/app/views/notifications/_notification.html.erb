@@ -1,18 +1,21 @@
 <%# locals: (notification:) %>
 <% notifiable = notification.notifiable %>
-<% open_path = if notification.category == "assignment_due" && notifiable.is_a?(CourseItem)
+<% open_path = if %w[assignment_due assignment_reminder].include?(notification.category) && notifiable.is_a?(CourseItem)
      edit_course_course_item_path(notifiable.course, notifiable)
-   elsif %w[high_priority event_created].include?(notification.category) && notifiable.is_a?(Event)
+   elsif %w[high_priority event_created event_reminder].include?(notification.category) && notifiable.is_a?(Event)
      event_path(notifiable)
    end %>
-<% category_label = if notification.category == "assignment_due" && notifiable.is_a?(CourseItem)
-     "#{notifiable.kind.humanize} added"
+<% category_label = if %w[assignment_due assignment_reminder].include?(notification.category) && notifiable.is_a?(CourseItem)
+     notification.category == "assignment_reminder" ? "Due soon" : "#{notifiable.kind.humanize} added"
    else
      {
-       "event_created" => "Event added",
-       "course_added"  => "Course added",
-       "high_priority" => "High priority",
-       "group"         => "Group"
+       "event_created"      => "Event added",
+       "course_added"       => "Course added",
+       "high_priority"      => "High priority",
+       "group"              => "Group",
+       "event_reminder"     => "Starting soon",
+       "course_reminder"    => "Class starting soon",
+       "assignment_reminder" => "Due soon"
      }.fetch(notification.category, notification.category.humanize)
    end %>
 <div id="<%= dom_id(notification) %>"
@@ -31,7 +34,13 @@
         <div class="mt-0.5 flex items-center gap-1.5 text-xs text-zinc-400">
           <span><%= notification.created_at.strftime("%-b %-d at %-I:%M %p") %></span>
           <span class="text-zinc-600">•</span>
-          <span><%= category_label %></span>
+          <% if notification.scheduled_for.present? %>
+            <span data-controller="countdown" data-countdown-event-time-value="<%= notification.scheduled_for.iso8601 %>">
+              <span data-countdown-display></span>
+            </span>
+          <% else %>
+            <span><%= category_label %></span>
+          <% end %>
         </div>
       </div>
     <% end %>
