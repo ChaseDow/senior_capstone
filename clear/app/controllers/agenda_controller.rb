@@ -95,11 +95,30 @@ class AgendaController < ApplicationController
                           .where("start_date <= ?", range_end.to_date)
                           .where("end_date IS NULL OR end_date >= ?", range_start.to_date)
 
+    base_work_shifts = current_user.work_shifts
+                                   .where("start_date <= ?", range_end.to_date)
+                                   .where("repeat_until IS NULL OR repeat_until >= ?", range_start.to_date)
+
+    if term.present?
+      base_work_shifts =
+        case field
+        when "location"
+          base_work_shifts.where("location ILIKE :term", term: "%#{term}%")
+        when "description"
+          base_work_shifts.where("description ILIKE :term", term: "%#{term}%")
+        else
+          base_work_shifts.where("title ILIKE :term", term: "%#{term}%")
+        end
+    end
+
     event_occurrences =
-      %w[course course_item].include?(type) ? [] : events.flat_map { |e| e.occurrences_between(range_start, range_end) }
+      %w[course course_item work_shift].include?(type) ? [] : events.flat_map { |e| e.occurrences_between(range_start, range_end) }
 
     course_occurrences =
-      %w[event course_item].include?(type) ? [] : courses.flat_map { |c| c.occurrences_between(range_start, range_end) }
+      %w[event course_item work_shift].include?(type) ? [] : courses.flat_map { |c| c.occurrences_between(range_start, range_end) }
+
+    work_shift_occurrences =
+      %w[event course course_item].include?(type) ? [] : base_work_shifts.flat_map { |ws| ws.occurrences_between(range_start, range_end) }
 
     course_items =
       CourseItem
@@ -123,9 +142,9 @@ class AgendaController < ApplicationController
         end
     end
 
-    item_occurrences = %w[event course].include?(type) ? [] : course_items.to_a
+    item_occurrences = %w[event course work_shift].include?(type) ? [] : course_items.to_a
 
-    (event_occurrences + course_occurrences + item_occurrences).sort_by(&:starts_at)
+    (event_occurrences + course_occurrences + work_shift_occurrences + item_occurrences).sort_by(&:starts_at)
   end
 
   def agenda_entry_for(occ)
@@ -142,6 +161,7 @@ class AgendaController < ApplicationController
 
     is_course_item = item.is_a?(CourseItem)
     is_course = item.is_a?(Course) || is_course_item
+    is_work_shift = item.is_a?(WorkShift)
 
     href =
       if is_course_item
@@ -150,13 +170,16 @@ class AgendaController < ApplicationController
         polymorphic_path(item, start_date: occ.starts_at.in_time_zone.to_date)
       end
 
-    type_label = if is_course_item
-      item&.kind&.humanize.presence || "Course Item"
-    elsif is_course
-      "Course"
-    else
-      "Event"
-    end
+    type_label =
+      if is_course_item
+        item&.kind&.humanize.presence || "Course Item"
+      elsif is_work_shift
+        "Shift"
+      elsif is_course
+        "Course"
+      else
+        "Event"
+      end
 
     {
       item: item,
@@ -164,7 +187,7 @@ class AgendaController < ApplicationController
       is_course_item: is_course_item,
       time: occ.starts_at.strftime("%I:%M %p"),
       time_sortable: occ.starts_at,
-      title: item&.title.presence || (is_course ? "(Untitled Course)" : "(Untitled Event)"),
+      title: item&.title.presence || (is_course ? "(Untitled Course)" : (is_work_shift ? "(Untitled Shift)" : "(Untitled Event)")),
       kind: is_course_item ? item&.kind&.humanize : nil,
       course_title: is_course_item ? item.course&.title : nil,
       location: is_course_item ? nil : item&.location,

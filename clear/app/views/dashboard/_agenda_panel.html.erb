@@ -138,9 +138,9 @@
             %>
             <% open_path =
               if is_due
-                edit_course_course_item_path(record.course, record)
+                course_course_item_path(record.course, record, start_date: start_at.to_date.iso8601)
               else
-                polymorphic_path(record)
+                polymorphic_path(record, start_date: start_at.to_date.iso8601)
               end
             %>
             <div

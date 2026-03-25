@@ -1,11 +1,11 @@
 <%= turbo_frame_tag "event_drawer" do %>
-  <% color = course.color.presence || "#34D399" %>
+  <% color = work_shift.color.presence || "#34D399" %>
   <div class="flex h-full flex-col">
     <div class="flex items-start justify-between border-b border-zinc-800 px-6 py-4">
       <div class="min-w-0">
         <div class="flex items-center gap-2">
           <span class="h-3 w-3 rounded-full" style="background-color:<%= color %>"></span>
-          <div class="text-sm font-semibold text-zinc-100 truncate">Edit course</div>
+          <div class="text-sm font-semibold text-zinc-100 truncate">Edit work shift</div>
         </div>
         <div class="mt-1 text-xs text-zinc-500">Update details without leaving the dashboard</div>
       </div>
@@ -19,7 +19,7 @@
       </div>
     </div>
     <div class="scrollbars min-h-0 flex-1 overflow-y-auto px-6 py-6">
-      <%= render "courses/form", course: course, start_date: start_date, cancel_drawer: true %>
+      <%= render "work_shifts/form", work_shift: work_shift, start_date: start_date, cancel_drawer: true %>
     </div>
   </div>
 <% end %>
