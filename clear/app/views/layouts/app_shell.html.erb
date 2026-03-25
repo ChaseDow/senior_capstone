@@ -85,33 +85,42 @@
               ) do |t| %>
           <% t.with_actions do %>
             <% unread_count = user_signed_in? ? current_user.notifications.unread.count : 0 %>
-            <div class="relative" data-controller="notifications-dropdown">
-              <button
-                type="button"
-                data-action="click->notifications-dropdown#toggle"
-                class="relative inline-flex h-10 w-10 items-center justify-center rounded-xl
-                       border border-white/10 bg-zinc-950/30 hover:bg-white/5 transition
-                       text-zinc-200 hover:text-zinc-50
-                       [&_svg]:text-current [&_svg_*]:stroke-current [&_svg_*]:fill-none"
-                aria-label="Notifications"
-              >
-                <span class="[&>svg]:h-6 [&>svg]:w-6">
-                  <%= icon "bell-dot-stroke-rounded" %>
-                </span>
-                <%= render "notifications/badge", unread_count: unread_count %>
-              </button>
-
-              <%# Dropdown panel %>
-              <div
-                data-notifications-dropdown-target="panel"
-                class="hidden absolute right-0 top-full mt-2 w-96 z-50 rounded-2xl border shadow-2xl overflow-hidden"
-                style="border-color: var(--studs-border); background-color: var(--studs-sidebar-bg);"
-              >
-                <%= turbo_frame_tag "notifications_panel",
-                      src: notifications_path,
-                      loading: :lazy do %>
-                  <div class="px-4 py-6 text-center text-sm text-zinc-400">Loading...</div>
+            <div class="flex items-center gap-2">
+              <% unless controller_name == "ai_chat" %>
+                <%= link_to ai_chat_index_path,
+                      class: "studs-topbar-icon-btn studs-topbar-icon-btn--ai",
+                      "aria-label": "Open AI Chat" do %>
+                  <span class="[&>svg]:h-5 [&>svg]:w-5">
+                    <%= icon "chat-bot-stroke-rounded" %>
+                  </span>
                 <% end %>
+              <% end %>
+
+              <div class="relative" data-controller="notifications-dropdown">
+                <button
+                  type="button"
+                  data-action="click->notifications-dropdown#toggle"
+                  class="studs-topbar-icon-btn"
+                  aria-label="Notifications"
+                >
+                  <span class="[&>svg]:h-5 [&>svg]:w-5">
+                    <%= icon "bell-dot-stroke-rounded" %>
+                  </span>
+                  <%= render "notifications/badge", unread_count: unread_count %>
+                </button>
+
+                <%# Dropdown panel %>
+                <div
+                  data-notifications-dropdown-target="panel"
+                  class="hidden absolute right-0 top-full mt-2 w-96 z-50 rounded-2xl border shadow-2xl overflow-hidden"
+                  style="border-color: var(--studs-border); background-color: var(--studs-sidebar-bg);"
+                >
+                  <%= turbo_frame_tag "notifications_panel",
+                        src: notifications_path,
+                        loading: :lazy do %>
+                    <div class="px-4 py-6 text-center text-sm text-zinc-400">Loading...</div>
+                  <% end %>
+                </div>
               </div>
             </div>
           <% end %>
@@ -184,6 +193,17 @@
     </div>
     <!-- Toast notifications -->
     <%= render "shared/toasts" %>
+    <% unless controller_name == 'ai_chat' %>
+      <%= link_to ai_chat_index_path,
+            class: "fixed bottom-6 right-6 z-50 inline-flex items-center justify-center
+                    w-14 h-14 rounded-2xl shadow-lg transition hover:brightness-110 hover:scale-105 active:scale-95",
+            style: "background-color: var(--studs-accent); box-shadow: 0 0 20px color-mix(in srgb, var(--studs-accent) 40%, transparent);",
+            "aria-label": "Open AI Chat" do %>
+        <span class="[&>svg]:h-7 [&>svg]:w-7 text-white [&_svg]:text-current [&_svg_*]:stroke-current [&_svg_*]:fill-none">
+          <%= icon "chat-bot-stroke-rounded" %>
+        </span>
+      <% end %>
+    <% end %>
     <script>
       function bindPasswordToggles() {
         document.querySelectorAll('[data-password-toggle]').forEach((button) => {

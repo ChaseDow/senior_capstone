@@ -42,6 +42,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_040638) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
+  create_table "ai_chat_messages", force: :cascade do |t|
+    t.bigint "ai_conversation_id", null: false
+    t.text "content", null: false
+    t.datetime "created_at", null: false
+    t.string "role", null: false
+    t.datetime "updated_at", null: false
+    t.index ["ai_conversation_id", "created_at"], name: "index_ai_chat_messages_on_ai_conversation_id_and_created_at"
+    t.index ["ai_conversation_id"], name: "index_ai_chat_messages_on_ai_conversation_id"
+    t.index ["role"], name: "index_ai_chat_messages_on_role"
+  end
+
+  create_table "ai_conversations", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id"], name: "index_ai_conversations_on_user_id", unique: true
+  end
+
   create_table "calendar_drafts", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.jsonb "operations", default: [], null: false
@@ -205,6 +223,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_040638) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "ai_chat_messages", "ai_conversations"
+  add_foreign_key "ai_conversations", "users"
   add_foreign_key "calendar_drafts", "users"
   add_foreign_key "course_items", "courses"
   add_foreign_key "courses", "users"
