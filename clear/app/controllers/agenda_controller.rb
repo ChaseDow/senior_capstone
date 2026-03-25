@@ -65,9 +65,14 @@ class AgendaController < ApplicationController
         {}
       end
 
-    base_events = current_user.events
-                              .ransack(event_query)
-                              .result
+
+    base_events = if params[:project_id].present?
+      current_user.events.where(project_id: params[:project_id])
+    else
+      current_user.events.where(project_id: nil)
+    end
+
+    base_events = base_events.ransack(event_query).result
 
     non_recurring_events = base_events.where(recurring: false)
                                       .where(starts_at: range_start..range_end)

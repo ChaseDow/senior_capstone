@@ -13,6 +13,7 @@
               class: "space-y-5",
               data: { drawer_close_on_success: "false", turbo: turbo_enabled, controller: "duration-fill" } do |f| %>
   <%= hidden_field_tag :start_date, start_date_param if start_date_param.present? %>
+  <%= f.hidden_field :project_id, value: @event.project_id || params[:project_id] %>
   <% if event.errors.any? %>
     <div class="rounded-2xl p-4 text-red-300"
          style="border: 1px solid rgba(239,68,68,0.3); background-color: rgba(127,29,29,0.2);">
@@ -154,7 +155,8 @@
     <% if cancel_drawer %>
       <button type="button" class="studs-nav-btn" data-action="drawer#close">Cancel</button>
     <% else %>
-      <%= link_to "Cancel", dashboard_path, class: "studs-nav-btn" %>
+      <% path = @event.project.present? ? project_path(@event.project) : dashboard_path %>
+      <%= link_to "Cancel", path, class: "studs-nav-btn" %>
     <% end %>
   </div>
 <% end %>

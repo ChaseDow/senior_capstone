@@ -2,7 +2,7 @@ class ApplicationController < ActionController::Base
   protected
 
   def after_sign_in_path_for(resource)
-    authenticated_root_path
+    stored_location_for(resource) || authenticated_root_path
   end
 
   def after_sign_out_path_for(resource_or_scope)
@@ -13,6 +13,7 @@ class ApplicationController < ActionController::Base
 
   def calendar_occurrences_for_range(range_start, range_end, draft: nil)
     base_events = current_user.events
+      .where(project_id: nil)
       .where("starts_at <= ?", range_end)
       .where("recurring = FALSE OR repeat_until >= ?", range_start.to_date)
       .order(starts_at: :asc)
