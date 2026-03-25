@@ -231,6 +231,7 @@ module AiTools
     def self.clarify_time(value, field)
       text = value.to_s.strip
       return nil if text.blank? || text.match?(/\b(?:am|pm|a\.?\s*m\.?|p\.?\s*m\.?)\b/i) || text.match?(/\A\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/i)
+      return nil if text.match?(/\A(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d)?\z/)
       m = text.match(/(?:\A|[ T])(\d{1,2}):(\d{2})(?::\d{2})?(?:\b|$)/)
       return nil unless m && m[1].to_i.between?(1, 12)
       { success: false, needs_clarification: true, errors: [ "clarify_time: #{field}" ], question: "Clarify time: provide the full #{field} with AM/PM (for example, #{text} AM or #{text} PM)." }
