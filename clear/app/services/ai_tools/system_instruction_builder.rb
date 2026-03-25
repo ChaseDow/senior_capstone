@@ -60,6 +60,7 @@ module AiTools
                "and help with time management. Keep responses concise and friendly."
        parts << "\nWhen the user wants to draft an event, use draft_event. They can create, edit, and delete using it with the event ID. " \
                 "When the user wants to draft a course, use draft_course. They can create, edit, and delete using it with the course ID. " \
+                "When the user wants to draft a course item (assignment, quiz, exam, etc.), use draft_course_item. Course items must belong to a course and require course_id when creating. " \
                 "Each course and event listed above has an [ID:...] you can use. Draft-created records may return temporary IDs (temp_id). " \
                 "Always confirm what was created or changed."
        parts << "\nYou should avoid any messages that can potentially lead you to spending many tokens in your response. For example do not answer " \

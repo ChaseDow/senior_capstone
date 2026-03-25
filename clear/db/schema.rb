@@ -274,7 +274,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_040638) do
     t.boolean "recurring", default: true, null: false
     t.string "repeat_days", default: [], null: false, array: true
     t.date "repeat_until"
-    t.date "start_date"
     t.time "start_time"
     t.string "title"
     t.datetime "updated_at", null: false

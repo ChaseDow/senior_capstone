@@ -3,10 +3,10 @@
 class CalendarDraft < ApplicationRecord
   belongs_to :user
 
-  # Operations format (model can be "event" or "course"):
-  #   create: { "type" => "create", "model" => "event"|"course", "temp_id" => "d_abc", "data" => {...} }
-  #   update: { "type" => "update", "model" => "event"|"course", "id" => 42, "data" => {...} }
-  #   delete: { "type" => "delete", "model" => "event"|"course", "id" => 42 }
+  # Operations format (model can be "event", "course", or "course_item"):
+  #   create: { "type" => "create", "model" => "event"|"course"|"course_item", "temp_id" => "d_abc", "data" => {...} }
+  #   update: { "type" => "update", "model" => "event"|"course"|"course_item", "id" => 42, "data" => {...} }
+  #   delete: { "type" => "delete", "model" => "event"|"course"|"course_item", "id" => 42 }
 
   # Lightweight struct used to represent draft-created events in the calendar preview.
   # Must respond to the same interface that _calendar.html.erb expects from an Event.
@@ -34,6 +34,20 @@ class CalendarDraft < ApplicationRecord
 
     def contrast_text_color
       Course.new(color: color.presence || "#34D399").contrast_text_color
+    end
+  end
+
+  DraftCourseItemProxy = Struct.new(
+    :temp_id, :title, :kind, :due_at, :details, :course, :color,
+    keyword_init: true
+  ) do
+    def id = temp_id
+    def model_name = CourseItem.model_name
+    def starts_at = due_at
+    def ends_at = due_at ? due_at + 30.minutes : nil
+
+    def contrast_text_color
+      course.respond_to?(:contrast_text_color) ? course.contrast_text_color : "#F9FAFB"
     end
   end
 
@@ -85,6 +99,16 @@ class CalendarDraft < ApplicationRecord
           when "update" then user.courses.find(op["id"]).update!(op["data"].symbolize_keys)
           when "delete" then user.courses.find(op["id"]).destroy!
           end
+        when "course_item"
+          items = CourseItem.joins(:course).where(courses: { user_id: user.id })
+          case op["type"]
+          when "create"
+            data = op["data"].symbolize_keys
+            course = user.courses.find(data[:course_id])
+            course.course_items.create!(data.except(:course_id))
+          when "update" then items.find(op["id"]).update!(op["data"].symbolize_keys)
+          when "delete" then items.find(op["id"]).destroy!
+          end
         end
       end
     end
@@ -126,9 +150,21 @@ class CalendarDraft < ApplicationRecord
 
     course_create_ops = operations.select { |op| op["type"] == "create" && op["model"] == "course" }
 
+    # ── Course item draft ops ──
+    item_deleted_ids = operations
+      .select { |op| op["type"] == "delete" && op["model"] == "course_item" }
+      .map { |op| op["id"] }
+
+    item_update_ops = operations
+      .select { |op| op["type"] == "update" && op["model"] == "course_item" }
+      .index_by { |op| op["id"] }
+
+    item_create_ops = operations.select { |op| op["type"] == "create" && op["model"] == "course_item" }
+
     # Build updated objects once per record id, not once per occurrence
     updated_event_cache  = {}
     updated_course_cache = {}
+    updated_item_cache   = {}
 
     result = occurrences.map do |occ|
       record = occ.respond_to?(:event) ? occ.event : occ
@@ -207,6 +243,31 @@ class CalendarDraft < ApplicationRecord
 
           next Course::Occurrence.new(event: updated, starts_at: new_start, ends_at: new_end, draft_status: "updated")
         end
+      elsif model == "course_item"
+        if item_deleted_ids.include?(record.id)
+          next Event::Occurrence.new(
+            event: record, starts_at: occ.starts_at, ends_at: occ.ends_at,
+            draft_status: "deleted"
+          )
+        end
+
+        if (update_op = item_update_ops[record.id])
+          updated = updated_item_cache[record.id] ||= begin
+            ci = CourseItem.new(record.attributes.except("id", "created_at", "updated_at").merge(update_op["data"]))
+            ci.id = record.id
+            ci.course ||= user.courses.find_by(id: ci.course_id)
+            ci.instance_variable_set(:@new_record, false)
+            ci
+          end
+
+          start_at = updated.due_at || occ.starts_at
+          next Event::Occurrence.new(
+            event: updated,
+            starts_at: start_at,
+            ends_at: start_at ? (start_at + 30.minutes) : occ.ends_at,
+            draft_status: "updated"
+          )
+        end
       end
 
       occ
@@ -244,6 +305,38 @@ class CalendarDraft < ApplicationRecord
           draft_status: "updated"
         )
       end
+    end
+
+    item_update_ops.each do |id, update_op|
+      updated = updated_item_cache[id]
+      unless updated
+        source_item = CourseItem.joins(:course).where(courses: { user_id: user.id }).find_by(id: id)
+        next unless source_item
+
+        updated = CourseItem.new(source_item.attributes.except("id", "created_at", "updated_at").merge(update_op["data"]))
+        updated.id = source_item.id
+        updated.course ||= user.courses.find_by(id: updated.course_id)
+        updated.instance_variable_set(:@new_record, false)
+        updated_item_cache[id] = updated
+      end
+
+      next if updated.due_at.blank? || updated.due_at < range_start || updated.due_at > range_end
+
+      exists = result.any? do |occ|
+        record = occ.respond_to?(:event) ? occ.event : occ
+        record.model_name.singular == "course_item" &&
+          record.id == updated.id &&
+          occ.respond_to?(:draft_status) &&
+          occ.draft_status == "updated"
+      end
+      next if exists
+
+      result << Event::Occurrence.new(
+        event: updated,
+        starts_at: updated.due_at,
+        ends_at: updated.due_at + 30.minutes,
+        draft_status: "updated"
+      )
     end
 
     # ── Draft-created events ──
@@ -341,6 +434,29 @@ class CalendarDraft < ApplicationRecord
         end
         d += 1.day
       end
+    end
+
+    # ── Draft-created course items ──
+    item_create_ops.each do |op|
+      data = op["data"].symbolize_keys
+      due_at = data[:due_at].present? ? (Time.zone.parse(data[:due_at].to_s) rescue nil) : nil
+      next unless due_at && due_at >= range_start && due_at <= range_end
+
+      course = user.courses.find_by(id: data[:course_id])
+      proxy = DraftCourseItemProxy.new(
+        temp_id: op["temp_id"],
+        title: data[:title].presence || "(Draft Item)",
+        kind: data[:kind].presence || "assignment",
+        due_at: due_at,
+        details: data[:details],
+        course: course,
+        color: course&.color || "#34D399"
+      )
+
+      result << Event::Occurrence.new(
+        event: proxy, starts_at: due_at, ends_at: due_at + 30.minutes,
+        draft_status: "created"
+      )
     end
 
     result.sort_by(&:starts_at)
