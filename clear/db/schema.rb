@@ -73,7 +73,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_03_051533) do
     t.time "end_time"
     t.time "ends_at"
     t.string "instructor"
-    t.bigint "label_id"
     t.string "location"
     t.string "meeting_days"
     t.string "professor"
@@ -119,7 +118,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_03_051533) do
     t.text "description"
     t.integer "duration_minutes"
     t.datetime "ends_at"
-    t.bigint "label_id"
     t.string "location"
     t.integer "priority"
     t.bigint "project_id"
@@ -135,16 +133,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_03_051533) do
     t.index ["user_id", "repeat_until"], name: "index_events_on_user_id_and_repeat_until"
     t.index ["user_id", "starts_at"], name: "index_events_on_user_id_and_starts_at"
     t.index ["user_id"], name: "index_events_on_user_id"
-  end
-
-  create_table "labels", force: :cascade do |t|
-    t.string "color", default: "#78866B", null: false
-    t.datetime "created_at", null: false
-    t.string "name", null: false
-    t.datetime "updated_at", null: false
-    t.bigint "user_id", null: false
-    t.index ["user_id", "name"], name: "index_labels_on_user_id_and_name", unique: true
-    t.index ["user_id"], name: "index_labels_on_user_id"
   end
 
   create_table "notifications", force: :cascade do |t|
@@ -277,7 +265,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_03_051533) do
   add_foreign_key "events", "labels"
   add_foreign_key "events", "projects"
   add_foreign_key "events", "users"
-  add_foreign_key "labels", "users"
   add_foreign_key "notifications", "users"
   add_foreign_key "project_invitations", "projects"
   add_foreign_key "project_invitations", "users", column: "sender_id"
