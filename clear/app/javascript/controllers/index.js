@@ -58,9 +58,6 @@ application.register("poll-frame", PollFrameController)
 import ProfileNavController from "./profile_nav_controller"
 application.register("profile-nav", ProfileNavController)
 
-import QuickCreateController from "./quick_create_controller"
-application.register("quick-create", QuickCreateController)
-
 import RecurrenceToggleController from "./recurrence_toggle_controller"
 application.register("recurrence-toggle", RecurrenceToggleController)
 
