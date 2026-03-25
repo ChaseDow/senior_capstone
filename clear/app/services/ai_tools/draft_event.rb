@@ -43,6 +43,9 @@ module AiTools
     end
 
     def self.create_event(user, args)
+      clarify = clarify_time(args["starts_at"], "starts_at") || clarify_time(args["ends_at"], "ends_at")
+      return clarify if clarify
+
       event_attrs = {
         title: args["title"],
         description: args["description"],
@@ -71,6 +74,9 @@ module AiTools
     def self.update_event(user, args)
       event = resolve_event(user, args)
       return event if event.is_a?(Hash) && event[:success] == false
+
+      clarify = clarify_time(args["starts_at"], "starts_at") || clarify_time(args["ends_at"], "ends_at")
+      return clarify if clarify
 
       updates = {}
       updates[:title] = args["title"] if args["title"].present?
@@ -246,5 +252,14 @@ module AiTools
       }
     end
     private_class_method :required_fields_clarification_response
+
+    def self.clarify_time(value, field)
+      text = value.to_s.strip
+      return nil if text.blank? || text.match?(/\b(?:am|pm|a\.?\s*m\.?|p\.?\s*m\.?)\b/i) || text.match?(/\A\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/i)
+      m = text.match(/(?:\A|[ T])(\d{1,2}):(\d{2})(?::\d{2})?(?:\b|$)/)
+      return nil unless m && m[1].to_i.between?(1, 12)
+      { success: false, needs_clarification: true, errors: [ "clarify_time: #{field}" ], question: "Clarify time: provide the full #{field} with AM/PM (for example, #{text} AM or #{text} PM)." }
+    end
+    private_class_method :clarify_time
   end
 end
