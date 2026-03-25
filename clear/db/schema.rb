@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_21_203938) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_25_040638) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -129,6 +129,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_21_203938) do
     t.index ["user_id"], name: "index_events_on_user_id"
   end
 
+  create_table "notifications", force: :cascade do |t|
+    t.string "category", null: false
+    t.datetime "created_at", null: false
+    t.string "message"
+    t.bigint "notifiable_id"
+    t.string "notifiable_type"
+    t.datetime "read_at"
+    t.datetime "scheduled_for"
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["notifiable_type", "notifiable_id", "category", "scheduled_for"], name: "idx_notifications_reminder_dedup", unique: true, where: "(scheduled_for IS NOT NULL)"
+    t.index ["notifiable_type", "notifiable_id"], name: "index_notifications_on_notifiable"
+    t.index ["user_id", "read_at"], name: "index_notifications_on_user_id_and_read_at"
+    t.index ["user_id"], name: "index_notifications_on_user_id"
+  end
+
   create_table "schedules", force: :cascade do |t|
     t.boolean "active", default: true, null: false
     t.datetime "created_at", null: false
@@ -194,6 +210,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_21_203938) do
   add_foreign_key "documents", "users"
   add_foreign_key "event_exceptions", "events"
   add_foreign_key "events", "users"
+  add_foreign_key "notifications", "users"
   add_foreign_key "schedules", "users"
   add_foreign_key "syllabuses", "courses", on_delete: :nullify
   add_foreign_key "syllabuses", "users"

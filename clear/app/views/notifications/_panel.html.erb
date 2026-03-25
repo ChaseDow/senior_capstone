@@ -1,0 +1,17 @@
+<%# locals: (notifications:, unread_count:) %>
+<div class="flex flex-col" style="max-height: 36rem;">
+  <%# Header %>
+  <div id="notifications_panel_header" class="shrink-0 flex items-center justify-between px-4 py-3 studs-topbar">
+    <%= render "notifications/panel_header", unread_count: unread_count %>
+  </div>
+  <%# Body %>
+  <div id="notifications_list" class="flex-1 min-h-0 overflow-y-auto px-3 py-3 space-y-2">
+    <% if notifications.empty? %>
+      <%= render "notifications/empty_state" %>
+    <% else %>
+      <% notifications.each do |notification| %>
+        <%= render "notifications/notification", notification: notification %>
+      <% end %>
+    <% end %>
+  </div>
+</div>
