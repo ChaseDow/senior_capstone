@@ -10,7 +10,7 @@
 <%= form_with model: event,
               url: form_url,
               class: "space-y-5",
-              data: { drawer_close_on_success: "false", turbo: turbo_enabled } do |f| %>
+              data: { drawer_close_on_success: "false", turbo: turbo_enabled, controller: "duration-fill" } do |f| %>
   <%= hidden_field_tag :start_date, start_date_param if start_date_param.present? %>
   <% if event.errors.any? %>
     <div class="rounded-2xl p-4 text-red-300"
@@ -43,13 +43,15 @@
       <%= f.datetime_local_field :starts_at,
             value: event.starts_at&.strftime("%Y-%m-%dT%H:%M"),
             class: input_classes,
-            style: input_style %>
+            style: input_style,
+            data: { duration_fill_target: "startField", action: "change->duration-fill#fill" } %>
     </div>
     <div>
       <%= f.label :ends_at, "End time (optional)", class: label_classes, style: label_style %>
       <%= f.datetime_local_field :ends_at,
             class: input_classes,
-            style: input_style %>
+            style: input_style,
+            data: { duration_fill_target: "endField" } %>
     </div>
   </div>
   <!-- Duration -->
@@ -59,7 +61,8 @@
           options_for_select(ApplicationHelper::DURATION_OPTIONS, event.duration_minutes),
           { include_blank: "— select duration —" },
           class: input_classes,
-          style: input_style %>
+          style: input_style,
+          data: { duration_fill_target: "durationField", action: "change->duration-fill#fill" } %>
     <p class="mt-1.5 text-xs text-zinc-500">Set a duration if you prefer not to enter an end time.</p>
   </div>
   <!-- Location + Priority -->

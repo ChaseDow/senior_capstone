@@ -10,7 +10,7 @@
 <%= form_with model: course,
               url: form_url,
               class: "space-y-5",
-              data: { turbo: turbo_enabled } do |f| %>
+              data: { turbo: turbo_enabled, controller: "duration-fill" } do |f| %>
   <%= hidden_field_tag :start_date, start_date_param if start_date_param.present? %>
   <% if course.errors.any? %>
     <div class="rounded-2xl p-4 text-red-300"
@@ -40,11 +40,13 @@
   <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
     <div>
       <%= f.label :start_time, "Start time *", class: label_classes, style: label_style %>
-      <%= f.time_field :start_time, class: input_classes, style: input_style %>
+      <%= f.time_field :start_time, class: input_classes, style: input_style,
+            data: { duration_fill_target: "startField", action: "change->duration-fill#fill" } %>
     </div>
     <div>
       <%= f.label :end_time, "End time", class: label_classes, style: label_style %>
-      <%= f.time_field :end_time, class: input_classes, style: input_style %>
+      <%= f.time_field :end_time, class: input_classes, style: input_style,
+            data: { duration_fill_target: "endField" } %>
     </div>
   </div>
   <!-- Duration -->
@@ -54,7 +56,8 @@
           options_for_select(ApplicationHelper::DURATION_OPTIONS, course.duration_minutes),
           { include_blank: "— select duration —" },
           class: input_classes,
-          style: input_style %>
+          style: input_style,
+          data: { duration_fill_target: "durationField", action: "change->duration-fill#fill" } %>
     <p class="mt-1.5 text-xs text-zinc-500">Set a duration if you prefer not to enter an end time.</p>
   </div>
   <!-- Dates -->

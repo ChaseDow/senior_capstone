@@ -34,6 +34,9 @@ application.register("delete-options", DeleteOptionsController)
 import DrawerController from "./drawer_controller"
 application.register("drawer", DrawerController)
 
+import DurationFillController from "./duration_fill_controller"
+application.register("duration-fill", DurationFillController)
+
 import EventPopoverController from "./event_popover_controller"
 application.register("event-popover", EventPopoverController)
 
