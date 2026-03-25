@@ -1,5 +1,32 @@
 @import "tailwindcss";
 
+/* Keep browser autofill from overriding app input styles */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+  color: #d4d4d8 !important;
+  -webkit-text-fill-color: #d4d4d8 !important;
+  caret-color: #d4d4d8;
+  border-color: var(--studs-border) !important;
+  -webkit-box-shadow: 0 0 0 1000px transparent inset;
+  box-shadow: 0 0 0 1000px transparent inset;
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill:focus {
+  border-color: var(--studs-accent) !important;
+  -webkit-box-shadow: 0 0 0 1000px transparent inset, 0 0 0 2px var(--studs-accent) !important;
+  box-shadow: 0 0 0 1000px transparent inset, 0 0 0 2px var(--studs-accent) !important;
+}
+
 /* =========================
    Studs Themes
    ========================= */
