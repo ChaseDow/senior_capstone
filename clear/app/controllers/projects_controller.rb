@@ -1,7 +1,7 @@
 class ProjectsController < ApplicationController
   layout "app_shell"
   before_action :authenticate_user!
-  before_action :set_project, only: %i[ show edit update destroy ]
+  before_action :set_project, only: %i[ show edit update destroy agenda ]
 
   # GET /projects or /projects.json
   def index
@@ -17,16 +17,7 @@ class ProjectsController < ApplicationController
         Date.current
       end
 
-    week_start  = @start_date.beginning_of_week
-    range_start = week_start.beginning_of_day
-    range_end   = (week_start + 6.days).end_of_day
-
-    @occurrences =
-    @project.events
-      .where("starts_at <= ?", range_end)
-      .where("recurring = FALSE OR repeat_until >= ?", range_start.to_date)
-      .flat_map { |e| e.occurrences_between(range_start, range_end) }
-      .sort_by(&:starts_at)
+    @occurrences = @project.occurrences_for_week(@start_date)
   end
 
   # GET /projects/new
@@ -78,23 +69,18 @@ class ProjectsController < ApplicationController
   end
 
   def agenda
-    @date =
-      begin
-        params[:date].present? ? Date.parse(params[:date]) : Date.current
-      rescue ArgumentError
-        Date.current
-      end
+  @date =
+    begin
+      params[:date].present? ? Date.parse(params[:date]) : Date.current
+    rescue ArgumentError
+      Date.current
+    end
 
-    range_start = @date.beginning_of_day
-    range_end   = @date.end_of_day
+  @occurrences = @project.occurrences_for_day(@date)
 
-    @occurrences = calendar_occurrences_for_range(range_start, range_end)
-
-    now = Time.current
-    next_occurrences = calendar_occurrences_for_range(now, now + 7.days)
-    @next_occurrence = next_occurrences.find { |o| o.starts_at > now }
-
-    render "dashboard/agenda"
+  now = Time.current
+  @next_occurrence = @project.occurrences_for_week(now.to_date)
+                              .find { |o| o.starts_at > now }
   end
 
   def join

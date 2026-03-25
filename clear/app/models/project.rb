@@ -12,4 +12,29 @@ class Project < ApplicationRecord
   def generate_invite_token
     self.invite_token = SecureRandom.hex(10)
   end
+
+  def occurrences_for_week(start_date)
+    week_start  = start_date.beginning_of_week
+    range_start = week_start.beginning_of_day
+    range_end   = (week_start + 6.days).end_of_day
+
+    events
+      .where("starts_at <= ?", range_end)
+      .where("recurring = FALSE OR repeat_until >= ?", range_start.to_date)
+      .order(starts_at: :asc)
+      .flat_map { |e| e.occurrences_between(range_start, range_end) }
+      .sort_by(&:starts_at)
+  end
+
+  def occurrences_for_day(date)
+    range_start = date.beginning_of_day
+    range_end   = date.end_of_day
+
+    events
+      .where("starts_at <= ?", range_end)
+      .where("recurring = FALSE OR repeat_until >= ?", range_start.to_date)
+      .order(starts_at: :asc)
+      .flat_map { |e| e.occurrences_between(range_start, range_end) }
+      .sort_by(&:starts_at)
+  end
 end

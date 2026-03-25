@@ -3,7 +3,8 @@ import { Controller } from "@hotwired/stimulus";
 export default class extends Controller {
   static targets = ["overlay", "panel", "frame", "skeleton"];
   static values = {
-    url: String, 
+    url: String,
+    projectId: Number, 
   };
 
   connect() {
@@ -20,6 +21,8 @@ export default class extends Controller {
   open(e) {
     e?.preventDefault?.();
     const date = e?.params?.date || e?.currentTarget?.dataset?.date || null;
+    const projectId = e?.params?.projectId || null;
+    if (projectId) this.projectIdValue = projectId;
     this.openForDate(date);
   }
 
@@ -78,6 +81,7 @@ export default class extends Controller {
   buildUrl(date) {
     const u = new URL(this.urlValue, window.location.origin);
     if (date) u.searchParams.set("date", date);
+    if (this.projectIdValue) u.searchParams.set("project_id", this.projectIdValue);
     return u.toString();
   }
 }
