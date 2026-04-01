@@ -18,6 +18,8 @@ class ProjectsController < ApplicationController
       end
 
     @occurrences = @project.occurrences_for_week(@start_date)
+    @month_occurrences = @project.occurrences_for_month(@start_date)
+    @month_date = @start_date
   end
 
   # GET /projects/new
