@@ -19,6 +19,9 @@ application.register("ai-usage", AiUsageController)
 import AvatarCropController from "./avatar_crop_controller"
 application.register("avatar-crop", AvatarCropController)
 
+import CalendarViewController from "./calendar_view_controller"
+application.register("calendar-view", CalendarViewController)
+
 import ChatController from "./chat_controller"
 application.register("chat", ChatController)
 

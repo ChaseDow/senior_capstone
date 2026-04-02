@@ -26,6 +26,18 @@ class Project < ApplicationRecord
       .sort_by(&:starts_at)
   end
 
+  def occurrences_for_month(date)
+    range_start = date.beginning_of_month.beginning_of_day
+    range_end   = date.end_of_month.end_of_day
+
+    events
+      .where("starts_at <= ?", range_end)
+      .where("recurring = FALSE OR repeat_until >= ?", range_start.to_date)
+      .order(starts_at: :asc)
+      .flat_map { |e| e.occurrences_between(range_start, range_end) }
+      .sort_by(&:starts_at)
+  end
+
   def occurrences_for_day(date)
     range_start = date.beginning_of_day
     range_end   = date.end_of_day
