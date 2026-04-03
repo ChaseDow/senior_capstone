@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_25_040638) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_03_051533) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -91,7 +91,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_040638) do
     t.time "end_time"
     t.time "ends_at"
     t.string "instructor"
-    t.bigint "label_id"
     t.string "location"
     t.string "meeting_days"
     t.string "professor"
@@ -114,9 +113,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_040638) do
 
   create_table "documents", force: :cascade do |t|
     t.datetime "created_at", null: false
+    t.bigint "project_id"
     t.string "title", null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
+    t.index ["project_id"], name: "index_documents_on_project_id"
     t.index ["user_id"], name: "index_documents_on_user_id"
   end
 
@@ -136,7 +137,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_040638) do
     t.text "description"
     t.integer "duration_minutes"
     t.datetime "ends_at"
-    t.bigint "label_id"
     t.string "location"
     t.integer "priority"
     t.bigint "project_id"
@@ -151,16 +151,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_040638) do
     t.index ["user_id", "repeat_until"], name: "index_events_on_user_id_and_repeat_until"
     t.index ["user_id", "starts_at"], name: "index_events_on_user_id_and_starts_at"
     t.index ["user_id"], name: "index_events_on_user_id"
-  end
-
-  create_table "labels", force: :cascade do |t|
-    t.string "color", default: "#78866B", null: false
-    t.datetime "created_at", null: false
-    t.string "name", null: false
-    t.datetime "updated_at", null: false
-    t.bigint "user_id", null: false
-    t.index ["user_id", "name"], name: "index_labels_on_user_id_and_name", unique: true
-    t.index ["user_id"], name: "index_labels_on_user_id"
   end
 
   create_table "notifications", force: :cascade do |t|
@@ -230,9 +220,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_040638) do
     t.string "parse_status"
     t.datetime "parsed_at"
     t.text "parsed_text"
+    t.bigint "project_id"
     t.string "title", null: false
     t.bigint "user_id", null: false
     t.index ["course_id"], name: "index_syllabuses_on_course_id"
+    t.index ["project_id"], name: "index_syllabuses_on_project_id"
     t.index ["user_id"], name: "index_syllabuses_on_user_id"
   end
 
@@ -248,21 +240,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_040638) do
     t.integer "invitations_count", default: 0
     t.bigint "invited_by_id"
     t.string "invited_by_type"
-    t.string "provider"
     t.datetime "remember_created_at"
     t.datetime "reset_password_sent_at"
     t.string "reset_password_token"
     t.integer "role", default: 0, null: false
     t.string "theme", default: "green", null: false
-    t.string "uid"
     t.datetime "updated_at", null: false
+    t.string "username", null: false
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token", unique: true
     t.index ["invited_by_id"], name: "index_users_on_invited_by_id"
     t.index ["invited_by_type", "invited_by_id"], name: "index_users_on_invited_by"
-    t.index ["provider", "uid"], name: "index_users_on_provider_and_uid", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["role"], name: "index_users_on_role"
+    t.index ["username"], name: "index_users_on_username"
   end
 
   create_table "work_shifts", force: :cascade do |t|
@@ -271,6 +262,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_040638) do
     t.text "description"
     t.time "end_time"
     t.string "location"
+    t.bigint "project_id"
     t.boolean "recurring", default: true, null: false
     t.string "repeat_days", default: [], null: false, array: true
     t.date "repeat_until"
@@ -279,6 +271,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_040638) do
     t.string "title"
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
+    t.index ["project_id"], name: "index_work_shifts_on_project_id"
     t.index ["user_id"], name: "index_work_shifts_on_user_id"
   end
 
@@ -290,19 +283,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_040638) do
   add_foreign_key "course_items", "courses"
   add_foreign_key "courses", "projects"
   add_foreign_key "courses", "users"
+  add_foreign_key "documents", "projects"
   add_foreign_key "documents", "users"
   add_foreign_key "event_exceptions", "events"
   add_foreign_key "events", "projects"
   add_foreign_key "events", "users"
-  add_foreign_key "labels", "users"
   add_foreign_key "notifications", "users"
   add_foreign_key "project_invitations", "projects"
   add_foreign_key "project_invitations", "users", column: "sender_id"
   add_foreign_key "project_memberships", "projects"
   add_foreign_key "project_memberships", "users"
-  add_foreign_key "projects", "users"
   add_foreign_key "schedules", "users"
   add_foreign_key "syllabuses", "courses", on_delete: :nullify
+  add_foreign_key "syllabuses", "projects"
   add_foreign_key "syllabuses", "users"
+  add_foreign_key "work_shifts", "projects"
   add_foreign_key "work_shifts", "users"
 end

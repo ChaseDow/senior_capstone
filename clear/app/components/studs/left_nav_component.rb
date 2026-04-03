@@ -60,6 +60,6 @@ class Studs::LeftNavComponent < ViewComponent::Base
   def user_display_name
     user = current_user
     return "" unless user
-    user.try(:name) || user.try(:first_name) || user.email.to_s.split("@").first
+    user.try(:username) || user.try(:first_name) || user.email.to_s.split("@").first
   end
 end
