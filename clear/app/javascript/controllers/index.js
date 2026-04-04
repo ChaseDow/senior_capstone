@@ -81,3 +81,6 @@ application.register("toast", ToastController)
 
 import TypewriterController from "./typewriter_controller"
 application.register("typewriter", TypewriterController)
+
+import UsernameEditController from "./username_edit_controller"
+application.register("username-edit", UsernameEditController)
