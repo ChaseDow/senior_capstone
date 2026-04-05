@@ -8,6 +8,7 @@ Rails.application.routes.draw do
   devise_for :users
 
   resource :profile, only: [ :show, :edit, :update ] do
+    patch :update_username
     get :edit_password
     patch :update_password
     get :edit_avatar
