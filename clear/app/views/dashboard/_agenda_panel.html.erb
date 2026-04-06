@@ -37,14 +37,14 @@
           <% end %>
         </div>
         <% if next_occurrence %>
-          <div class="mt-1.5 flex items-center gap-1.5 text-xs text-zinc-400"
+          <div class="mt-1.5 flex items-center gap-1.5 min-w-0 text-xs text-zinc-400"
                data-controller="countdown"
                data-countdown-event-time-value="<%= next_occurrence.starts_at.iso8601 %>">
-            <span class="inline-block h-1.5 w-1.5 rounded-full animate-pulse" style="background-color: var(--studs-accent);"></span>
-            Next:
-            <span class="font-medium text-zinc-200"><%= next_occurrence.title %></span>
-            <span class="mx-0.5 text-zinc-600">—</span>
-            <span data-countdown-display class="font-mono tabular-nums" style="color: var(--studs-accent);">...</span>
+            <span class="shrink-0 inline-block h-1.5 w-1.5 rounded-full animate-pulse" style="background-color: var(--studs-accent);"></span>
+            <span class="shrink-0">Next:</span>
+            <span class="font-medium text-zinc-200 truncate min-w-0"><%= next_occurrence.title %></span>
+            <span class="shrink-0 mx-0.5 text-zinc-600">—</span>
+            <span data-countdown-display class="shrink-0 font-mono tabular-nums" style="color: var(--studs-accent);">...</span>
           </div>
         <% end %>
       </div>
@@ -138,9 +138,9 @@
             %>
             <% open_path =
               if is_due
-                edit_course_course_item_path(record.course, record)
+                course_course_item_path(record.course, record, start_date: start_at.to_date.iso8601)
               else
-                polymorphic_path(record)
+                polymorphic_path(record, start_date: start_at.to_date.iso8601)
               end
             %>
             <div
@@ -158,8 +158,8 @@
               >
               <div class="flex items-start justify-between gap-3">
                 <div class="min-w-0">
-                  <div class="flex items-center gap-2">
-                    <span class="inline-flex h-2.5 w-2.5 rounded-full" style="background-color: <%= tint_bar %>"></span>
+                  <div class="flex items-center gap-2 min-w-0">
+                    <span class="shrink-0 inline-flex h-2.5 w-2.5 rounded-full" style="background-color: <%= tint_bar %>"></span>
                     <div class="truncate text-sm font-semibold text-zinc-50">
                       <%= record.respond_to?(:title) ? (record.title.presence || "(Untitled)") : "(Untitled)" %>
                     </div>

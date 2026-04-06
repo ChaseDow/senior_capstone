@@ -22,6 +22,9 @@ application.register("avatar-crop", AvatarCropController)
 import ChatController from "./chat_controller"
 application.register("chat", ChatController)
 
+import ClipboardController from "./clipboard_controller"
+application.register("clipboard", ClipboardController)
+
 import CountdownController from "./countdown_controller"
 application.register("countdown", CountdownController)
 
@@ -33,6 +36,9 @@ application.register("delete-options", DeleteOptionsController)
 
 import DrawerController from "./drawer_controller"
 application.register("drawer", DrawerController)
+
+import DurationFillController from "./duration_fill_controller"
+application.register("duration-fill", DurationFillController)
 
 import EventPopoverController from "./event_popover_controller"
 application.register("event-popover", EventPopoverController)
@@ -49,8 +55,14 @@ application.register("hello", HelloController)
 import ModalController from "./modal_controller"
 application.register("modal", ModalController)
 
+import NotificationsDropdownController from "./notifications_dropdown_controller"
+application.register("notifications-dropdown", NotificationsDropdownController)
+
 import PollFrameController from "./poll_frame_controller"
 application.register("poll-frame", PollFrameController)
+
+import ProfileNavController from "./profile_nav_controller"
+application.register("profile-nav", ProfileNavController)
 
 import RecurrenceToggleController from "./recurrence_toggle_controller"
 application.register("recurrence-toggle", RecurrenceToggleController)

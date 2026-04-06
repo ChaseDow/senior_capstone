@@ -31,6 +31,11 @@ class EventsController < ApplicationController
   def new
     start_time = params[:start_time].present? ? Time.zone.parse(params[:start_time]) : nil
     @event = current_user.events.new(starts_at: start_time)
+
+    if params[:project_id].present?
+      @project = current_user.projects.find(params[:project_id])
+      @event.project = @project
+    end
   end
 
   def create
@@ -40,6 +45,9 @@ class EventsController < ApplicationController
     end
 
     @event = current_user.events.new(event_params)
+    if params[:event][:project_id].present?
+      @event.project = current_user.projects.find(params[:event][:project_id])
+    end
 
     if @event.save
       respond_to do |format|
@@ -91,6 +99,7 @@ class EventsController < ApplicationController
   end
 
   def update
+    project = @event.project
     if in_draft_mode?
       current_user_draft.add_update("event", @event.id, event_params.to_h)
       return render_draft_calendar_update
@@ -98,7 +107,12 @@ class EventsController < ApplicationController
 
     if @event.update(event_params)
       respond_to do |format|
-        format.html { redirect_to dashboard_path, notice: "Event updated." }
+        if project.present?
+          format.html { redirect_to project_path(project), notice: "Event updated." }
+        else
+          format.html { redirect_to dashboard_path, notice: "Event updated." }
+        end
+
 
         format.turbo_stream do
           unless turbo_frame_request?
@@ -112,6 +126,18 @@ class EventsController < ApplicationController
           range_end   = (week_start + 6.days).end_of_day
           occurrences = calendar_occurrences_for_range(range_start, range_end)
 
+          if project.present?
+          render turbo_stream: [
+            turbo_stream.replace(
+              "dashboard_calendar",
+              partial: "dashboard/calendar_frame",
+              locals: { events: project.occurrences, start_date: start_date, draft: nil }
+            ),
+            turbo_stream.replace("agenda_list", partial: "agenda/list"),
+            turbo_stream.update("event_drawer", ""),
+            turbo_stream.update("event_popover", "")
+          ]
+          else
           render turbo_stream: [
             turbo_stream.replace(
               "dashboard_calendar",
@@ -119,8 +145,10 @@ class EventsController < ApplicationController
               locals: { events: occurrences, start_date: start_date, draft: nil }
             ),
             turbo_stream.replace("agenda_list", partial: "agenda/list"),
-            turbo_stream.update("event_drawer", "")
+            turbo_stream.update("event_drawer", ""),
+            turbo_stream.update("event_popover", "")
           ]
+          end
         end
       end
     else
@@ -144,6 +172,7 @@ class EventsController < ApplicationController
   end
 
   def destroy
+    project =  @event.project
     if in_draft_mode?
       current_user_draft.add_delete("event", @event.id)
       return render_draft_calendar_update
@@ -173,16 +202,29 @@ class EventsController < ApplicationController
         range_end   = (week_start + 6.days).end_of_day
         occurrences = calendar_occurrences_for_range(range_start, range_end)
 
-        render turbo_stream: [
-          turbo_stream.replace(
-            "dashboard_calendar",
-            partial: "dashboard/calendar_frame",
-            locals: { events: occurrences, start_date: start_date, draft: nil }
-          ),
-          turbo_stream.replace("agenda_list", partial: "agenda/list"),
-          turbo_stream.update("event_drawer", ""),
-          turbo_stream.update("event_popover", "")
-        ]
+        if project.present?
+          render turbo_stream: [
+            turbo_stream.replace(
+              "dashboard_calendar",
+              partial: "dashboard/calendar_frame",
+              locals: { events: project.occurrences_for_week(start_date), start_date: start_date, draft: nil }
+            ),
+            turbo_stream.replace("agenda_list", partial: "agenda/list"),
+            turbo_stream.update("event_drawer", ""),
+            turbo_stream.update("event_popover", "")
+          ]
+        else
+          render turbo_stream: [
+            turbo_stream.replace(
+              "dashboard_calendar",
+              partial: "dashboard/calendar_frame",
+              locals: { events: occurrences, start_date: start_date, draft: nil }
+            ),
+            turbo_stream.replace("agenda_list", partial: "agenda/list"),
+            turbo_stream.update("event_drawer", ""),
+            turbo_stream.update("event_popover", "")
+          ]
+        end
       end
     end
   end
@@ -238,7 +280,7 @@ class EventsController < ApplicationController
   def event_params
     params.require(:event).permit(
       :title, :starts_at, :ends_at, :duration_minutes, :location, :priority,
-      :description, :color, :recurring, :repeat_until,
+      :description, :color, :recurring, :repeat_until, :project_id,
       repeat_days: []
     )
   end

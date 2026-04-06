@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_23_170637) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_25_040638) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -76,6 +76,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_23_170637) do
     t.string "location"
     t.string "meeting_days"
     t.string "professor"
+    t.bigint "project_id"
     t.boolean "recurring", default: false, null: false
     t.integer "repeat_days", default: [], null: false, array: true
     t.date "repeat_until"
@@ -86,6 +87,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_23_170637) do
     t.string "title"
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
+    t.index ["project_id"], name: "index_courses_on_project_id"
     t.index ["user_id", "repeat_until"], name: "index_courses_on_user_id_and_repeat_until"
     t.index ["user_id", "start_date"], name: "index_courses_on_user_id_and_start_date"
     t.index ["user_id"], name: "index_courses_on_user_id"
@@ -117,6 +119,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_23_170637) do
     t.datetime "ends_at"
     t.string "location"
     t.integer "priority"
+    t.bigint "project_id"
     t.boolean "recurring", default: false, null: false
     t.integer "repeat_days", default: [], null: false, array: true
     t.date "repeat_until"
@@ -124,6 +127,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_23_170637) do
     t.string "title"
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
+    t.index ["project_id"], name: "index_events_on_project_id"
     t.index ["user_id", "repeat_until"], name: "index_events_on_user_id_and_repeat_until"
     t.index ["user_id", "starts_at"], name: "index_events_on_user_id_and_starts_at"
     t.index ["user_id"], name: "index_events_on_user_id"
@@ -136,11 +140,44 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_23_170637) do
     t.bigint "notifiable_id"
     t.string "notifiable_type"
     t.datetime "read_at"
+    t.datetime "scheduled_for"
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
+    t.index ["notifiable_type", "notifiable_id", "category", "scheduled_for"], name: "idx_notifications_reminder_dedup", unique: true, where: "(scheduled_for IS NOT NULL)"
     t.index ["notifiable_type", "notifiable_id"], name: "index_notifications_on_notifiable"
     t.index ["user_id", "read_at"], name: "index_notifications_on_user_id_and_read_at"
     t.index ["user_id"], name: "index_notifications_on_user_id"
+  end
+
+  create_table "project_invitations", force: :cascade do |t|
+    t.datetime "accepted_at"
+    t.datetime "created_at", null: false
+    t.string "email"
+    t.bigint "project_id", null: false
+    t.bigint "sender_id", null: false
+    t.string "token"
+    t.datetime "updated_at", null: false
+    t.index ["project_id"], name: "index_project_invitations_on_project_id"
+    t.index ["sender_id"], name: "index_project_invitations_on_sender_id"
+    t.index ["token"], name: "index_project_invitations_on_token", unique: true
+  end
+
+  create_table "project_memberships", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "project_id", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["project_id"], name: "index_project_memberships_on_project_id"
+    t.index ["user_id"], name: "index_project_memberships_on_user_id"
+  end
+
+  create_table "projects", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.string "invite_token"
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id"
   end
 
   create_table "schedules", force: :cascade do |t|
@@ -176,6 +213,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_23_170637) do
     t.datetime "created_at", null: false
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
+    t.datetime "invitation_accepted_at"
+    t.datetime "invitation_created_at"
+    t.integer "invitation_limit"
+    t.datetime "invitation_sent_at"
+    t.string "invitation_token"
+    t.integer "invitations_count", default: 0
+    t.bigint "invited_by_id"
+    t.string "invited_by_type"
     t.string "provider"
     t.datetime "remember_created_at"
     t.datetime "reset_password_sent_at"
@@ -187,6 +232,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_23_170637) do
     t.datetime "updated_at", null: false
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["invitation_token"], name: "index_users_on_invitation_token", unique: true
+    t.index ["invited_by_id"], name: "index_users_on_invited_by_id"
+    t.index ["invited_by_type", "invited_by_id"], name: "index_users_on_invited_by"
     t.index ["provider", "uid"], name: "index_users_on_provider_and_uid", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["role"], name: "index_users_on_role"
@@ -201,6 +249,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_23_170637) do
     t.boolean "recurring", default: true, null: false
     t.string "repeat_days", default: [], null: false, array: true
     t.date "repeat_until"
+    t.date "start_date"
     t.time "start_time"
     t.string "title"
     t.datetime "updated_at", null: false
@@ -212,11 +261,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_23_170637) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "calendar_drafts", "users"
   add_foreign_key "course_items", "courses"
+  add_foreign_key "courses", "projects"
   add_foreign_key "courses", "users"
   add_foreign_key "documents", "users"
   add_foreign_key "event_exceptions", "events"
+  add_foreign_key "events", "projects"
   add_foreign_key "events", "users"
   add_foreign_key "notifications", "users"
+  add_foreign_key "project_invitations", "projects"
+  add_foreign_key "project_invitations", "users", column: "sender_id"
+  add_foreign_key "project_memberships", "projects"
+  add_foreign_key "project_memberships", "users"
   add_foreign_key "schedules", "users"
   add_foreign_key "syllabuses", "courses", on_delete: :nullify
   add_foreign_key "syllabuses", "users"

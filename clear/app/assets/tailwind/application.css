@@ -1,5 +1,32 @@
 @import "tailwindcss";
 
+/* Keep browser autofill from overriding app input styles */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+  color: #d4d4d8 !important;
+  -webkit-text-fill-color: #d4d4d8 !important;
+  caret-color: #d4d4d8;
+  border-color: var(--studs-border) !important;
+  -webkit-box-shadow: 0 0 0 1000px transparent inset;
+  box-shadow: 0 0 0 1000px transparent inset;
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill:focus {
+  border-color: var(--studs-accent) !important;
+  -webkit-box-shadow: 0 0 0 1000px transparent inset, 0 0 0 2px var(--studs-accent) !important;
+  box-shadow: 0 0 0 1000px transparent inset, 0 0 0 2px var(--studs-accent) !important;
+}
+
 /* =========================
    Studs Themes
    ========================= */
@@ -392,25 +419,25 @@ body[data-theme="latech"] [data-drawer-target="panel"] {
 }
 
 /* ── Space theme profile modal ────────────────────────── */
-body[data-theme="nebula"] [data-modal-target="panel"] > div {
+body[data-theme="nebula"] [data-modal-target="panel"]>div {
   background-color: rgba(15, 10, 26, 0.92) !important;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
 }
 
-body[data-theme="aurora"] [data-modal-target="panel"] > div {
+body[data-theme="aurora"] [data-modal-target="panel"]>div {
   background-color: rgba(6, 17, 28, 0.92) !important;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
 }
 
-body[data-theme="sunset"] [data-modal-target="panel"] > div {
+body[data-theme="sunset"] [data-modal-target="panel"]>div {
   background-color: rgba(17, 6, 16, 0.92) !important;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
 }
 
-body[data-theme="latech"] [data-modal-target="panel"] > div {
+body[data-theme="latech"] [data-modal-target="panel"]>div {
   background-color: #111827 !important;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
@@ -482,6 +509,70 @@ body {
   transition:
     background-color 0.3s ease,
     border-color 0.3s ease;
+}
+
+/* ── Top bar icon buttons ───────────────────────────────── */
+.studs-topbar-icon-btn {
+  position: relative;
+  display: inline-flex;
+  height: 2.25rem;
+  width: 2.25rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.75rem;
+  border: 1px solid var(--studs-border);
+  background-color: var(--studs-panel-bg);
+  color: #e4e4e7;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.studs-topbar-icon-btn:hover {
+  background-color: var(--studs-panel-hover);
+  border-color: var(--studs-accent);
+  color: #fafafa;
+}
+
+.studs-topbar-icon-btn [stroke],
+.studs-topbar-icon-btn *[stroke] {
+  stroke: currentColor;
+}
+
+.studs-topbar-icon-btn--ai {
+  background-color: var(--studs-accent);
+  border-color: transparent;
+  color: #ffffff;
+  transform: scale(1);
+  box-shadow: 0 0 20px color-mix(in srgb, var(--studs-accent) 40%, transparent);
+  transition:
+    transform 0.15s ease,
+    filter 0.15s ease,
+    box-shadow 0.15s ease,
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.studs-topbar-icon-btn--ai:hover {
+  background-color: var(--studs-accent);
+  border-color: transparent;
+  transform: scale(1.05);
+  filter: brightness(1.1);
+}
+
+.studs-topbar-icon-btn--ai:active {
+  transform: scale(0.95);
+}
+
+body[data-theme="mono"] .studs-topbar-icon-btn--ai {
+  color: #000000;
+}
+
+body[data-theme="mono"] .studs-topbar-icon-btn--ai [stroke],
+body[data-theme="mono"] .studs-topbar-icon-btn--ai *[stroke] {
+  stroke: #000000 !important;
 }
 
 /* ── Nav buttons (ghost/outline pill) ───────────────────── */
@@ -696,11 +787,9 @@ body[data-theme="cyan"] .studs-today-badge {
 
 /* ── Active nav pill (glassmorphic, theme-aware) ───────── */
 .studs-nav-link--active-pill {
-  background: linear-gradient(
-    135deg,
-    color-mix(in srgb, var(--studs-accent) 22%, transparent) 0%,
-    color-mix(in srgb, var(--studs-accent-secondary) 10%, transparent) 100%
-  );
+  background: linear-gradient(135deg,
+      color-mix(in srgb, var(--studs-accent) 22%, transparent) 0%,
+      color-mix(in srgb, var(--studs-accent-secondary) 10%, transparent) 100%);
   border: 1px solid color-mix(in srgb, var(--studs-accent) 30%, transparent);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -730,6 +819,24 @@ body[data-theme="cyan"] .studs-today-badge {
 .studs-icon--inactive [stroke],
 .studs-icon--inactive *[stroke] {
   stroke: #d4d4d8 !important;
+}
+
+.studs-icon-accent-soft {
+  color: color-mix(in srgb, var(--studs-accent) 55%, transparent);
+}
+
+.studs-eye-toggle {
+  border: 1px solid var(--studs-border);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--studs-accent) 22%, transparent),
+    0 0 12px color-mix(in srgb, var(--studs-accent) 18%, transparent);
+}
+
+.studs-eye-toggle:hover {
+  border-color: color-mix(in srgb, var(--studs-accent) 55%, var(--studs-border));
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--studs-accent) 34%, transparent),
+    0 0 16px color-mix(in srgb, var(--studs-accent) 26%, transparent);
 }
 
 /* ── Theme swatches ─────────────────────────────────────── */
@@ -968,6 +1075,7 @@ body[data-theme="cyan"] .studs-today-badge {
   }
 }
 
+/* Old Scrollbar Styles (kept for easy rollback)
 @layer base {
   :root {
     --sb-track: #f4f4f5;
@@ -1011,5 +1119,71 @@ body[data-theme="cyan"] .studs-today-badge {
 
   *::-webkit-scrollbar-thumb:hover {
     background: var(--sb-thumb-hover) !important;
+  }
+}
+*/
+
+@layer base {
+  :root {
+    --sb-track: color-mix(in srgb, var(--studs-panel-bg-2) 75%, #09090b 25%);
+    --sb-thumb: color-mix(in srgb, var(--studs-accent) 35%, #71717a 65%);
+    --sb-thumb-hover: color-mix(in srgb, var(--studs-accent) 55%, #71717a 45%);
+    --sb-size: 10px;
+    --sb-radius: 9999px;
+    --sb-border: 2px;
+  }
+
+  body[data-theme] {
+    --sb-track: color-mix(in srgb, var(--studs-panel-bg-2) 75%, #09090b 25%);
+    --sb-thumb: color-mix(in srgb, var(--studs-accent) 35%, #71717a 65%);
+    --sb-thumb-hover: color-mix(in srgb, var(--studs-accent) 55%, #71717a 45%);
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--sb-thumb) var(--sb-track);
+  }
+
+  *::-webkit-scrollbar {
+    width: var(--sb-size);
+    height: var(--sb-size);
+  }
+
+  *::-webkit-scrollbar-track {
+    background: var(--sb-track) !important;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background: var(--sb-thumb) !important;
+    border-radius: var(--sb-radius);
+    border: var(--sb-border) solid var(--sb-track);
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background: var(--sb-thumb-hover) !important;
+  }
+
+  .scrollbars {
+    scrollbar-width: thin;
+    scrollbar-color: var(--sb-thumb) var(--sb-track);
+  }
+
+  .scrollbars::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+  }
+
+  .scrollbars::-webkit-scrollbar-track {
+    background: linear-gradient(180deg, var(--sb-track), color-mix(in srgb, var(--sb-track) 70%, #09090b 30%)) !important;
+  }
+
+  .scrollbars::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, var(--sb-thumb), color-mix(in srgb, var(--sb-thumb) 80%, #18181b 20%)) !important;
+    border: 2px solid var(--sb-track);
+    border-radius: var(--sb-radius);
+  }
+
+  .scrollbars::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, var(--sb-thumb-hover), var(--sb-thumb)) !important;
   }
 }

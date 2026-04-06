@@ -38,13 +38,27 @@ class CourseItemsController < ApplicationController
   end
 
   def show
+    # return unless turbo_frame_request?
+
+    # render partial: "course_items/popover_detail",
+    #       locals: { course_item: @course_item, course: @course, start_date: params[:start_date] }
     return unless turbo_frame_request?
 
-    render partial: "course_items/popover_detail",
+    partial = if request.headers["Turbo-Frame"] == "event_popover"
+                "course_items/popover_detail"
+    else
+                "course_items/drawer_detail"
+    end
+
+    render partial: partial,
            locals: { course_item: @course_item, course: @course, start_date: params[:start_date] }
   end
 
-  def edit; end
+  def edit
+    return unless turbo_frame_request?
+
+    render partial: "course_items/drawer_edit", locals: { course_item: @course_item, course: @course, start_date: params[:start_date] }
+  end
 
   def update
     if @course_item.update(course_item_params)
@@ -54,15 +68,40 @@ class CourseItemsController < ApplicationController
         end
 
         format.turbo_stream do
-          redirect_to course_course_items_path(@course),
-                      notice: "Course item updated.",
-                      status: :see_other
+          if turbo_frame_request?
+            start_date  = parse_start_date(params[:start_date])
+            week_start  = start_date.beginning_of_week
+            range_start = week_start.beginning_of_day
+            range_end   = (week_start + 6.days).end_of_day
+            occurrences = calendar_occurrences_for_range(range_start, range_end)
+
+            render turbo_stream: [
+              turbo_stream.replace(
+                "dashboard_calendar",
+                partial: "dashboard/calendar_frame",
+                locals: { events: occurrences, start_date: start_date }
+              ),
+              turbo_stream.replace("agenda_list", partial: "agenda/list"),
+              turbo_stream.update("event_drawer", ""),
+              turbo_stream.update("event_popover", "")
+            ]
+          else
+            redirect_to course_course_items_path(@course),
+                        notice: "Course item updated.",
+                        status: :see_other
+          end
         end
       end
     else
       respond_to do |format|
         format.html { render :edit, status: :unprocessable_entity }
-        format.turbo_stream { render :edit, status: :unprocessable_entity }
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.replace(
+            "event_drawer",
+            partial: "course_items/drawer_edit",
+            locals: { course_item: @course_item, course: @course, start_date: params[:start_date] }
+          ), status: :unprocessable_entity
+        end
       end
     end
   end
@@ -93,6 +132,8 @@ class CourseItemsController < ApplicationController
             partial: "dashboard/calendar_frame",
             locals: { events: occurrences, start_date: start_date }
           ),
+          turbo_stream.replace("agenda_list", partial: "agenda/list"),
+          turbo_stream.update("event_drawer", ""),
           turbo_stream.update("event_popover", "")
         ]
       end
