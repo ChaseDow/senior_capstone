@@ -1,79 +1,131 @@
-<div class="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-7xl items-center px-6 py-12">
-  <div class="grid w-full grid-cols-1 gap-16 md:grid-cols-[5fr_7fr]">
-    <div class="space-y-8">
-      <div class="inline-flex items-center gap-2 rounded-full border border-zinc-800 bg-zinc-900/40 px-4 py-1.5 text-xs font-medium tracking-wide text-zinc-300 backdrop-blur-md">
-        <span class="relative flex h-2 w-2">
-          <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
-          <span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-400"></span>
-        </span>
-        Planner + dashboard foundation
+<div class="relative overflow-hidden">
+
+  <div>
+    <section class="relative">
+      <div class="relative border-y" style="border-color: var(--studs-border);">
+        <div class="relative h-[calc(100vh-4.5rem)]">
+          <%= image_tag "Preview.gif", alt: "Clear app preview", class: "h-full w-full object-cover" %>
+          <div class="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/20 via-black/35 to-black/80"></div>
+
+          <div class="absolute inset-x-0 mx-auto w-full max-w-7xl px-6"
+               style="bottom: 10%;">
+            <h1 class="max-w-[14ch] text-[clamp(2rem,4.6vw+0.4rem,5.2rem)] font-semibold leading-[0.98] tracking-tight text-zinc-50">
+              <span class="block">Life is uncertain.</span>
+              <span class="block whitespace-nowrap">Your plan shouldn&rsquo;t be.</span>
+            </h1>
+            <p class="mt-[clamp(0.75rem,1.6vh,1.25rem)] whitespace-nowrap text-[clamp(0.92rem,0.65vw+0.62rem,1.22rem)] leading-relaxed text-zinc-200/90">
+              Plan with AI, test in drafts, and collaborate in real time with confidence.
+            </p>
+
+            <div class="mt-[clamp(1rem,2.8vh,1.8rem)] flex flex-wrap items-center gap-3">
+              <% if user_signed_in? %>
+                <%= link_to "Go to dashboard",
+                      authenticated_root_path,
+                      class: "studs-btn-accent rounded-xl px-5 py-2.5 text-sm" %>
+
+                <%= button_to "Sign out",
+                      destroy_user_session_path,
+                      method: :delete,
+                      data: { turbo: false },
+                      class: "studs-nav-btn rounded-xl px-5 py-2.5 text-sm !bg-zinc-950/60 !text-zinc-100" %>
+              <% else %>
+                <%= link_to "Create account",
+                      new_user_registration_path,
+                      data: { turbo: false },
+                      class: "studs-btn-accent rounded-xl px-5 py-2.5 text-sm" %>
+
+                <%= link_to "Sign in",
+                      new_user_session_path,
+                      data: { turbo: false },
+                      class: "studs-nav-btn rounded-xl px-5 py-2.5 text-sm !bg-zinc-950/60 !text-zinc-100" %>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="mx-auto w-full max-w-7xl px-6 pb-24 pt-4">
+    <div class="mt-4 grid gap-3 sm:grid-cols-3">
+      <div class="relative rounded-2xl px-4 py-3 backdrop-blur-sm"
+           style="border: 1px solid var(--studs-border); background-color: color-mix(in srgb, var(--studs-panel-bg-2) 90%, transparent);">
+        <div class="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-lg"
+             style="background-color: color-mix(in srgb, var(--studs-accent) 16%, transparent);">
+          <svg class="h-4 w-4" style="color: color-mix(in srgb, var(--studs-accent) 82%, #34d399);" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+          </svg>
+        </div>
+        <p class="text-[11px] uppercase tracking-[0.18em] text-zinc-400">Simple</p>
+        <p class="mt-1 text-sm font-medium text-zinc-100">No Clutter. Just What You Need</p>
+      </div>
+      <div class="relative rounded-2xl px-4 py-3 backdrop-blur-sm"
+           style="border: 1px solid var(--studs-border); background-color: color-mix(in srgb, var(--studs-panel-bg-2) 90%, transparent);">
+        <div class="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-lg"
+             style="background-color: color-mix(in srgb, var(--studs-accent) 16%, transparent);">
+          <svg class="h-4 w-4" style="color: color-mix(in srgb, var(--studs-accent) 82%, #34d399);" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+          </svg>
+        </div>
+        <p class="text-[11px] uppercase tracking-[0.18em] text-zinc-400">Secure</p>
+        <p class="mt-1 text-sm font-medium text-zinc-100">Devise Auth + reset flow.</p>
+      </div>
+      <div class="relative rounded-2xl px-4 py-3 backdrop-blur-sm"
+           style="border: 1px solid var(--studs-border); background-color: color-mix(in srgb, var(--studs-panel-bg-2) 90%, transparent);">
+        <div class="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-lg"
+             style="background-color: color-mix(in srgb, var(--studs-accent) 16%, transparent);">
+          <svg class="h-4 w-4" style="color: color-mix(in srgb, var(--studs-accent) 82%, #34d399);" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16 11a3 3 0 1 0-2.999-3A3 3 0 0 0 16 11Zm-8 0A3 3 0 1 0 5 8a3 3 0 0 0 3 3Zm0 2c-2.33 0-7 1.17-7 3.5V18h14v-1.5C15 14.17 10.33 13 8 13Zm8 0c-.29 0-.62.02-.97.05A4.7 4.7 0 0 1 17 16.5V18h6v-1.5C23 14.17 18.33 13 16 13Z" />
+          </svg>
+        </div>
+        <p class="text-[11px] uppercase tracking-[0.18em] text-zinc-400">Collaborative</p>
+        <p class="mt-1 text-sm font-medium text-zinc-100">Plan together with members.</p>
+      </div>
+    </div>
+
+    <section class="mt-20 space-y-7 sm:mt-24">
+      <div class="space-y-2">
+        <p class="text-xs uppercase tracking-[0.24em] text-zinc-500">Product tour</p>
+        <h2 class="text-3xl font-semibold tracking-tight text-zinc-100 sm:text-4xl">As you scroll...</h2>
       </div>
 
-      <div class="space-y-4">
-        <h1 class="text-5xl font-bold tracking-tight text-zinc-50 sm:text-6xl">
-          Clear
-        </h1>
+      <% features = [
+        {
+          title: "Title 1",
+          body: "Body 1",
+          tag: "01"
+        },
+        {
+          title: "Title 2",
+          body: "Body 2",
+          tag: "02"
+        },
+        {
+          title: "Title 3",
+          body: "Body 3",
+          tag: "03"
+        }
+      ] %>
 
-        <p class="max-w-md text-base leading-relaxed text-zinc-400">
-          A clean, fast dashboard for your schedule, events, and life. Sign in to continue or create an account in seconds.
-        </p>
-      </div>
+      <div class="space-y-6">
+        <% features.each_with_index do |feature, index| %>
+          <article class="group grid gap-6 rounded-[1.75rem] p-5 backdrop-blur-xl transition-all duration-300 sm:p-6 <%= index.odd? ? 'lg:grid-cols-[1.1fr_0.9fr]' : 'lg:grid-cols-[0.9fr_1.1fr]' %> lg:items-center lg:gap-8"
+                   style="border: 1px solid var(--studs-border); background-color: color-mix(in srgb, var(--studs-panel-bg) 72%, transparent);">
+            <div class="<%= index.odd? ? 'lg:order-2' : '' %>">
+              <p class="text-[11px] uppercase tracking-[0.2em] text-zinc-500"><%= feature[:tag] %></p>
+              <h3 class="mt-3 text-2xl font-semibold tracking-tight text-zinc-100"><%= feature[:title] %></h3>
+              <p class="mt-3 max-w-xl text-sm leading-relaxed text-zinc-300/90 sm:text-base"><%= feature[:body] %></p>
+            </div>
 
-      <div class="flex flex-wrap items-center gap-3">
-        <% if user_signed_in? %>
-          <%= link_to "Go to dashboard",
-                authenticated_root_path,
-                class: "studs-btn-accent !rounded-xl !px-5 !py-2.5 !text-sm" %>
-
-          <%= button_to "Sign out",
-                destroy_user_session_path,
-                method: :delete,
-                data: { turbo: false },
-                class: "studs-nav-btn !rounded-xl !px-5 !py-2.5 !text-sm" %>
-        <% else %>
-          <%= link_to "Create account",
-                new_user_registration_path,
-                data: { turbo: false },
-                class: "studs-btn-accent !rounded-xl !px-5 !py-2.5 !text-sm" %>
-
-          <%= link_to "Sign in",
-                new_user_session_path,
-                data: { turbo: false },
-                class: "studs-nav-btn !rounded-xl !px-5 !py-2.5 !text-sm" %>
+            <div class="<%= index.odd? ? 'lg:order-1' : '' %>">
+              <div class="overflow-hidden rounded-2xl shadow-xl shadow-black/35" style="border: 1px solid var(--studs-border); background-color: #09090b;">
+                <%= image_tag "Preview.gif", alt: "Feature GIF placeholder", class: "h-52 w-full object-cover sm:h-72" %>
+              </div>
+              <p class="mt-2 text-xs text-zinc-500">GIF placeholder for this feature section</p>
+            </div>
+          </article>
         <% end %>
       </div>
-
-      <div class="grid grid-cols-1 gap-3 pt-2 sm:grid-cols-2">
-        <div class="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5 backdrop-blur-md transition-all duration-200 hover:border-emerald-500/30 hover:shadow-lg hover:shadow-emerald-500/5">
-          <div class="mb-2 flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10">
-            <svg class="h-4 w-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-            </svg>
-          </div>
-          <div class="text-sm font-medium text-zinc-100">Simple</div>
-          <div class="mt-1 text-sm text-zinc-500">No clutter. Just what you need.</div>
-        </div>
-        <div class="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5 backdrop-blur-md transition-all duration-200 hover:border-emerald-500/30 hover:shadow-lg hover:shadow-emerald-500/5">
-          <div class="mb-2 flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10">
-            <svg class="h-4 w-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
-            </svg>
-          </div>
-          <div class="text-sm font-medium text-zinc-100">Secure</div>
-          <div class="mt-1 text-sm text-zinc-500">Devise auth + reset flow.</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="hidden items-center md:flex">
-      <div class="w-full rounded-3xl border border-zinc-800 bg-gradient-to-b from-zinc-900/40 to-zinc-950 p-1.5 shadow-2xl shadow-black/40 backdrop-blur-md">
-        <div class="overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950/60">
-          <%= image_tag "Preview.gif", alt: "Dashboard preview animation", class: "w-full h-full object-contain bg-zinc-950" %>
-        </div>
-        <div class="px-4 py-3 text-xs text-zinc-500">
-          Your real dashboard lives behind login.
-        </div>
-      </div>
-    </div>
+    </section>
   </div>
 </div>
