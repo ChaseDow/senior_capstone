@@ -5,11 +5,11 @@
   data-agenda-drawer-url-value="<%= dashboard_agenda_path %>"
 >
   <div class="flex h-full min-h-0 min-w-0 p-4">
-    <section class="min-w-0 flex-1 min-h-0">
+    <section class="min-w-0 w-full flex-1 min-h-0">
       <%= render "dashboard/calendar_frame",
         events: @occurrences,
         start_date: @start_date,
-        month_occurrences: @month_occurrences,
+        month_events_by_date: @month_events_by_date,
         month_date: @month_date %>
     </section>
   </div>
@@ -27,7 +27,7 @@
     class="absolute right-4 top-4 bottom-4 z-50 pointer-events-auto
            overflow-hidden rounded-2xl shadow-2xl
            translate-x-[120%] transition-transform duration-300 ease-in-out"
-    style="width: 0px; border: 1px solid var(--studs-border); background-color: var(--studs-sidebar-bg);"
+    style="width: 0px; visibility: hidden; border: 1px solid var(--studs-border); background-color: var(--studs-sidebar-bg);"
   >
     <%= turbo_frame_tag "agenda_drawer",
           class: "block h-full w-full",

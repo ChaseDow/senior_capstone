@@ -1,48 +1,34 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static values = { view: { type: String, default: "weekly" } }
-  static targets = ["weeklyView", "monthlyView", "weeklyNav", "monthlyNav", "weeklyTitle", "monthlyTitle", "selector"]
+  static targets = ["weeklyWrapper", "monthlyWrapper", "selector", "weeklyContent", "monthlyContent"]
 
   connect() {
     const saved = localStorage.getItem("calendar:view")
-    if (saved === "monthly" || saved === "weekly") {
-      this.viewValue = saved
-    }
-    this.syncView()
-  }
-
-  viewValueChanged() {
+    this.currentView = (saved === "monthly") ? "monthly" : "weekly"
     this.syncView()
   }
 
   toggle(event) {
-    this.viewValue = event.target.value
-    localStorage.setItem("calendar:view", this.viewValue)
+    this.currentView = event.target.value
+    localStorage.setItem("calendar:view", this.currentView)
+    this.syncView()
   }
 
   syncView() {
-    const isMonthly = this.viewValue === "monthly"
+    const isMonthly = this.currentView === "monthly"
 
-    this.#toggle(this.weeklyViewTargets, !isMonthly)
-    this.#toggle(this.monthlyViewTargets, isMonthly)
-    this.#toggle(this.weeklyNavTargets, !isMonthly)
-    this.#toggle(this.monthlyNavTargets, isMonthly)
-    this.#toggle(this.weeklyTitleTargets, !isMonthly)
-    this.#toggle(this.monthlyTitleTargets, isMonthly)
-
-    if (this.hasSelectorTarget) {
-      this.selectorTarget.value = this.viewValue
+    if (this.hasWeeklyWrapperTarget) {
+      this.weeklyWrapperTarget.classList.toggle("hidden", isMonthly)
+      this.weeklyWrapperTarget.style.display = isMonthly ? "none" : ""
     }
-  }
+    if (this.hasMonthlyWrapperTarget) {
+      this.monthlyWrapperTarget.style.display = isMonthly ? "flex" : "none"
+      this.monthlyWrapperTarget.classList.toggle("hidden", !isMonthly)
+    }
 
-  #toggle(targets, show) {
-    targets.forEach(el => {
-      if (show) {
-        el.style.removeProperty("display")
-      } else {
-        el.style.display = "none"
-      }
+    this.selectorTargets.forEach(sel => {
+      sel.value = this.currentView
     })
   }
 }

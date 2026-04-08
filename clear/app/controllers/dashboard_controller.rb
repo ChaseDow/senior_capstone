@@ -27,6 +27,7 @@ class DashboardController < ApplicationController
     @month_occurrences = calendar_occurrences_for_range(
       month_start.beginning_of_day, month_end.end_of_day, draft: @draft
     )
+    @month_events_by_date = group_occurrences_by_date(@month_occurrences)
     @month_date = @start_date
 
     now = Time.current
@@ -37,7 +38,7 @@ class DashboardController < ApplicationController
 
     render partial: "dashboard/calendar_frame",
            locals: { events: @occurrences, start_date: @start_date, draft: @draft,
-                     month_occurrences: @month_occurrences, month_date: @month_date }
+                     month_events_by_date: @month_events_by_date, month_date: @month_date }
   end
 
   def agenda
@@ -61,6 +62,14 @@ class DashboardController < ApplicationController
   end
 
   private
+
+  def group_occurrences_by_date(occurrences)
+    grouped = Hash.new { |h, k| h[k] = [] }
+    occurrences.each do |occ|
+      grouped[occ.starts_at.in_time_zone.to_date] << occ
+    end
+    grouped
+  end
 
   def occurrences_for_range(range_start, range_end)
     base_events = current_user.events
