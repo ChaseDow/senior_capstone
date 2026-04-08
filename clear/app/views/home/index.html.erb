@@ -5,7 +5,7 @@
       <div class="relative border-y" style="border-color: var(--studs-border);">
         <div class="relative h-[calc(100vh-4.5rem)]">
           <%= image_tag "Preview.gif", alt: "Clear app preview", class: "h-full w-full object-cover" %>
-          <div class="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/20 via-black/35 to-black/80"></div>
+          <div class="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/10 via-black/24 to-black/72"></div>
 
           <div class="absolute inset-x-0 mx-auto w-full max-w-7xl px-6"
                style="bottom: 10%;">
@@ -13,7 +13,7 @@
               <span class="block">Life is uncertain.</span>
               <span class="block whitespace-nowrap">Your plan shouldn&rsquo;t be.</span>
             </h1>
-            <p class="mt-[clamp(0.75rem,1.6vh,1.25rem)] whitespace-nowrap text-[clamp(0.92rem,0.65vw+0.62rem,1.22rem)] leading-relaxed text-zinc-200/90">
+            <p class="mt-[clamp(0.75rem,1.6vh,1.25rem)] whitespace-nowrap text-[clamp(0.92rem,0.65vw+0.62rem,1.22rem)] leading-relaxed text-zinc-100/95">
               Plan with AI, test in drafts, and collaborate in real time with confidence.
             </p>
 
@@ -27,17 +27,17 @@
                       destroy_user_session_path,
                       method: :delete,
                       data: { turbo: false },
-                      class: "studs-nav-btn rounded-xl px-5 py-2.5 text-sm !bg-zinc-950/60 !text-zinc-100" %>
+                      class: "studs-nav-btn rounded-xl px-5 py-2.5 text-sm !bg-zinc-900/60 !text-zinc-100" %>
               <% else %>
-                <%= link_to "Create account",
+                <%= link_to "Get Started For Free",
                       new_user_registration_path,
                       data: { turbo: false },
                       class: "studs-btn-accent rounded-xl px-5 py-2.5 text-sm" %>
 
-                <%= link_to "Sign in",
+                <%= link_to "Login",
                       new_user_session_path,
                       data: { turbo: false },
-                      class: "studs-nav-btn rounded-xl px-5 py-2.5 text-sm !bg-zinc-950/60 !text-zinc-100" %>
+                      class: "studs-nav-btn rounded-xl px-4 py-2 text-sm" %>
               <% end %>
             </div>
           </div>
@@ -46,85 +46,73 @@
     </section>
   </div>
 
-  <div class="mx-auto w-full max-w-7xl px-6 pb-24 pt-4">
-    <div class="mt-4 grid gap-3 sm:grid-cols-3">
-      <div class="relative rounded-2xl px-4 py-3 backdrop-blur-sm"
-           style="border: 1px solid var(--studs-border); background-color: color-mix(in srgb, var(--studs-panel-bg-2) 90%, transparent);">
-        <div class="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-lg"
-             style="background-color: color-mix(in srgb, var(--studs-accent) 16%, transparent);">
-          <svg class="h-4 w-4" style="color: color-mix(in srgb, var(--studs-accent) 82%, #34d399);" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-          </svg>
-        </div>
-        <p class="text-[11px] uppercase tracking-[0.18em] text-zinc-400">Simple</p>
-        <p class="mt-1 text-sm font-medium text-zinc-100">No Clutter. Just What You Need</p>
-      </div>
-      <div class="relative rounded-2xl px-4 py-3 backdrop-blur-sm"
-           style="border: 1px solid var(--studs-border); background-color: color-mix(in srgb, var(--studs-panel-bg-2) 90%, transparent);">
-        <div class="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-lg"
-             style="background-color: color-mix(in srgb, var(--studs-accent) 16%, transparent);">
-          <svg class="h-4 w-4" style="color: color-mix(in srgb, var(--studs-accent) 82%, #34d399);" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
-          </svg>
-        </div>
-        <p class="text-[11px] uppercase tracking-[0.18em] text-zinc-400">Secure</p>
-        <p class="mt-1 text-sm font-medium text-zinc-100">Devise Auth + reset flow.</p>
-      </div>
-      <div class="relative rounded-2xl px-4 py-3 backdrop-blur-sm"
-           style="border: 1px solid var(--studs-border); background-color: color-mix(in srgb, var(--studs-panel-bg-2) 90%, transparent);">
-        <div class="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-lg"
-             style="background-color: color-mix(in srgb, var(--studs-accent) 16%, transparent);">
-          <svg class="h-4 w-4" style="color: color-mix(in srgb, var(--studs-accent) 82%, #34d399);" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M16 11a3 3 0 1 0-2.999-3A3 3 0 0 0 16 11Zm-8 0A3 3 0 1 0 5 8a3 3 0 0 0 3 3Zm0 2c-2.33 0-7 1.17-7 3.5V18h14v-1.5C15 14.17 10.33 13 8 13Zm8 0c-.29 0-.62.02-.97.05A4.7 4.7 0 0 1 17 16.5V18h6v-1.5C23 14.17 18.33 13 16 13Z" />
-          </svg>
-        </div>
-        <p class="text-[11px] uppercase tracking-[0.18em] text-zinc-400">Collaborative</p>
-        <p class="mt-1 text-sm font-medium text-zinc-100">Plan together with members.</p>
-      </div>
-    </div>
-
-    <section class="mt-20 space-y-7 sm:mt-24">
+  <div class="mx-auto w-full max-w-7xl px-6 pb-24 pt-0">
+    <section class="mt-14 space-y-7 sm:mt-20">
       <div class="space-y-2">
-        <p class="text-xs uppercase tracking-[0.24em] text-zinc-500">Product tour</p>
-        <h2 class="text-3xl font-semibold tracking-tight text-zinc-100 sm:text-4xl">As you scroll...</h2>
+        <p class="text-3xl font-semibold tracking-tight text-zinc-100 sm:text-4xl">A Planner for College Students by College Students</p>
       </div>
 
       <% features = [
         {
-          title: "Title 1",
-          body: "Body 1",
-          tag: "01"
+          title: "Plan Easily",
+          body: "Simplicity is our philosophy. There is no clutter or learning curve. Everything you need is right where you expect it."
         },
         {
-          title: "Title 2",
-          body: "Body 2",
-          tag: "02"
+          title: "Plan Fast",
+          body: "Tired of schedululing your class times or assignments each time on your planner? Our syllabus parser can take care of that in seconds."
         },
         {
-          title: "Title 3",
-          body: "Body 3",
-          tag: "03"
+          title: "Plan Ahead",
+          body: "Stay ahead of deadlines. Our AI prepares study sessions before exams and assignment due dates, so you can stay on track without cramming."
+        },
+        {
+          title: "Plan Together",
+          body: "Whether it's group projects or a hobby together, collaborate with your classmates in one shared space without any hassle."
+        },
+        {
+          title: "Plan Beyond",
+          body: "Life happens. Plans change. Use our draft system to make alternative schedules as backups when life gets unpredictable."
         }
       ] %>
 
-      <div class="space-y-6">
+      <div class="space-y-10 sm:space-y-18">
         <% features.each_with_index do |feature, index| %>
           <article class="group grid gap-6 rounded-[1.75rem] p-5 backdrop-blur-xl transition-all duration-300 sm:p-6 <%= index.odd? ? 'lg:grid-cols-[1.1fr_0.9fr]' : 'lg:grid-cols-[0.9fr_1.1fr]' %> lg:items-center lg:gap-8"
-                   style="border: 1px solid var(--studs-border); background-color: color-mix(in srgb, var(--studs-panel-bg) 72%, transparent);">
+                   style="border: 1px solid color-mix(in srgb, var(--studs-border) 55%, var(--studs-accent) 45%); background-color: color-mix(in srgb, var(--studs-panel-hover) 94%, var(--studs-panel-bg-2) 6%);">
             <div class="<%= index.odd? ? 'lg:order-2' : '' %>">
-              <p class="text-[11px] uppercase tracking-[0.2em] text-zinc-500"><%= feature[:tag] %></p>
-              <h3 class="mt-3 text-2xl font-semibold tracking-tight text-zinc-100"><%= feature[:title] %></h3>
-              <p class="mt-3 max-w-xl text-sm leading-relaxed text-zinc-300/90 sm:text-base"><%= feature[:body] %></p>
+              <h3 class="text-3xl font-semibold tracking-tight text-zinc-50 sm:text-4xl"><%= feature[:title] %></h3>
+              <p class="mt-3 max-w-xl text-base leading-relaxed text-zinc-100/95 sm:text-lg"><%= feature[:body] %></p>
             </div>
 
             <div class="<%= index.odd? ? 'lg:order-1' : '' %>">
               <div class="overflow-hidden rounded-2xl shadow-xl shadow-black/35" style="border: 1px solid var(--studs-border); background-color: #09090b;">
                 <%= image_tag "Preview.gif", alt: "Feature GIF placeholder", class: "h-52 w-full object-cover sm:h-72" %>
               </div>
-              <p class="mt-2 text-xs text-zinc-500">GIF placeholder for this feature section</p>
+              <p class="mt-2 text-xs text-zinc-400">GIF placeholder for this feature section</p>
             </div>
           </article>
         <% end %>
+      </div>
+    </section>
+
+    <section class="mt-20 sm:mt-24">
+      <div class="text-center">
+        <h3 class="text-4xl font-semibold tracking-tight text-zinc-50 sm:text-5xl lg:text-6xl">
+          <span class="block">Deadlines move fast.</span>
+          <span class="mt-3 block">Get your schedule on track today.</span>
+        </h3>
+        <div class="mt-7 flex flex-wrap items-center justify-center gap-3">
+          <% if user_signed_in? %>
+            <%= link_to "Go to dashboard",
+                  authenticated_root_path,
+                  class: "studs-btn-accent rounded-xl px-5 py-2.5 text-sm" %>
+          <% else %>
+            <%= link_to "Get Started For Free",
+                  new_user_registration_path,
+                  data: { turbo: false },
+                  class: "studs-btn-accent rounded-xl px-5 py-2.5 text-sm" %>
+          <% end %>
+        </div>
       </div>
     </section>
   </div>
