@@ -1,24 +1,20 @@
 class User < ApplicationRecord
   has_many :events, dependent: :destroy
+  has_many :courses, dependent: :destroy
   has_many :syllabuses, dependent: :destroy
   has_many :documents, dependent: :destroy
   has_many :work_shifts, dependent: :destroy
   has_one :calendar_draft, dependent: :destroy
   has_many :notifications, dependent: :destroy
   has_many :owned_projects, class_name: "Project", dependent: :destroy
-  has_many :courses, dependent: :destroy
   has_many :project_memberships, dependent: :destroy
   has_many :projects, through: :project_memberships
   has_many :sent_project_invitations, class_name: "ProjectInvitation", foreign_key: :sender_id, dependent: :destroy
 
-<<<<<<< HEAD
-  devise :database_authenticatable, :registerable,
+  devise :invitable, :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable, :confirmable,
          :omniauthable, omniauth_providers: [ :google_oauth2 ]
-=======
-  devise :invitable, :database_authenticatable, :registerable,
-         :recoverable, :rememberable, :validatable
->>>>>>> origin/main
+
 
   enum :role, { user: 0, admin: 1 }
   has_one_attached :avatar
@@ -48,6 +44,7 @@ class User < ApplicationRecord
     user ||= find_by(email: auth.info.email)
 
     if user
+      user.skip_confirmation!
       user.update(provider: auth.provider, uid: auth.uid)
     else
       user = create(
@@ -56,12 +53,18 @@ class User < ApplicationRecord
         provider: auth.provider,
         uid:      auth.uid
       )
+      user.skip_confirmation!
+      user.save
     end
 
     user
   end
 
   def password_required?
+    super && provider.blank?
+  end
+
+  def confirmation_required?
     super && provider.blank?
   end
 end

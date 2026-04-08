@@ -28,6 +28,8 @@ class WorkShift < ApplicationRecord
   end
 
   def occurrences_between(range_start, range_end)
+    return [] if start_date.nil?
+
     unless recurring?
       return [] if start_date < range_start.to_date || start_date > range_end.to_date
       occ_start = Time.zone.local(start_date.year, start_date.month, start_date.day, start_time.hour, start_time.min)

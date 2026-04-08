@@ -8,7 +8,6 @@ Rails.application.routes.draw do
     resources :project_invitations, only: %i[new create]
   end
   get "project_invitations/accept", to: "project_invitations#accept", as: :accept_project_invitation
-  devise_for :users
 
   resource :profile, only: [ :show, :edit, :update ] do
     get :edit_password
