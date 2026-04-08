@@ -103,7 +103,7 @@
     background-color: color-mix(in srgb, var(--studs-accent) 10%, transparent);
   }
 </style>
-<div class="flex h-full min-h-0 flex-col" data-controller="agenda-highlight event-popover">
+<div class="flex h-full min-h-0 flex-col" data-controller="agenda-highlight event-popover" data-calendar-view-target="weeklyContent">
   <%# Draft mode banner %>
   <% if in_draft %>
     <div class="mb-3 flex items-center gap-3 rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-2.5 text-sm text-amber-100">
@@ -142,6 +142,14 @@
       </div>
     </div>
     <nav class="flex items-center gap-1.5">
+      <select
+        data-calendar-view-target="selector"
+        data-action="change->calendar-view#toggle"
+        class="studs-nav-btn studs-view-select">
+        <option value="weekly">Weekly</option>
+        <option value="monthly">Monthly</option>
+      </select>
+      <div class="mx-1 h-5 w-px rounded-full" style="background-color: var(--studs-border);"></div>
       <% if @project %>
         <%= link_to new_project_project_invitation_path(@project),
               class: "studs-nav-btn",

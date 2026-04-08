@@ -21,6 +21,15 @@ class DashboardController < ApplicationController
     @draft       = current_user_draft
     @occurrences = calendar_occurrences_for_range(range_start, range_end, draft: @draft)
 
+    # Monthly view data
+    month_start = @start_date.beginning_of_month
+    month_end   = @start_date.end_of_month
+    @month_occurrences = calendar_occurrences_for_range(
+      month_start.beginning_of_day, month_end.end_of_day, draft: @draft
+    )
+    @month_events_by_date = group_occurrences_by_date(@month_occurrences)
+    @month_date = @start_date
+
     now = Time.current
     next_occurrences = calendar_occurrences_for_range(now, now + 7.days)
     @next_occurrence = next_occurrences.find { |o| o.starts_at > now }
@@ -28,7 +37,8 @@ class DashboardController < ApplicationController
     return unless turbo_frame_request?
 
     render partial: "dashboard/calendar_frame",
-           locals: { events: @occurrences, start_date: @start_date, draft: @draft }
+           locals: { events: @occurrences, start_date: @start_date, draft: @draft,
+                     month_events_by_date: @month_events_by_date, month_date: @month_date }
   end
 
   def agenda
@@ -52,6 +62,14 @@ class DashboardController < ApplicationController
   end
 
   private
+
+  def group_occurrences_by_date(occurrences)
+    grouped = Hash.new { |h, k| h[k] = [] }
+    occurrences.each do |occ|
+      grouped[occ.starts_at.in_time_zone.to_date] << occ
+    end
+    grouped
+  end
 
   def occurrences_for_range(range_start, range_end)
     base_events = current_user.events
