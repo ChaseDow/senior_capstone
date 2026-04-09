@@ -202,7 +202,7 @@ users_data = [
     ],
     work_shifts: [
       {
-        color: "#EF4444",
+        color: "#3B82F6",
         title: "Target Morning Shift",
         recurring: true,
         repeat_days: [ 1, 3, 5 ],
