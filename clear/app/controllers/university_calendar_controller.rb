@@ -8,6 +8,7 @@ class UniversityCalendarController < ApplicationController
   IMPORT_COLOR = "#60A5FA"
 
   def preview
+    @mode = :rss
     @rss_url = params[:rss_url].to_s.strip
     return unless @rss_url.present?
 
@@ -17,6 +18,36 @@ class UniversityCalendarController < ApplicationController
     flash.now[:alert] = "Could not load calendar feed: #{e.message}"
     @items = []
     @existing_keys = Set.new
+  end
+
+  def pdf_preview_page
+    @mode = :pdf
+    render :preview
+  end
+
+  def pdf_preview
+    @mode = :pdf
+
+    unless params[:pdf_file].present?
+      flash.now[:alert] = "Please select a PDF file."
+      render :preview and return
+    end
+
+    file = params[:pdf_file]
+    unless file.content_type == "application/pdf"
+      flash.now[:alert] = "Only PDF files are supported."
+      render :preview and return
+    end
+
+    pdf_data = file.read
+    @items = UniversityCalendar::PdfParser.call(pdf_data)
+    @existing_keys = existing_event_keys
+    render :preview
+  rescue => e
+    flash.now[:alert] = "Could not parse PDF: #{e.message}"
+    @items = []
+    @existing_keys = Set.new
+    render :preview
   end
 
   def import
