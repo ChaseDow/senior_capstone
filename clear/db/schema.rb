@@ -230,6 +230,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_07_141359) do
     t.string "uid"
     t.string "unconfirmed_email"
     t.datetime "updated_at", null: false
+    t.string "username", null: false
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token", unique: true
@@ -238,6 +239,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_07_141359) do
     t.index ["provider", "uid"], name: "index_users_on_provider_and_uid", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["role"], name: "index_users_on_role"
+    t.index ["username"], name: "index_users_on_username"
   end
 
   create_table "work_shifts", force: :cascade do |t|

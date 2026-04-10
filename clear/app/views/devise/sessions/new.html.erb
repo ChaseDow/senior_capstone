@@ -4,38 +4,33 @@
       <h1 class="text-2xl font-bold tracking-tight text-zinc-50">Welcome back</h1>
       <p class="mt-1 text-sm text-zinc-500">Sign in to continue.</p>
     </div>
-
     <%= form_for(resource,
           as: resource_name,
           url: session_path(resource_name),
           html: { data: { turbo: false } }) do |f| %>
       <% label_classes = "block text-[10px] font-bold uppercase tracking-widest mb-1.5" %>
       <% label_style   = "color: var(--studs-accent); opacity: 0.8;" %>
-      <% input_classes = "w-full rounded-2xl px-4 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-600 " \
+      <% input_classes = "w-full rounded-xl px-4 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-600 " \
                          "bg-zinc-950/60 focus:outline-none focus:ring-2 transition-all duration-150 border" %>
       <% input_style   = "border-color: var(--studs-border); --tw-ring-color: var(--studs-accent);" %>
-
       <div class="space-y-5">
         <div>
           <%= f.label :email, class: label_classes, style: label_style %>
           <%= f.email_field :email,
                 autofocus: true,
                 autocomplete: "email",
-                class: input_classes,
+                class: "#{input_classes} mt-2",
                 style: input_style,
                 placeholder: "your email" %>
         </div>
-
         <div class="relative">
           <%= f.label :password, class: label_classes, style: label_style %>
-
           <%= f.password_field :password,
                 id: "password_field",
                 autocomplete: "current-password",
-                class: "#{input_classes} pr-10",
+                class: "#{input_classes} mt-2",
                 style: input_style,
                 placeholder: "Your Password" %>
-
           <button type="button"
             id="toggle_password"
             class="absolute right-3 top-[calc(50%+1rem)] -translate-y-1/2
@@ -46,18 +41,14 @@
                   focus:outline-none
                   focus:ring-2 focus:ring-emerald-500/40
                   transition-colors duration-200">
-
             <span id="icon-show">
               <%= icon "eye-stroke-rounded", class: "h-5 w-5 text-emerald-500/40" %>
             </span>
-
             <span id="icon-hide" class="hidden">
               <%= icon "view-off-slash-stroke-rounded", class: "h-5 w-5 text-emerald-500/40" %>
             </span>
-
-            </button>
-          </div>
-
+          </button>
+        </div>
         <% if devise_mapping.rememberable? %>
           <label class="flex items-center gap-2 text-sm text-zinc-400">
             <%= f.check_box :remember_me,
@@ -65,7 +56,6 @@
             Remember me
           </label>
         <% end %>
-
         <%= f.submit "Sign in",
               class: "studs-btn-accent mt-3 !w-full !rounded-xl !py-2.5 !text-sm" %>
       </div>
@@ -93,7 +83,6 @@
     <%= render "devise/shared/links" %>
   </div>
 </div>
-
 <script>
   document.addEventListener("DOMContentLoaded", () => {
     const button = document.getElementById("toggle_password");

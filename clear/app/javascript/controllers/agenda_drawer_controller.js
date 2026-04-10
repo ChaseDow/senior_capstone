@@ -35,6 +35,7 @@ export default class extends Controller {
     this.panelTarget.classList.remove("translate-x-[120%]");
     this.panelTarget.classList.add("translate-x-0");
 
+    this.panelTarget.style.visibility = "visible";
     this.panelTarget.style.width = "360px";
 
     if (this.frameTarget.src !== url) {
@@ -53,6 +54,7 @@ export default class extends Controller {
 
     window.setTimeout(() => {
         this.panelTarget.style.width = "0px";
+        this.panelTarget.style.visibility = "hidden";
     }, 300);
     window.dispatchEvent(new CustomEvent("agenda:clear"))
     }

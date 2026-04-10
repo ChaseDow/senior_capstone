@@ -18,6 +18,7 @@ class User < ApplicationRecord
 
   enum :role, { user: 0, admin: 1 }
   has_one_attached :avatar
+  validates :username, length: { in: 2..32 }
 
   # ── Theme ────────────────────────────────────────────────
   THEMES = %w[green blue purple rose amber cyan pink red lime slate orange mono nebula aurora sunset latech].freeze

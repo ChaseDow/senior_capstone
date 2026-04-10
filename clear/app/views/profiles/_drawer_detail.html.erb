@@ -94,13 +94,39 @@
                 </div>
               </div>
               <div class="mt-4 border-t pt-4 space-y-4" style="border-color: var(--studs-divider);">
-                <div class="flex items-center justify-between gap-4">
+                <div class="flex items-center justify-between gap-4" data-controller="username-edit">
                   <div>
                     <div class="text-xs text-zinc-400">Username</div>
-                    <div class="mt-1 text-sm font-medium text-zinc-100"><%= user.email %></div>
+                    <div id="username_display" data-username-edit-target="display" class="mt-1 text-sm font-medium text-zinc-100"><%= user.username %></div>
+                    <%= form_with model: user, url: update_username_profile_path, method: :patch, id: "username_form", class: "mt-1 hidden items-center gap-2", data: { username_edit_target: "form" } do |f| %>
+                      <%= f.text_field :username,
+                            id: "username_input",
+                            class: "w-full max-w-[12rem] rounded-md px-2.5 py-1 text-sm text-zinc-100 placeholder:text-zinc-600 bg-zinc-950/60 focus:outline-none focus:ring-2 transition-all duration-150 border",
+                            style: "border-color: var(--studs-border); --tw-ring-color: var(--studs-accent);",
+                            data: { username_edit_target: "input" },
+                            autocomplete: "username" %>
+                    <% end %>
                   </div>
-                  <div class="shrink-0">
-                    <button type="button" class="studs-nav-btn px-3 py-1.5 text-xs">Edit</button>
+                  <div class="shrink-0 translate-y-3" id="username_edit_wrap">
+                    <button
+                      id="username_edit_btn"
+                      data-username-edit-target="editButton"
+                      data-action="click->username-edit#edit"
+                      type="button"
+                      class="studs-nav-btn px-3 py-1.5 text-xs"
+                    >
+                      Edit
+                    </button>
+                    <div id="username_actions" data-username-edit-target="actions" class="hidden items-center gap-2">
+                      <button type="submit" form="username_form" class="studs-btn-accent !px-4 !py-1.5">Save</button>
+                      <button
+                        data-action="click->username-edit#cancel"
+                        type="button"
+                        class="studs-nav-btn px-3 py-1.5 text-xs"
+                      >
+                        Cancel
+                      </button>
+                    </div>
                   </div>
                 </div>
                 <div class="flex items-center justify-between gap-4">
@@ -108,7 +134,7 @@
                     <div class="text-xs text-zinc-400">Email</div>
                     <div class="mt-1 text-sm font-medium text-zinc-100"><%= user.email %></div>
                   </div>
-                  <div class="shrink-0">
+                  <div class="shrink-0 translate-y-3">
                     <button type="button" class="studs-nav-btn px-3 py-1.5 text-xs">Edit</button>
                   </div>
                 </div>

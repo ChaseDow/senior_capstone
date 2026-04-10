@@ -143,4 +143,33 @@ class ProfilesController < ApplicationController
       turbo_stream.replace("toast-container", partial: "shared/toasts")
     ], status: status
   end
+
+  def update_username
+    @user = current_user
+    if @user.update(username_params)
+      flash.now[:notice] = "Username updated."
+      render turbo_stream: [
+        turbo_stream.replace(
+          "profile_modal",
+          partial: "profiles/drawer_detail",
+          locals: { user: @user }
+        ),
+        turbo_stream.update(
+          "left_nav_profile",
+          partial: "profiles/left_nav_profile",
+          locals: { user: @user }
+        ),
+        turbo_stream.replace("toast-container", partial: "shared/toasts")
+      ]
+    else
+      error_message = @user.errors.full_messages.to_sentence.presence || "Couldn't update username."
+      @user = current_user.reload
+      flash.now[:alert] = error_message
+      render_profile_modal_with_toast(partial: "profiles/drawer_detail", status: :unprocessable_entity)
+    end
+  end
+
+  def username_params
+    params.require(:user).permit(:username)
+  end
 end

@@ -10,6 +10,7 @@ Rails.application.routes.draw do
   get "project_invitations/accept", to: "project_invitations#accept", as: :accept_project_invitation
 
   resource :profile, only: [ :show, :edit, :update ] do
+    patch :update_username
     get :edit_password
     patch :update_password
     get :edit_avatar
