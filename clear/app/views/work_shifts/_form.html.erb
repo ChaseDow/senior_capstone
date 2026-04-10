@@ -83,10 +83,9 @@
           <% [["Su", 0], ["Mo", 1], ["Tu", 2], ["We", 3], ["Th", 4], ["Fr", 5], ["Sa", 6]].each do |lbl, wday| %>
             <label class="relative cursor-pointer">
               <%= f.check_box :repeat_days, { multiple: true, class: "peer sr-only" }, wday, nil %>
-              <div class="flex h-9 items-center justify-center rounded-xl border text-xs font-semibold transition-all
+              <div class="repeat-day-btn flex h-9 items-center justify-center rounded-xl border text-xs font-semibold transition-all
                           border-zinc-700 bg-zinc-900/40 text-zinc-400
-                          hover:border-zinc-500 hover:text-zinc-200
-                          peer-checked:border-white/40 peer-checked:bg-white/10 peer-checked:text-white">
+                          hover:border-zinc-500 hover:text-zinc-200">
                 <%= lbl %>
               </div>
             </label>

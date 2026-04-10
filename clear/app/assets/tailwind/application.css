@@ -188,6 +188,16 @@ body[data-theme="mono"] {
   --studs-sidebar-bg: #111111;
 }
 
+/* =========================
+   Repeat Day Picker
+   ========================= */
+
+.peer:checked ~ .repeat-day-btn {
+  border-color: var(--studs-accent) !important;
+  background-color: var(--studs-accent) !important;
+  color: white !important;
+}
+
 /* ══════════════════════════════════════════════════════════
    Space Themes — each has a unique visual personality
    ══════════════════════════════════════════════════════════ */
