@@ -31,8 +31,10 @@ Rails.application.routes.draw do
   resources :work_shifts
 
   scope :university_calendar do
-    get  "preview", to: "university_calendar#preview", as: :university_calendar_preview
-    post "import",  to: "university_calendar#import",  as: :university_calendar_import
+    get  "preview",     to: "university_calendar#preview",     as: :university_calendar_preview
+    get  "pdf_preview", to: "university_calendar#pdf_preview_page", as: :university_calendar_pdf_preview_page
+    post "pdf_preview", to: "university_calendar#pdf_preview", as: :university_calendar_pdf_preview
+    post "import",      to: "university_calendar#import",      as: :university_calendar_import
   end
   resources :courses do
     resources :course_items, only: %i[index create show edit update destroy]

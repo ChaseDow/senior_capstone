@@ -221,7 +221,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_03_051533) do
     t.integer "invitations_count", default: 0
     t.bigint "invited_by_id"
     t.string "invited_by_type"
-    t.string "provider"
     t.datetime "remember_created_at"
     t.datetime "reset_password_sent_at"
     t.string "reset_password_token"
@@ -236,7 +235,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_03_051533) do
     t.index ["invitation_token"], name: "index_users_on_invitation_token", unique: true
     t.index ["invited_by_id"], name: "index_users_on_invited_by_id"
     t.index ["invited_by_type", "invited_by_id"], name: "index_users_on_invited_by"
-    t.index ["provider", "uid"], name: "index_users_on_provider_and_uid", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["role"], name: "index_users_on_role"
     t.index ["username"], name: "index_users_on_username"
