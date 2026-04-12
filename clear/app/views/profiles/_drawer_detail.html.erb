@@ -10,7 +10,7 @@
     }
   </style>
 
-  <div class="flex max-h-[85vh] flex-col" data-controller="profile-nav">
+  <div class="flex h-[85vh] flex-col" data-controller="profile-nav">
     <!-- Header -->
     <div class="flex items-start justify-between border-b border-zinc-800 bg-zinc-950/50 px-6 py-4">
       <div>
@@ -25,8 +25,8 @@
       </button>
     </div>
     <!-- Body -->
-    <div class="min-h-0 flex-1 overflow-y-auto">
-      <div class="grid min-h-0 grid-cols-12">
+    <div class="min-h-0 flex-1 overflow-hidden">
+      <div class="grid h-full min-h-0 grid-cols-12">
         <!-- Left nav -->
         <aside class="col-span-3 border-r border-zinc-800 bg-zinc-950/30 p-4 flex flex-col">
           <div class="space-y-1">
@@ -66,7 +66,7 @@
           </div>
         </aside>
         <!-- Right content -->
-        <section class="col-span-9 p-6 space-y-8 overflow-y-auto" data-profile-nav-target="scroll">
+        <section class="col-span-9 h-full min-h-0 p-6 space-y-8 overflow-y-auto" data-profile-nav-target="scroll">
           <!-- Account -->
           <div id="account" data-profile-nav-target="section">
             <div class="text-xs font-semibold uppercase tracking-wide text-zinc-500">User Profile</div>
