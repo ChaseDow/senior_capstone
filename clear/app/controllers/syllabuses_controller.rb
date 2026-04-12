@@ -13,9 +13,7 @@ class SyllabusesController < ApplicationController
   ].freeze
 
   def index
-    @q = params[:q].to_s.strip
-    @syllabuses = current_user.syllabuses.order(:title)
-    @syllabuses = @syllabuses.where("title ILIKE ?", "%#{@q}%") if @q.present?
+    redirect_to courses_path
   end
 
   def show; end
@@ -28,19 +26,33 @@ class SyllabusesController < ApplicationController
     @syllabus = current_user.syllabuses.new(syllabus_params)
 
     if @syllabus.save
-      redirect_to @syllabus, notice: "Syllabus was successfully uploaded."
+      @syllabus.update!(parse_status: "queued", parse_error: nil, course_draft: {})
+      begin
+        SyllabusParseJob.perform_now(@syllabus.id)
+        redirect_to course_preview_syllabus_path(@syllabus), notice: "Syllabus uploaded and parsed."
+      rescue StandardError
+        @syllabus.destroy
+        redirect_to courses_path, alert: "Syllabus import failed. The upload was removed."
+      end
     else
       render :new, status: :unprocessable_entity
     end
   end
 
   def create_course
-    unless @syllabus.parse_status.in?(%w[queued processing])
-      @syllabus.update!(parse_status: "queued", parse_error: nil, course_draft: {})
-      SyllabusParseJob.perform_later(@syllabus.id)
+    if @syllabus.parse_status.in?(%w[queued processing])
+      redirect_to course_preview_syllabus_path(@syllabus), notice: "Parsing in progress."
+      return
     end
 
-    redirect_to course_preview_syllabus_path(@syllabus), notice: "Parsing started…"
+    @syllabus.update!(parse_status: "queued", parse_error: nil, course_draft: {})
+    begin
+      SyllabusParseJob.perform_now(@syllabus.id)
+      redirect_to course_preview_syllabus_path(@syllabus), notice: "Parsing complete."
+    rescue StandardError
+      @syllabus.destroy
+      redirect_to courses_path, alert: "Parsing failed. The upload was removed."
+    end
   end
 
   def status
@@ -120,8 +132,13 @@ class SyllabusesController < ApplicationController
   end
 
   def destroy
+    go_to_new_upload = params[:return_to] == "new" && @syllabus.course_id.blank?
     @syllabus.destroy
-    redirect_to syllabuses_url, notice: "Syllabus was successfully deleted."
+    if go_to_new_upload
+      redirect_to new_syllabus_path, notice: "Syllabus deleted."
+    else
+      redirect_to courses_url, notice: "Syllabus was successfully deleted."
+    end
   end
 
   private
