@@ -10,13 +10,18 @@
 <% if syllabus.parse_status.in?(%w[queued processing]) %>
   <div class="text-sm text-zinc-400">Parsing…</div>
 <% elsif syllabus.parse_status == "failed" %>
-  <div class="text-sm text-red-200">
-    Parsing failed: <%= syllabus.parse_error %>
+  <div class="space-y-3">
+    <div class="text-sm text-red-200">
+      Parsing failed: <%= syllabus.parse_error %>
+    </div>
+    <%= link_to "Retry parsing",
+          create_course_syllabus_path(syllabus),
+          class: "studs-btn-accent",
+          data: { turbo_method: :post, turbo_frame: "_top" } %>
   </div>
 <% else %>
   <%= form_with model: course,
         url: confirm_course_syllabus_path(syllabus),
-
         method: :post,
         data: { turbo_frame: "_top" } do |f| %>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
