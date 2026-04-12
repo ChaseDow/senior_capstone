@@ -59,7 +59,6 @@
                 { label: "Work Shifts", path: "/work_shifts", icon_name: "apartment-stroke-rounded" },
                 { label: "Syllabus",    path: "/syllabuses",  icon_name: "file-01-stroke-rounded" },
                 { label: "Documents",   path: "/documents",   icon_name: "file-01-stroke-rounded" },
-                { label: "AI Chat",     path: "/ai_chat",     icon_name: "chat-bot-stroke-rounded" }
               ] +
               (current_user&.admin? ? [
                 { label: "Users", path: "/admin/users", icon_name: "user-02-stroke-rounded" }
@@ -84,47 +83,45 @@
                 title: (content_for?(:page_title) ? yield(:page_title) : "Dashboard"),
                 subtitle: (content_for?(:page_subtitle) ? yield(:page_subtitle) : nil)
               ) do |t| %>
-          <% t.with_actions do %>
-            <% unread_count = user_signed_in? ? current_user.notifications.unread.count : 0 %>
-            <div class="flex items-center gap-2">
-              <% unless controller_name == "ai_chat" %>
-                <%= link_to ai_chat_index_path,
+            <% t.with_actions do %>
+              <% unread_count = user_signed_in? ? current_user.notifications.unread.count : 0 %>
+              <div class="flex items-center gap-2">
+                <% unless controller_name == "ai_chat" %>
+                  <%= link_to ai_chat_index_path,
                       class: "studs-topbar-icon-btn studs-topbar-icon-btn--ai",
                       "aria-label": "Open AI Chat" do %>
-                  <span class="[&>svg]:h-5 [&>svg]:w-5">
-                    <%= icon "chat-bot-stroke-rounded" %>
-                  </span>
+                    <span class="[&>svg]:h-5 [&>svg]:w-5">
+                      <%= icon "chat-bot-stroke-rounded" %>
+                    </span>
+                  <% end %>
                 <% end %>
-              <% end %>
-
-              <div class="relative" data-controller="notifications-dropdown">
-                <button
+                <div class="relative" data-controller="notifications-dropdown">
+                  <button
                   type="button"
                   data-action="click->notifications-dropdown#toggle"
-                  class="studs-topbar-icon-btn"
-                  aria-label="Notifications"
-                >
-                  <span class="[&>svg]:h-5 [&>svg]:w-5">
-                    <%= icon "bell-dot-stroke-rounded" %>
-                  </span>
-                  <%= render "notifications/badge", unread_count: unread_count %>
-                </button>
-
-                <%# Dropdown panel %>
-                <div
+                    class="studs-topbar-icon-btn"
+                    aria-label="Notifications"
+                    >
+                    <span class="[&>svg]:h-5 [&>svg]:w-5">
+                      <%= icon "bell-dot-stroke-rounded" %>
+                    </span>
+                    <%= render "notifications/badge", unread_count: unread_count %>
+                  </button>
+                  <%# Dropdown panel %>
+                  <div
                   data-notifications-dropdown-target="panel"
                   class="hidden absolute right-0 top-full mt-2 w-96 z-50 rounded-2xl border shadow-2xl overflow-hidden"
                   style="border-color: var(--studs-border); background-color: var(--studs-sidebar-bg);"
                 >
-                  <%= turbo_frame_tag "notifications_panel",
+                    <%= turbo_frame_tag "notifications_panel",
                         src: notifications_path,
                         loading: :lazy do %>
-                    <div class="px-4 py-6 text-center text-sm text-zinc-400">Loading...</div>
-                  <% end %>
+                      <div class="px-4 py-6 text-center text-sm text-zinc-400">Loading...</div>
+                    <% end %>
+                  </div>
                 </div>
               </div>
-            </div>
-          <% end %>
+            <% end %>
           <% end %>
         </header>
         <!-- Page content -->
