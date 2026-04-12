@@ -9,7 +9,7 @@ class SyllabusesController < ApplicationController
   ]
 
   PREVIEW_FIELDS = %i[
-    title code term professor meeting_days location start_time end_time start_date end_date
+    title code term professor meeting_days location office office_hours start_time end_time start_date end_date
   ].freeze
 
   def index
@@ -146,6 +146,7 @@ class SyllabusesController < ApplicationController
       :title, :code, :term,
       :professor, :instructor,
       :meeting_days, :location,
+      :office, :office_hours,
       :start_date, :end_date,
       :start_time, :end_time,
       :starts_at, :ends_at,

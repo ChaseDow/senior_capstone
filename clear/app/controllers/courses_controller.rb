@@ -232,6 +232,8 @@ class CoursesController < ApplicationController
       :duration_minutes,
       :professor,
       :location,
+      :office,
+      :office_hours,
       :description,
       repeat_days: []
     )
