@@ -54,13 +54,9 @@
             <label class="relative">
               <%= f.check_box :repeat_days, { multiple: true, class: "peer sr-only" }, wday, nil %>
 
-              <div class="flex h-9 items-center justify-center rounded-xl border border-zinc-800 bg-zinc-950/30
+              <div class="repeat-day-btn flex h-9 items-center justify-center rounded-xl border border-zinc-800 bg-zinc-950/30
                           text-xs font-medium text-zinc-300 transition
-                          hover:bg-zinc-900/40
-                          peer-checked:border-emerald-200
-                          peer-checked:bg-emerald-400/70
-                          peer-checked:text-white
-                          peer-checked:ring-2 peer-checked:ring-emerald-200/70">
+                          hover:bg-zinc-900/40">
                 <%= lbl %>
               </div>
             </label>
