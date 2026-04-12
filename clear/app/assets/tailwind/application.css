@@ -204,7 +204,7 @@ body[data-theme="mono"] {
    Repeat Day Picker
    ========================= */
 
-.peer:checked ~ .repeat-day-btn {
+label:has(.peer:checked) .repeat-day-btn {
   border-color: var(--studs-accent) !important;
   background-color: var(--studs-accent) !important;
   color: var(--studs-accent-text) !important;
