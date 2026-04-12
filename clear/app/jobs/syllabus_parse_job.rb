@@ -39,6 +39,8 @@ class SyllabusParseJob < ApplicationJob
     draft[:instructor]  = attrs[:instructor] || attrs[:professor]
     draft[:meeting_days]= normalize_meeting_days(attrs[:meeting_days])
     draft[:location]    = attrs[:location]
+    draft[:office]      = attrs[:office]
+    draft[:office_hours]= attrs[:office_hours]
     draft[:start_date]  = attrs[:start_date]
     draft[:end_date]    = attrs[:end_date]
     draft[:description] = attrs[:description]

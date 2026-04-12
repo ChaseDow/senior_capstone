@@ -63,7 +63,8 @@ module Syllabuses
     SECTION_SPLIT = /Section\s*\d+\s*:\s*/i
 
     def self.call(lines)
-      candidates = build_candidates(lines)
+      office_line_indices = office_section_indices(lines)
+      candidates = build_candidates(lines, office_line_indices)
       best = nil
 
       candidates.each do |raw|
@@ -84,14 +85,43 @@ module Syllabuses
       best
     end
 
-    def self.build_candidates(lines)
+    # Identify line indices that fall under an "OFFICE HOURS" heading
+    # (up to the next all-caps heading). Lines in this range should be
+    # skipped even if they don't individually mention "office".
+    def self.office_section_indices(lines)
+      indices = Set.new
+      header = lines.first(180)
+
+      i = 0
+      while i < header.length
+        if header[i].match?(/\A\s*office\s*hours\b/i)
+          indices << i
+          j = i + 1
+          while j < header.length
+            break if header[j].match?(/\A[A-Z][A-Z ]{2,}\z/) # next heading
+            indices << j
+            j += 1
+          end
+        end
+        i += 1
+      end
+
+      indices
+    end
+
+    def self.build_candidates(lines, office_indices = Set.new)
       header = lines.first(180)
       out = []
 
       header.each_with_index do |l, i|
+        next if office_indices.include?(i)
         out << l
-        out << "#{l} #{header[i + 1]}" if header[i + 1]
-        out << "#{l} #{header[i + 1]} #{header[i + 2]}" if header[i + 1] && header[i + 2]
+        if header[i + 1] && !office_indices.include?(i + 1)
+          out << "#{l} #{header[i + 1]}"
+          if header[i + 2] && !office_indices.include?(i + 2)
+            out << "#{l} #{header[i + 1]} #{header[i + 2]}"
+          end
+        end
       end
 
       out.map { |s| normalize(s) }.uniq

@@ -4,8 +4,11 @@ require "date"
 
 module Syllabuses
   class CourseAttributesExtractor
-    COURSE_CODE = /\b[A-Z]{2,4}\s?\d{3,4}(?:-\d{3})?\b/
+    COURSE_CODE = /\b[A-Za-z]{2,4}\s?\d{3,4}(?:-\d{3})?\b/
     TERM        = /\b(?<season>Spring|Summer|Fall|Winter)\s*(?<year>20\d{2})\b/i
+
+    # Labels that indicate a room/building, not a course code
+    ROOM_LABEL = /(?:CLASSROOM|CLASS\s*ROOM|ROOM|RM\.?|BUILDING)\s*:\s*/i
 
     # Instructor / Professor line
     INSTRUCTOR_LINE = /\A(?:Instructor|Professor)\s*:\s*(?<name>.+)\z/i
@@ -31,7 +34,7 @@ module Syllabuses
       term_year  = term_match&.[](:year)&.to_i
       term       = term_match&.to_s
 
-      code = flat.match(COURSE_CODE)&.to_s&.gsub(/\s+/, " ")
+      code = extract_course_code(flat)
 
       professor = extract_professor(lines)
 
@@ -39,9 +42,13 @@ module Syllabuses
       meeting_days     = meeting&.dig(:meeting_days)
       starts_at        = meeting&.dig(:starts_at)
       ends_at          = meeting&.dig(:ends_at)
-      location         = meeting&.dig(:location)
+      location         = meeting&.dig(:location) || extract_classroom(lines)
       meeting_raw      = meeting&.dig(:meeting_raw)
       parse_confidence = meeting&.dig(:confidence)
+
+      office_info  = Syllabuses::OfficeHoursExtractor.call(text)
+      office       = office_info[:office]
+      office_hours = office_info[:office_hours]
 
       start_date, end_date = extract_date_range(text, lines, season:, term_year:)
 
@@ -56,6 +63,10 @@ module Syllabuses
         starts_at: starts_at,
         ends_at: ends_at,
         location: location,
+
+        # office info
+        office: office,
+        office_hours: office_hours,
 
         # dates
         start_date: start_date,
@@ -80,19 +91,69 @@ module Syllabuses
 
     def self.normalize_text(s)
       s.to_s
-       .gsub(/[’‘`]/, "")
+       .gsub(/[‘’`]/, "")
        .gsub(/\\/, "")
        .gsub(/\s+/, " ")
+       .then { |t| collapse_spaced_headings(t) }
        .strip
     end
 
-    def self.extract_professor(lines)
-      line = lines.find { |l| l.match?(INSTRUCTOR_LINE) }
-      return nil unless line
+    # PDF renderers sometimes space out heading letters, e.g.
+    #   "O FFICE H OURS" -> "OFFICE HOURS"
+    #   "C LASS M EETINGS" -> "CLASS MEETINGS"
+    # Collapse a single uppercase letter followed by uppercase fragment
+    # back into one word. Excludes "A" and "I" (real single-letter words).
+    def self.collapse_spaced_headings(s)
+      s.gsub(/\b([B-HJ-Z]) ([A-Z]{2,})\b/) { "#{$1}#{$2}" }
+    end
 
-      name = line.match(INSTRUCTOR_LINE)[:name].strip
-      name = name.split(/\s{2,}|\s+-\s+/).first.to_s.strip
-      name.presence
+    def self.extract_course_code(flat)
+      # Scan all matches and skip any preceded by a room/building label
+      flat.scan(COURSE_CODE).each do |match|
+        pos = flat.index(match)
+        prefix = flat[0...pos]
+        next if prefix.match?(/(?:CLASSROOM|CLASS\s*ROOM|ROOM|RM\.?|BUILDING|OFFICE)\s*:?\s*\z/i)
+        return match.gsub(/\s+/, " ")
+      end
+      nil
+    end
+
+    def self.extract_classroom(lines)
+      lines.each do |line|
+        m = line.match(/(?:CLASSROOM|CLASS\s*ROOM)\s*:\s*(?<room>.+)/i)
+        next unless m
+        room = m[:room].to_s.strip
+        # Truncate at the next labeled field (e.g. "INSTRUCTOR:", "OFFICE:", etc.)
+        room = room.split(/\s{2,}|\s+(?=[A-Z]{2,}[\s]*:)/).first.to_s.strip
+        room = room.sub(/[.,;:]\z/, "")
+        return room.presence
+      end
+      nil
+    end
+
+    def self.extract_professor(lines)
+      # Format 1: "Instructor: Dr. Name" on one line
+      line = lines.find { |l| l.match?(INSTRUCTOR_LINE) }
+      if line
+        name = line.match(INSTRUCTOR_LINE)[:name].strip
+        name = name.split(/\s{2,}|\s+-\s+|\s+(?=OFFICE\b)/i).first.to_s.strip
+        return name.presence
+      end
+
+      # Format 2: "INSTRUCTOR" heading on its own line, name on the next line
+      lines.each_with_index do |l, i|
+        next unless l.match?(/\A(?:INSTRUCTOR|PROFESSOR)S?\z/i)
+        next_line = lines[i + 1]
+        next if next_line.blank?
+
+        # Extract name, splitting on "//" (email/office separators) or double-space
+        name = next_line.split(/\s*\/\/\s*|\s{2,}/).first.to_s.strip
+        # Strip "Dr.", titles are fine to keep but remove trailing punctuation
+        name = name.sub(/[.,;:]\z/, "")
+        return name.presence
+      end
+
+      nil
     end
 
     def self.extract_date_range(text, lines, season:, term_year:)
