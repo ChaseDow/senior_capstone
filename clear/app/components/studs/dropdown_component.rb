@@ -2,8 +2,8 @@
 
 module Studs
   class DropdownComponent < ViewComponent::Base
-    SHARED_MENU_CLASSES = "dropdown-menu absolute left-0 z-50 mt-2 rounded-xl border shadow-lg backdrop-blur-md hidden".freeze
-    SHARED_MENU_STYLE = "border-color: var(--studs-border); background-color: rgba(24, 24, 27, 0.97);".freeze
+    SHARED_MENU_CLASSES = "dropdown-menu absolute left-0 z-50 mt-2 max-h-72 overflow-y-auto rounded-none border shadow-lg backdrop-blur-md hidden".freeze
+    SHARED_MENU_STYLE = "border-color: rgb(63 63 70); background-color: rgba(24, 24, 27, 0.97); box-shadow: 0 0 0 1px color-mix(in srgb, var(--studs-accent) 90%, transparent), 0 0 32px color-mix(in srgb, var(--studs-accent) 52%, transparent), 0 14px 34px rgba(0, 0, 0, 0.48);".freeze
     SHARED_ITEM_CLASSES = "dropdown-item block w-full px-4 py-2 text-left text-sm text-zinc-200 transition hover:bg-zinc-800/60 data-[selected=true]:bg-zinc-800/70".freeze
 
     VARIANTS = {
@@ -12,13 +12,14 @@ module Studs
         menu_width: "min-w-[6.5rem]",
         button: [
           "studs-nav-btn",
-          "justify-between"
+          "justify-between focus:outline-none focus:ring-2 transition-all"
         ].join(" "),
-        button_style: nil,
+        button_style: "--tw-ring-color: var(--studs-accent);",
         label: "block w-full text-left text-inherit"
       },
       agenda_filter: {
-        width: "w-36",
+        width: "w-full",
+        wrapper: "relative block w-full dropdown-wrapper",
         button: [
           "justify-between rounded-xl border bg-zinc-900/50 px-3 py-2 text-sm text-zinc-200",
           "focus:outline-none focus:ring-2 transition-all"
@@ -27,6 +28,7 @@ module Studs
       },
       duration: {
         width: "w-full",
+        wrapper: "relative block w-full dropdown-wrapper",
         button: [
           "justify-between rounded-2xl px-4 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-600",
           "bg-zinc-950/60 focus:outline-none focus:ring-2 transition-all duration-150 border"
@@ -52,6 +54,7 @@ module Studs
       ].join(" ")
     end
 
+    def wrapper_classes = @variant[:wrapper] || "relative inline-block dropdown-wrapper"
     def button_style = @variant[:button_style]
     def label_classes = "dropdown-label #{@variant[:label] || 'block w-full text-left text-zinc-200'}"
 

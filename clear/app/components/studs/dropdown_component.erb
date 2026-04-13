@@ -1,7 +1,7 @@
-<div class="relative inline-block dropdown-wrapper"
+<div class="<%= wrapper_classes %>"
      data-controller="dropdown">
   <%= tag.button(type: "button", class: button_classes, style: button_style, data: { action: "click->dropdown#toggle" }) do %>
-    <%= tag.span(display_label, class: label_classes, data: { dropdown_target: "label" }) %>
+    <%= tag.span(display_label, class: label_classes, data: { dropdown_target: "label", default_label: @label }) %>
     <% if show_arrow? %>
       <%= helpers.icon "arrow-down-01-stroke-rounded", library: "huge_icons", class: arrow_classes, data: { dropdown_target: "arrow" } %>
     <% end %>

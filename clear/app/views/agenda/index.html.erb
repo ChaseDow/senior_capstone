@@ -1,6 +1,5 @@
 <% content_for :page_title, "Agenda" %>
 <% content_for :page_subtitle, "Upcoming tasks" %>
-<% filter_input_style = "border-color: var(--studs-border); --tw-ring-color: var(--studs-accent);" %>
 <% today = Time.zone.today %>
 <% entries = (@paged_agenda_by_date || {})[today] || [] %>
 <% active_filters = [params.dig(:q, :term), params[:type], params[:start_date], params[:end_date]].compact.count(&:present?) %>
@@ -38,26 +37,37 @@
       </div>
       <div class="mx-1 hidden h-5 w-px rounded-full md:block" style="background-color: var(--studs-border);"></div>
       <div class="w-40">
-        <%= select_tag "q[field]",
-          options_for_select(
-            [["Name", "name"], ["Location", "location"], ["Description", "description"]],
-            params.dig(:q, :field).presence || "name"
-          ),
-          class: "w-full rounded-xl border bg-zinc-900/50 px-3 py-2 text-sm text-zinc-200 focus:outline-none focus:ring-2 transition-all",
-          style: filter_input_style,
-          data: { action: "change->search#search" } %>
+        <div data-action="dropdown:select->search#search">
+          <%= render Studs::DropdownComponent.new(
+            label: "Name",
+            variant: :agenda_filter,
+            name: "q[field]",
+            selected_value: params.dig(:q, :field).presence || "name",
+            items: [
+              { label: "Name", value: "name" },
+              { label: "Location", value: "location" },
+              { label: "Description", value: "description" }
+            ]
+          ) %>
+        </div>
       </div>
       <div class="mx-1 hidden h-5 w-px rounded-full md:block" style="background-color: var(--studs-border);"></div>
       <div class="w-36">
-        <%= f.select :type,
-          options_for_select(
-            [["All Types", ""], ["Events", "event"], ["Courses", "course"], ["Course Items", "course_item"], ["Work Shifts", "work_shift"]],
-            params[:type]
-          ),
-          {},
-          class: "w-full rounded-xl border bg-zinc-900/50 px-3 py-2 text-sm text-zinc-200 focus:outline-none focus:ring-2 transition-all",
-          style: filter_input_style,
-          data: { action: "change->search#search" } %>
+        <div data-action="dropdown:select->search#search">
+          <%= render Studs::DropdownComponent.new(
+            label: "All Types",
+            variant: :agenda_filter,
+            name: "type",
+            selected_value: params[:type],
+            items: [
+              { label: "All Types", value: "" },
+              { label: "Events", value: "event" },
+              { label: "Courses", value: "course" },
+              { label: "Course Items", value: "course_item" },
+              { label: "Work Shifts", value: "work_shift" }
+            ]
+          ) %>
+        </div>
       </div>
       <div class="mx-1 hidden h-5 w-px rounded-full md:block" style="background-color: var(--studs-border);"></div>
       <div class="flex items-center gap-2">
@@ -65,14 +75,14 @@
           value: params[:start_date],
           placeholder: "Start",
           class: "h-[38px] w-36 rounded-xl border bg-zinc-900/50 px-3 py-2 text-sm text-zinc-200 focus:outline-none focus:ring-2 transition-all",
-          style: filter_input_style,
+          style: "border-color: var(--studs-border); --tw-ring-color: var(--studs-accent);",
           data: { action: "change->search#search" } %>
         <span class="text-sm text-zinc-500 font-medium select-none">:</span>
         <%= f.date_field :end_date,
           value: params[:end_date],
           placeholder: "End",
           class: "h-[38px] w-36 rounded-xl border bg-zinc-900/50 px-3 py-2 text-sm text-zinc-200 focus:outline-none focus:ring-2 transition-all",
-          style: filter_input_style,
+          style: "border-color: var(--studs-border); --tw-ring-color: var(--studs-accent);",
           data: { action: "change->search#search" } %>
       </div>
       <% if active_filters.positive? %>
@@ -80,7 +90,7 @@
         <%= link_to "Reset",
           agenda_index_path,
           class: "inline-block rounded-xl border bg-zinc-900/50 px-4 py-2 text-sm font-medium text-zinc-200 hover:bg-zinc-800/50 focus:outline-none transition",
-          style: filter_input_style %>
+          style: "border-color: var(--studs-border); --tw-ring-color: var(--studs-accent);" %>
       <% end %>
     </div>
   <% end %>

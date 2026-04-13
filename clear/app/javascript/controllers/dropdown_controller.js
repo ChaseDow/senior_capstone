@@ -34,6 +34,7 @@ export default class extends Controller {
     })
 
     event.currentTarget.dataset.selected = "true"
+    this.dispatch("select", { detail: { label, value } })
     this.close()
   }
 
