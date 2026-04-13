@@ -114,4 +114,68 @@ class CourseTest < ActiveSupport::TestCase
     assert_not course.valid?
     assert course.errors[:end_time].any?
   end
+
+  test "requires start_time" do
+    course = Course.new(valid_course_attrs(start_time: nil))
+    assert_not course.valid?
+    assert course.errors[:start_time].any?
+  end
+
+  # color validation
+
+  test "accepts a valid hex color" do
+    course = Course.new(valid_course_attrs(color: "#3B82F6"))
+    assert course.valid?, course.errors.full_messages.to_sentence
+  end
+
+  test "rejects a color that is not a valid hex format" do
+    course = Course.new(valid_course_attrs(color: "blue"))
+    assert_not course.valid?
+    assert course.errors[:color].any?
+  end
+
+  test "rejects a hex color missing the leading hash" do
+    course = Course.new(valid_course_attrs(color: "3B82F6"))
+    assert_not course.valid?
+    assert course.errors[:color].any?
+  end
+
+  test "defaults color to #34D399 when nil is given" do
+    course = Course.new(valid_course_attrs(color: nil))
+    course.valid?
+    assert_equal "#34D399", course.color
+    assert course.valid?, course.errors.full_messages.to_sentence
+  end
+
+  # meeting_days / repeat_days
+
+  test "requires at least one meeting day" do
+    course = Course.new(valid_course_attrs(meeting_days: nil, repeat_days: []))
+    assert_not course.valid?
+    assert course.errors[:repeat_days].any?
+  end
+
+  test "meeting_days MWF maps to repeat_days 1 3 5" do
+    course = Course.new(valid_course_attrs(meeting_days: "MWF"))
+    course.valid?
+    assert_equal [ 1, 3, 5 ], course.repeat_days
+  end
+
+  test "meeting_days TR maps to repeat_days 2 4" do
+    course = Course.new(valid_course_attrs(meeting_days: "TR"))
+    course.valid?
+    assert_equal [ 2, 4 ], course.repeat_days
+  end
+
+  test "meeting_days strips unrecognized characters" do
+    course = Course.new(valid_course_attrs(meeting_days: "M-W-F"))
+    course.valid?
+    assert_equal [ 1, 3, 5 ], course.repeat_days
+  end
+
+  test "repeat_days rejects values outside 0-6" do
+    course = Course.new(valid_course_attrs(meeting_days: nil, repeat_days: [ 1, 8 ]))
+    assert_not course.valid?
+    assert course.errors[:repeat_days].any?
+  end
 end
