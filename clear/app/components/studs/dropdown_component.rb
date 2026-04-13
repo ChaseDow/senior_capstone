@@ -2,42 +2,85 @@
 
 module Studs
   class DropdownComponent < ViewComponent::Base
-    COLORS = {
-      orange:  { base: "bg-orange-500", hover: "hover:bg-orange-600", ring: "focus-visible:ring-orange-300/70" },
-      blue:    { base: "bg-blue-600",   hover: "hover:bg-blue-700",   ring: "focus-visible:ring-blue-300/70" },
-      emerald: { base: "bg-emerald-600", hover: "hover:bg-emerald-700", ring: "focus-visible:ring-emerald-300/70" },
-      zinc:    { base: "bg-zinc-800",   hover: "hover:bg-zinc-700",   ring: "focus-visible:ring-zinc-300/50" }
+    SHARED_MENU_CLASSES = "dropdown-menu absolute left-0 z-50 mt-2 rounded-xl border shadow-lg backdrop-blur-md hidden".freeze
+    SHARED_MENU_STYLE = "border-color: var(--studs-border); background-color: rgba(24, 24, 27, 0.97);".freeze
+    SHARED_ITEM_CLASSES = "dropdown-item block w-full px-4 py-2 text-left text-sm text-zinc-200 transition hover:bg-zinc-800/60 data-[selected=true]:bg-zinc-800/70".freeze
+
+    VARIANTS = {
+      dashboard_view: {
+        width: "w-auto",
+        menu_width: "min-w-[6.5rem]",
+        button: [
+          "studs-nav-btn",
+          "justify-between"
+        ].join(" "),
+        button_style: nil,
+        label: "block w-full text-left text-inherit"
+      },
+      agenda_filter: {
+        width: "w-36",
+        button: [
+          "justify-between rounded-xl border bg-zinc-900/50 px-3 py-2 text-sm text-zinc-200",
+          "focus:outline-none focus:ring-2 transition-all"
+        ].join(" "),
+        button_style: "border-color: var(--studs-border); --tw-ring-color: var(--studs-accent);"
+      },
+      duration: {
+        width: "w-full",
+        button: [
+          "justify-between rounded-2xl px-4 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-600",
+          "bg-zinc-950/60 focus:outline-none focus:ring-2 transition-all duration-150 border"
+        ].join(" "),
+        button_style: "border-color: var(--studs-border); --tw-ring-color: var(--studs-accent);"
+      }
     }.freeze
 
-    SIZES = {
-      xs: { pad: "px-2.5 py-1.5", text: "text-xs",   radius: "rounded-lg",  width: "w-32" },
-      sm: { pad: "px-3 py-2",     text: "text-sm",   radius: "rounded-xl",  width: "w-40" },
-      md: { pad: "px-4 py-2.5",   text: "text-sm",   radius: "rounded-xl",  width: "w-48" },
-      lg: { pad: "px-5 py-3",     text: "text-base", radius: "rounded-2xl", width: "w-56" }
-    }.freeze
-
-    def initialize(label:, items:, color: :zinc, size: :md, class_name: nil, name: "dropdown", selected_value: nil)
+    def initialize(label:, items:, name: "dropdown", selected_value: nil, variant: :duration)
       @label = label
       @items = items
-      @color = COLORS.key?(color) ? color : :zinc
-      @size = SIZES.key?(size) ? size : :md
-      @class_name = class_name
       @name = name
       @selected_value = selected_value
+      @variant = VARIANTS.fetch(variant, VARIANTS[:duration])
     end
 
     def button_classes
-      c = COLORS.fetch(@color)
-      s = SIZES.fetch(@size)
       [
-        "inline-flex items-center justify-center font-medium text-white",
-        "transition cursor-pointer",
-        "focus:outline-none focus-visible:ring-2",
-        s[:pad], s[:text], s[:radius], s[:width],
-        c[:base], c[:hover], c[:ring],
-        "disabled:opacity-50 disabled:cursor-not-allowed",
-        @class_name
-      ].compact.join(" ")
+        "dropdown-toggle inline-flex items-center justify-between gap-2",
+        @variant[:button],
+        @variant[:width],
+        "disabled:opacity-50 disabled:cursor-not-allowed"
+      ].join(" ")
+    end
+
+    def button_style = @variant[:button_style]
+    def label_classes = "dropdown-label #{@variant[:label] || 'block w-full text-left text-zinc-200'}"
+
+    def show_arrow? = @variant.fetch(:show_arrow, true)
+    def arrow_classes = @variant[:arrow] || "dropdown-arrow h-4 w-4 text-zinc-400 transition-transform"
+
+    def menu_classes = [SHARED_MENU_CLASSES, @variant[:menu_width] || @variant[:width]].join(" ")
+    def menu_style = SHARED_MENU_STYLE
+    def item_classes = SHARED_ITEM_CLASSES
+
+    def item_data(item)
+      value = item_value(item)
+      {
+        action: "click->dropdown#select",
+        selected: selected?(value),
+        dropdown_label_param: item[:label],
+        dropdown_value_param: value
+      }
+    end
+
+    def display_label = selected_item&.fetch(:label, @label) || @label
+
+    private
+
+    def item_value(item) = item[:value] || item[:label]
+    def selected?(value) = @selected_value.present? && value.to_s == @selected_value.to_s
+
+    def selected_item
+      @selected_item ||= @items.find { |item| !item[:divider] && selected?(item_value(item)) }
     end
   end
 end
