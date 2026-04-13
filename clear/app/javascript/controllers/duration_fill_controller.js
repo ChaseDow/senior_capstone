@@ -1,12 +1,20 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Watches a duration select and auto-fills an end-time field based on start + duration.
+// Watches a duration field and auto-fills an end-time field based on start + duration.
 // Works with both datetime-local ("2026-03-25T14:00") and time ("14:00") input types.
 export default class extends Controller {
   static targets = ["startField", "endField", "durationField"]
 
-  fill() {
-    const minutes = parseInt(this.durationFieldTarget.value, 10)
+  connect() {
+    this.element.querySelectorAll(".dropdown-wrapper .dropdown-label").forEach((label) => {
+      if (!label.dataset.defaultLabel) {
+        label.dataset.defaultLabel = label.textContent.trim()
+      }
+    })
+  }
+
+  fill(event) {
+    const minutes = this.resolveDurationMinutes(event)
     const startValue = this.startFieldTarget.value
 
     if (!minutes || !startValue) return
@@ -29,7 +37,7 @@ export default class extends Controller {
     }
   }
 
-  // When the end-time field changes, update the duration select to match.
+  // When the end-time field changes, update the duration field to match.
   reverseFill() {
     const startValue = this.startFieldTarget.value
     const endValue = this.endFieldTarget.value
@@ -50,9 +58,59 @@ export default class extends Controller {
       diffMinutes = (eh * 60 + em) - (sh * 60 + sm)
     }
 
-    const select = this.durationFieldTarget
-    // If the diff matches an option, select it; otherwise clear the select.
-    const option = [...select.options].find(o => parseInt(o.value, 10) === diffMinutes)
-    select.value = option ? option.value : ""
+    this.assignDurationValue(diffMinutes)
+  }
+
+  resolveDurationMinutes(event) {
+    if (event?.detail?.value !== undefined) {
+      return parseInt(event.detail.value, 10)
+    }
+
+    if (this.hasDurationFieldTarget) {
+      return parseInt(this.durationFieldTarget.value, 10)
+    }
+
+    const fallback = this.element.querySelector('input.dropdown-input[name$="[duration_minutes]"]')
+    return fallback ? parseInt(fallback.value, 10) : NaN
+  }
+
+  assignDurationValue(minutes) {
+    if (this.hasDurationFieldTarget) {
+      const select = this.durationFieldTarget
+      const option = [...select.options].find(o => parseInt(o.value, 10) === minutes)
+      select.value = option ? option.value : ""
+      return
+    }
+
+    const dropdownInput = this.element.querySelector('input.dropdown-input[name$="[duration_minutes]"]')
+    if (!dropdownInput) return
+
+    const dropdown = dropdownInput.closest("[data-controller~='dropdown']") || dropdownInput.closest(".dropdown-wrapper")
+    if (!dropdown) {
+      dropdownInput.value = Number.isFinite(minutes) ? String(minutes) : ""
+      return
+    }
+
+    const option = dropdown.querySelector(`.dropdown-item[data-dropdown-value-param="${minutes}"]`)
+    const label = dropdown.querySelector(".dropdown-label")
+
+    dropdown.querySelectorAll(".dropdown-item").forEach((item) => {
+      item.dataset.selected = "false"
+    })
+
+    if (option) {
+      dropdownInput.value = String(minutes)
+      option.dataset.selected = "true"
+
+      if (label) {
+        label.textContent = option.dataset.dropdownLabelParam || option.textContent.trim()
+      }
+    } else {
+      dropdownInput.value = ""
+
+      if (label) {
+        label.textContent = label.dataset.defaultLabel || "— select duration —"
+      }
+    }
   }
 }

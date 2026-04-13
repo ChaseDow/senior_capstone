@@ -53,12 +53,15 @@
   <!-- Duration -->
   <div>
     <%= f.label :duration_minutes, "Duration (optional)", class: label_classes, style: label_style %>
-    <%= f.select :duration_minutes,
-          options_for_select(ApplicationHelper::DURATION_OPTIONS, course.duration_minutes),
-          { include_blank: "— select duration —" },
-          class: input_classes,
-          style: input_style,
-          data: { duration_fill_target: "durationField", action: "change->duration-fill#fill" } %>
+    <div data-action="dropdown:select->duration-fill#fill">
+      <%= render Studs::DropdownComponent.new(
+        label: "— select duration —",
+        variant: :duration,
+        name: "#{f.object_name}[duration_minutes]",
+        selected_value: course.duration_minutes,
+        items: ApplicationHelper::DURATION_OPTIONS.map { |label, value| { label: label, value: value.to_s } }
+      ) %>
+    </div>
     <p class="mt-1.5 text-xs text-zinc-500">Set a duration if you prefer not to enter an end time.</p>
   </div>
   <!-- Dates -->
