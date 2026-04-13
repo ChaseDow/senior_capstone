@@ -70,6 +70,9 @@ application.register("modal", ModalController)
 import NotificationsDropdownController from "./notifications_dropdown_controller"
 application.register("notifications-dropdown", NotificationsDropdownController)
 
+import PdfPreviewController from "./pdf_preview_controller"
+application.register("pdf-preview", PdfPreviewController)
+
 import PollFrameController from "./poll_frame_controller"
 application.register("poll-frame", PollFrameController)
 
