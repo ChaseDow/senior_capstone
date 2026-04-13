@@ -24,7 +24,7 @@
       <% input_style   = "border-color: var(--studs-border); --tw-ring-color: var(--studs-accent);" %>
 
       <div>
-        <%= f.label :email, "Email address *", class: label_classes, style: label_style %>
+        <%= f.label :email, class: label_classes, style: label_style do %>Email address <span class="text-red-400">*</span><% end %>
         <%= f.email_field :email,
               class: input_classes,
               style: input_style,

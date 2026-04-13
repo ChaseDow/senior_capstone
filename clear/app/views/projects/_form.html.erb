@@ -18,7 +18,7 @@
   <% input_style   = "border-color: var(--studs-border); --tw-ring-color: var(--studs-accent);" %>
   <!-- Project name -->
   <div>
-    <%= f.label :title, "Project name *", class: label_classes, style: label_style %>
+    <%= f.label :title, class: label_classes, style: label_style do %>Project name <span class="text-red-400">*</span><% end %>
     <%= f.text_field :title,
           class: input_classes,
           style: input_style,

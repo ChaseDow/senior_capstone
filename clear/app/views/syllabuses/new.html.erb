@@ -34,7 +34,7 @@
     <% label_style = "color: var(--studs-accent); opacity: 0.8;" %>
 
     <div>
-      <%= f.label :title, class: label_classes, style: label_style %>
+      <%= f.label :title, class: label_classes, style: label_style do %>Title <span class="text-red-400">*</span><% end %>
       <%= f.text_field :title, class: input_classes, style: input_style, placeholder: "e.g. BISC 1303 - Biological Principles, MATH 2413 - Calculus I" %>
     </div>
   

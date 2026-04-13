@@ -18,14 +18,14 @@
   <% end %>
   <div class="grid gap-4 md:grid-cols-6 items-end">
     <div class="md:col-span-6">
-      <%= f.label :title, "Title", class: label_classes, style: label_style %>
+      <%= f.label :title, class: label_classes, style: label_style do %>Title <span class="text-red-400">*</span><% end %>
       <%= f.text_field :title,
             placeholder: "HW 3, Midterm, Seminar…",
             class: input_classes,
             style: input_style %>
     </div>
     <div class="md:col-span-3">
-      <%= f.label :kind, "Type", class: label_classes, style: label_style %>
+      <%= f.label :kind, class: label_classes, style: label_style do %>Type <span class="text-red-400">*</span><% end %>
       <%= f.select :kind,
             CourseItem.kinds.keys.map { |k| [k.humanize, k] },
             {},
