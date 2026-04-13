@@ -2,13 +2,6 @@
 
 module Syllabuses
   # Extracts the professor's office location and office hours from syllabus text.
-  #
-  # Recognizes common label styles such as:
-  #   "Office: IESB 216"
-  #   "Office Hours: MW 1:00 - 3:00 pm"
-  #   "Office Hours - Tues/Thurs 1-3pm, by appointment"
-  #   "Office Hours MW 1:00 pm - 3:00 pm IESB 216"
-  #
   # Returns a hash with :office and :office_hours keys (either may be nil).
   class OfficeHoursExtractor
     OFFICE_HOURS_LABEL = /\A\s*(?:office\s*hours|student\s*hours)\s*[:\-–—]?\s*(?<rest>.*)\z/i
