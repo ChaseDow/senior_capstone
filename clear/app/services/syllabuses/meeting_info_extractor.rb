@@ -21,9 +21,6 @@ module Syllabuses
     /x
 
     # Supports:
-    # - MWF, TR, MW, etc.
-    # - Monday, Tuesday, Thursday
-    # - Tue/Thu, Tues/Thurs, Mon/Wed/Fri, etc.
     DAYS = /
       (?<days>
         MWF|MW|WF|TR|TTH|TH|M|T|W|R|F|
@@ -128,11 +125,6 @@ module Syllabuses
     end
 
     # Prevent office hours from ever being treated as the class meeting.
-    #
-    # Examples to skip:
-    # - "MW: 1:00 pm - 3:00 pm"
-    # - "Office: IESB 216 MW 1:00 pm - 3:00 pm"
-    # - "Office Hours: Tues/Thurs 1-3pm"
     def self.office_candidate?(s)
       s = normalize(s)
       return false if s.blank?

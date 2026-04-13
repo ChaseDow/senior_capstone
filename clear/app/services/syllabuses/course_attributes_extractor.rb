@@ -98,9 +98,7 @@ module Syllabuses
        .strip
     end
 
-    # PDF renderers sometimes space out heading letters, e.g.
-    #   "O FFICE H OURS" -> "OFFICE HOURS"
-    #   "C LASS M EETINGS" -> "CLASS MEETINGS"
+    # PDF renderers sometimes space out heading letters (Capstone Syllabus).
     # Collapse a single uppercase letter followed by uppercase fragment
     # back into one word. Excludes "A" and "I" (real single-letter words).
     def self.collapse_spaced_headings(s)

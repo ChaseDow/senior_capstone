@@ -15,15 +15,19 @@ module UniversityCalendar
       "sep" => 9, "sept" => 9, "oct" => 10, "nov" => 11, "dec" => 12
     }.freeze
 
-    MONTH_RE = /(?:January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)\.?/i
+    MONTH_RE = /(?:January|February|March|April|May|June|July|August|September|October|November|December)\.?/i
 
-    # "August 25 - September 1" or "Aug 25-27" — try range before single date
-    DATE_RANGE = /(?<sm>#{MONTH_RE})\s+(?<sd>\d{1,2})\s*[-–]\s*(?:(?<em>#{MONTH_RE})\s+)?(?<ed>\d{1,2})/
+    WEEKDAY_RE = /(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)/i
+    WEEKDAY_RANGE_RE = /#{WEEKDAY_RE}\s*(?:-\s*#{WEEKDAY_RE})?/
 
-    # "August 25" or "Aug. 25"
-    MONTH_DAY = /(?<month>#{MONTH_RE})\s+(?<day>\d{1,2})/
+    # Tabular row: Month  Day(s)  Weekday(s)  Description
+    TABLE_ROW = /\A\s*(?<month_part>(?:#{MONTH_RE})(?:\s*[-\/]\s*#{MONTH_RE})?)\s+(?<day_part>\d{1,2}(?:\s*-\s*\d{1,2})?)\s+(?<weekday_part>#{WEEKDAY_RANGE_RE})\s+(?<description>.+)/i
 
-    SKIP_LINE = /\A\s*(\d{4}|page\s+\d+|table\s+of\s+contents|academic\s+calendar\s*\z|semester\s+calendar\s*\z)/i
+    # Semester headers like "FALL SEMESTER 2025", "SPRING SEMESTER 2026", "SUMMER I 2026"
+    SEMESTER_HEADER = /\A\s*(?:FALL|SPRING|WINTER|SUMMER\s*(?:I{1,2})?)\s+(?:SEMESTER\s+)?(\d{4})\b/i
+    WINTERSESSION_HEADER = /\A\s*WINTERSESSION\b.*?(\d{4})\s*-\s*\w+\s+(\d{4})/i
+
+    SKIP_LINE = /\A\s*(?:20\d{2}\s*-\s*20\d{2}\s+ACADEMIC|Last updated|Approved:|Please note:|page\s+\d+|table\s+of\s+contents|participate in the)\b/i
 
     def self.call(pdf_data)
       reader = PDF::Reader.new(StringIO.new(pdf_data))
@@ -33,18 +37,34 @@ module UniversityCalendar
 
     def initialize(text)
       @text = text
-      @year = extract_year(text)
     end
 
     def parse
       lines = normalize_lines(@text)
       items = []
+      current_year = nil
 
-      lines.each do |line|
+      # First pass: join continuation lines onto their parent row
+      merged = merge_continuation_lines(lines)
+
+      merged.each do |line|
         next if line.match?(SKIP_LINE)
         next if line.strip.length < 5
 
-        result = extract_event(line)
+        # Track semester year from headers
+        if (m = line.match(SEMESTER_HEADER))
+          current_year = m[1].to_i
+          @semester_end_year = nil
+          next
+        end
+        if (m = line.match(WINTERSESSION_HEADER))
+          current_year = m[1].to_i
+          @semester_end_year = m[2].to_i
+          next
+        end
+
+        year = current_year || extract_fallback_year(line)
+        result = extract_event(line, year)
         items << result if result
       end
 
@@ -53,49 +73,101 @@ module UniversityCalendar
 
     private
 
-    def extract_event(line)
-      if (m = line.match(DATE_RANGE))
-        start_month = resolve_month(m[:sm])
-        end_month   = m[:em].present? ? resolve_month(m[:em]) : start_month
-        return nil unless start_month
+    def merge_continuation_lines(lines)
+      merged = []
+      pending_continuation = nil
 
-        start_year = @year || infer_year(start_month)
-        end_year   = @year || infer_year(end_month)
+      lines.each do |line|
+        stripped = line.strip
+        next if stripped.empty?
 
-        starts_at = safe_date(start_year, start_month, m[:sd].to_i)
-        ends_at   = safe_date(end_year, end_month, m[:ed].to_i)
-        return nil unless starts_at
+        is_row = stripped.match?(/\A(?:#{MONTH_RE})/i)
+        is_header = stripped.match?(SEMESTER_HEADER) || stripped.match?(WINTERSESSION_HEADER)
+        is_skip = stripped.match?(SKIP_LINE)
 
-        title = clean_title(line, m[0])
-        return nil if title.blank?
+        if is_row || is_header
+          if pending_continuation && merged.any? && !is_header
+            row_match = stripped.match(TABLE_ROW)
+            desc = row_match ? row_match[:description].strip : nil
 
-        { title: title, starts_at: starts_at.to_time, ends_at: ends_at&.to_time, all_day: true }
-
-      elsif (m = line.match(MONTH_DAY))
-        month = resolve_month(m[:month])
-        return nil unless month
-
-        year = @year || infer_year(month)
-        date = safe_date(year, month, m[:day].to_i)
-        return nil unless date
-
-        title = clean_title(line, m[0])
-        return nil if title.blank?
-
-        { title: title, starts_at: date.to_time, ends_at: nil, all_day: true }
-
-      else
-        nil
+            if desc && fragment?(desc)
+              # The continuation belongs with this row — prepend it to the description
+              new_desc = "#{pending_continuation} #{desc}"
+              stripped = stripped.sub(desc, new_desc)
+              pending_continuation = nil
+            else
+              # Continuation didn't match the next row — attach to previous row
+              merged[-1] = "#{merged[-1]} #{pending_continuation}"
+              pending_continuation = nil
+            end
+          end
+          merged << stripped
+        elsif !is_skip
+          # Continuation line — save it for the next row
+          pending_continuation = [ pending_continuation, stripped ].compact.join(" ")
+        end
       end
+
+      merged
     end
 
-    def clean_title(line, date_str)
-      title = line.sub(date_str, "")
-      title = title.gsub(/\A\s*[-–:,;.•*\d]\s*/, "")
-      title = title.gsub(/\s*[-–:,;.]\s*\z/, "")
-      title = title.strip.squeeze(" ")
-      title = title[0, 100].sub(/\s+\S*\z/, "") if title.length > 100
-      title.presence
+    def fragment?(desc)
+      # A fragment typically starts with lowercase, a quote/paren, or common continuation words
+      desc.match?(/\A["""\u201C\u201D\(a-z\\]/) ||
+        desc.match?(/\A(?:is issued|changes at|grade is|p\.m|a\.m|ends at|\d{4}\)|issued)/i)
+    end
+
+    def clean_description(desc)
+      # Strip trailing footer/junk text
+      desc = desc.sub(/\s*Approved:.*\z/i, "")
+      desc = desc.sub(/\s*Please note:.*\z/i, "")
+      desc = desc.sub(/\s*participate in the following.*\z/i, "")
+      desc = desc.strip
+
+      # Reject orphan fragments that aren't real event titles
+      return nil if fragment?(desc)
+
+      desc.presence
+    end
+
+    def extract_event(line, year)
+      m = line.match(TABLE_ROW)
+      return nil unless m
+
+      month_part = m[:month_part]
+      day_part   = m[:day_part]
+      description = clean_description(m[:description])
+
+      return nil if description.blank?
+
+      # Parse start/end months
+      months = month_part.scan(/#{MONTH_RE}/i).map { |mo| resolve_month(mo) }
+      start_month = months.first
+      return nil unless start_month
+
+      # Parse start/end days
+      days = day_part.scan(/\d+/).map(&:to_i)
+      start_day = days.first
+      end_day   = days.last if days.size > 1
+
+      year ||= infer_year(start_month)
+      # For cross-year semesters (Wintersession), use end year for Jan-Jul months
+      if @semester_end_year && start_month.between?(1, 7)
+        year = @semester_end_year
+      end
+      starts_at = safe_date(year, start_month, start_day)
+      return nil unless starts_at
+
+      ends_at = nil
+      if end_day
+        end_month = months.size > 1 ? months.last : start_month
+        end_year = year
+        # Handle cross-year ranges (e.g. December 19 - January 2)
+        end_year += 1 if end_month < start_month
+        ends_at = safe_date(end_year, end_month, end_day)
+      end
+
+      { title: description, starts_at: starts_at.to_time, ends_at: ends_at&.to_time, all_day: true }
     end
 
     def resolve_month(str)
@@ -108,9 +180,9 @@ module UniversityCalendar
       nil
     end
 
-    def extract_year(text)
-      m = text.match(/\b(20\d{2})\b/)
-      m ? m[1].to_i : nil
+    def extract_fallback_year(line)
+      m = @text.match(/\b(20\d{2})\b/)
+      m ? m[1].to_i : Date.today.year
     end
 
     def infer_year(month)
@@ -122,8 +194,7 @@ module UniversityCalendar
       text.gsub("\u00A0", " ")
           .tr("\u2013\u2014\u2212", "-")
           .lines
-          .map { |l| l.strip.gsub(/\s+/, " ") }
-          .reject(&:empty?)
+          .map { |l| l.rstrip.gsub(/\s+/, " ") }
     end
 
     def deduplicate(items)
