@@ -1,0 +1,9 @@
+<div class="flex gap-3 p-3 rounded-2xl" style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg-2);">
+  <div class="min-w-0 flex-1">
+    <div class="flex items-center gap-2">
+      <span class="text-sm font-semibold text-zinc-100"><%= message.user.email %></span>
+      <span class="text-xs text-zinc-500"><%= message.created_at.strftime("%-I:%M %p") %></span>
+    </div>
+    <p class="mt-1 text-sm text-zinc-300"><%= message.body %></p>
+  </div>
+</div>

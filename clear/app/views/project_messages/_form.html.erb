@@ -1,0 +1,12 @@
+<div id="project_message_form" class="px-3 py-3" style="border-top: 1px solid var(--studs-border);">
+  <%= form_with model: [@project, ProjectMessage.new], data: { turbo_stream: true } do |f| %>
+    <div class="flex gap-2">
+      <%= f.text_area :body,
+            placeholder: "Send a message...",
+            rows: 2,
+            class: "flex-1 rounded-xl px-3 py-2 text-sm text-zinc-100 resize-none",
+            style: "border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg-2);" %>
+      <%= f.submit "Send", class: "studs-nav-btn" %>
+    </div>
+  <% end %>
+</div>

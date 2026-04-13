@@ -25,6 +25,9 @@ application.register("calendar-view", CalendarViewController)
 import ChatController from "./chat_controller"
 application.register("chat", ChatController)
 
+import ChatDrawerController from "./chat_drawer_controller"
+application.register("chat-drawer", ChatDrawerController)
+
 import ClipboardController from "./clipboard_controller"
 application.register("clipboard", ClipboardController)
 

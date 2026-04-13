@@ -4,6 +4,7 @@ class Project < ApplicationRecord
   has_many :courses, dependent: :destroy
 
   has_many :project_memberships, dependent: :destroy
+  has_many :project_messages, dependent: :destroy
   has_many :users, through: :project_memberships, source: :user
   has_many :project_invitations, dependent: :destroy
 

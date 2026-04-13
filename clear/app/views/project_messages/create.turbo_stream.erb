@@ -1,0 +1,9 @@
+<% if @message.persisted? %>
+  <%= turbo_stream.replace "project_message_form" do %>
+    <%= render "project_messages/form", project: @project %>
+  <% end %>
+<% else %>
+  <%= turbo_stream.replace "project_message_form" do %>
+    <%= render "project_messages/form", project: @project %>
+  <% end %>
+<% end %>
