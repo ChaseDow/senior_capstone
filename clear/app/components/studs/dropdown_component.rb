@@ -61,7 +61,7 @@ module Studs
     def show_arrow? = @variant.fetch(:show_arrow, true)
     def arrow_classes = @variant[:arrow] || "dropdown-arrow h-4 w-4 text-zinc-400 transition-transform"
 
-    def menu_classes = [SHARED_MENU_CLASSES, @variant[:menu_width] || @variant[:width]].join(" ")
+    def menu_classes = [ SHARED_MENU_CLASSES, @variant[:menu_width] || @variant[:width] ].join(" ")
     def menu_style = SHARED_MENU_STYLE
     def item_classes = SHARED_ITEM_CLASSES
 
