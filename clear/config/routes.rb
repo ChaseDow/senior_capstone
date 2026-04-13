@@ -1,8 +1,10 @@
 Rails.application.routes.draw do
   resources :projects do
     get :agenda, on: :member
+    get :chat, on: :member
     get :join, on: :collection
     resources :project_invitations, only: %i[new create]
+    resources :project_messages, only: [ :create ]
   end
   get "project_invitations/accept", to: "project_invitations#accept", as: :accept_project_invitation
   devise_for :users

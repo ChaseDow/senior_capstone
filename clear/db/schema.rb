@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_07_141359) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_13_012139) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -171,6 +171,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_07_141359) do
     t.index ["user_id"], name: "index_project_memberships_on_user_id"
   end
 
+  create_table "project_messages", force: :cascade do |t|
+    t.text "body", null: false
+    t.datetime "created_at", null: false
+    t.bigint "project_id", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["project_id"], name: "index_project_messages_on_project_id"
+    t.index ["user_id"], name: "index_project_messages_on_user_id"
+  end
+
   create_table "projects", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "description"
@@ -274,6 +284,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_07_141359) do
   add_foreign_key "project_invitations", "users", column: "sender_id"
   add_foreign_key "project_memberships", "projects"
   add_foreign_key "project_memberships", "users"
+  add_foreign_key "project_messages", "projects"
+  add_foreign_key "project_messages", "users"
   add_foreign_key "schedules", "users"
   add_foreign_key "syllabuses", "courses", on_delete: :nullify
   add_foreign_key "syllabuses", "users"

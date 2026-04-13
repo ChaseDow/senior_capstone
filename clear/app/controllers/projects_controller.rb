@@ -1,7 +1,7 @@
 class ProjectsController < ApplicationController
   layout "app_shell"
   before_action :authenticate_user!
-  before_action :set_project, only: %i[ show edit update destroy agenda ]
+  before_action :set_project, only: %i[ show edit update destroy agenda chat]
 
   # GET /projects or /projects.json
   def index
@@ -102,22 +102,11 @@ class ProjectsController < ApplicationController
     redirect_to project_path(project), notice: "You joined the project!"
   end
 
+  def chat
+      @messages = @project.project_messages.includes(:user).order(created_at: :asc)
+  end
+
   private
-
-    def join
-      project = Project.find_by(invite_token: params[:token])
-
-      if project.nil?
-        redirect_to root_path, alert: "Invalid invite link"
-        return
-      end
-
-      unless project.users.include?(current_user)
-        project.users << current_user
-      end
-
-      redirect_to project_path(project), notice: "You joined the project!"
-    end
 
     def occurrences_for_range(range_start, range_end)
       base_events = current_user.events
