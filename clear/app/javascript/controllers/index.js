@@ -43,6 +43,9 @@ application.register("delete-options", DeleteOptionsController)
 import DrawerController from "./drawer_controller"
 application.register("drawer", DrawerController)
 
+import DropdownController from "./dropdown_controller"
+application.register("dropdown", DropdownController)
+
 import DurationFillController from "./duration_fill_controller"
 application.register("duration-fill", DurationFillController)
 
