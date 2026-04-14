@@ -31,7 +31,7 @@
   <% input_style   = "border-color: var(--studs-border); --tw-ring-color: var(--studs-accent);" %>
   <!-- Course name -->
   <div>
-    <%= f.label :title, "Course name *", class: label_classes, style: label_style %>
+    <%= f.label :title, class: label_classes, style: label_style do %>Course name <span class="text-red-400">*</span><% end %>
     <%= f.text_field :title,
           class: input_classes,
           style: input_style,
@@ -40,12 +40,12 @@
   <!-- Times -->
   <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
     <div>
-      <%= f.label :start_time, "Start time *", class: label_classes, style: label_style %>
+      <%= f.label :start_time, class: label_classes, style: label_style do %>Start time <span class="text-red-400">*</span><% end %>
       <%= f.time_field :start_time, class: input_classes, style: input_style,
             data: { duration_fill_target: "startField", action: "change->duration-fill#fill" } %>
     </div>
     <div>
-      <%= f.label :end_time, "End time", class: label_classes, style: label_style %>
+      <%= f.label :end_time, class: label_classes, style: label_style do %>End time <span class="text-red-400">*</span><% end %>
       <%= f.time_field :end_time, class: input_classes, style: input_style,
             data: { duration_fill_target: "endField", action: "change->duration-fill#reverseFill" } %>
     </div>
@@ -67,11 +67,11 @@
   <!-- Dates -->
   <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
     <div>
-      <%= f.label :start_date, "Start date *", class: label_classes, style: label_style %>
+      <%= f.label :start_date, class: label_classes, style: label_style do %>Start date <span class="text-red-400">*</span><% end %>
       <%= f.date_field :start_date, class: input_classes, style: input_style %>
     </div>
     <div>
-      <%= f.label :end_date, "End date *", class: label_classes, style: label_style %>
+      <%= f.label :end_date, class: label_classes, style: label_style do %>End date <span class="text-red-400">*</span><% end %>
       <%= f.date_field :end_date, class: input_classes, style: input_style %>
     </div>
   </div>
@@ -111,7 +111,7 @@
     <!-- Repeat card -->
     <div class="rounded-2xl p-4"
          style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg-2);">
-      <div class="text-sm font-semibold text-zinc-200">Repeat days *</div>
+      <div class="text-sm font-semibold text-zinc-200">Repeat days <span class="text-red-400">*</span></div>
       <div class="text-xs text-zinc-500 mt-0.5 mb-4">Select which weekdays this course meets</div>
       <div class="text-[10px] font-bold uppercase tracking-widest mb-2"
            style="color: var(--studs-accent); opacity: 0.8;">Days</div>
