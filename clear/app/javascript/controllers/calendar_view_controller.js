@@ -1,6 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 
-const DASHBOARD_VIEW_TOGGLE_NAME = "calendar_dashboard_view"
+const DASHBOARD_VIEW_TOGGLE_NAME = "calendar_dashboard"
 
 export default class extends Controller {
   static targets = ["weeklyWrapper", "monthlyWrapper"]
