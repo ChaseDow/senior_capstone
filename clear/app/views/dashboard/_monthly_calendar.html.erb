@@ -103,7 +103,7 @@
        style="flex: 1 1 0%; min-height: 0; border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg-2); box-shadow: 0 1px 3px rgba(0,0,0,0.3), 0 4px 20px rgba(0,0,0,0.15);">
     <table class="w-full border-collapse table-fixed" style="height: 100%;">
       <thead>
-        <tr style="background-color: var(--studs-panel-header);">
+        <tr style="background-color: var(--studs-panel-header); height: 38px;">
           <% %w[Mon Tue Wed Thu Fri Sat Sun].each_with_index do |day_name, i| %>
             <th class="px-3 py-2.5 text-center text-[11px] font-medium uppercase tracking-widest <%= %w[Sat Sun].include?(day_name) ? 'text-zinc-500' : 'text-zinc-400' %>"
                 style="border-bottom: 1px solid var(--studs-border); <%= i < 6 ? 'border-right: 1px solid var(--studs-border);' : '' %>">
@@ -114,14 +114,15 @@
       </thead>
       <tbody>
         <% weeks.each do |week| %>
-          <tr style="height: 1px;">
+          <tr>
             <% week.each_with_index do |day, i| %>
               <% is_today  = (day == today) %>
               <% in_month  = (day.month == month_start.month && day.year == month_start.year) %>
               <% is_weekend = day.saturday? || day.sunday? %>
               <% day_items = month_events_by_date[day] || [] %>
-              <td class="align-top min-h-[80px] px-2 py-1.5 relative"
-                  style="border-bottom: 1px solid var(--studs-border);
+              <td class="align-top px-2 py-1.5 relative"
+                  style="height: 110px; vertical-align: top;
+                         border-bottom: 1px solid var(--studs-border);
                          <%= i < 6 ? 'border-right: 1px solid var(--studs-divider);' : '' %>
                          <%= is_today ? 'background-color: color-mix(in srgb, var(--studs-accent) 14%, transparent);' : '' %>
                          <%= is_weekend && !is_today ? 'background-color: rgba(0,0,0,0.12);' : '' %>
