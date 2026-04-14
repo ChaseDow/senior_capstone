@@ -29,13 +29,18 @@
       </div>
     </div>
     <nav class="flex items-center gap-1.5">
-      <select
-        data-calendar-view-target="selector"
-        data-action="change->calendar-view#toggle"
-        class="studs-nav-btn studs-view-select">
-        <option value="weekly">Weekly</option>
-        <option value="monthly" selected>Monthly</option>
-      </select>
+      <div data-action="dropdown:select->calendar-view#toggle">
+        <%= render Studs::DropdownComponent.new(
+          label: "Monthly",
+          variant: :dashboard_view,
+          name: "calendar_dashboard",
+          selected_value: "monthly",
+          items: [
+            { label: "Weekly", value: "weekly" },
+            { label: "Monthly", value: "monthly" },
+          ]
+        ) %>
+      </div>
       <div class="mx-1 h-5 w-px rounded-full" style="background-color: var(--studs-border);"></div>
       <% if @project %>
         <%= link_to project_path(@project, start_date: prev_month), class: nav_btn, data: { turbo_frame: "dashboard_calendar" } do %>
