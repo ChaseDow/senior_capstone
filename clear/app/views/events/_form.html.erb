@@ -53,7 +53,7 @@
       <%= f.datetime_local_field :ends_at,
             class: input_classes,
             style: input_style,
-            data: { duration_fill_target: "endField" } %>
+            data: { duration_fill_target: "endField", action: "change->duration-fill#reverseFill" } %>
     </div>
   </div>
   <!-- Duration -->

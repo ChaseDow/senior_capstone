@@ -28,4 +28,31 @@ export default class extends Controller {
       this.endFieldTarget.value = `${p(Math.floor(total / 60) % 24)}:${p(total % 60)}`
     }
   }
+
+  // When the end-time field changes, update the duration select to match.
+  reverseFill() {
+    const startValue = this.startFieldTarget.value
+    const endValue = this.endFieldTarget.value
+
+    if (!startValue || !endValue) return
+
+    let diffMinutes
+
+    if (startValue.includes("T")) {
+      const start = new Date(startValue)
+      const end = new Date(endValue)
+      if (isNaN(start) || isNaN(end)) return
+      diffMinutes = Math.round((end - start) / 60000)
+    } else {
+      const [sh, sm] = startValue.split(":").map(Number)
+      const [eh, em] = endValue.split(":").map(Number)
+      if (isNaN(sh) || isNaN(sm) || isNaN(eh) || isNaN(em)) return
+      diffMinutes = (eh * 60 + em) - (sh * 60 + sm)
+    }
+
+    const select = this.durationFieldTarget
+    // If the diff matches an option, select it; otherwise clear the select.
+    const option = [...select.options].find(o => parseInt(o.value, 10) === diffMinutes)
+    select.value = option ? option.value : ""
+  }
 }
