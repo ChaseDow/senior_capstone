@@ -18,14 +18,18 @@ class DashboardController < ApplicationController
     range_start = week_start.beginning_of_day
     range_end   = (week_start + 6.days).end_of_day
 
+    @calendar_filter  = params[:filter].presence
+    @course_filter_id = @calendar_filter  # kept for view compatibility
+    @courses          = current_user.courses.order(:title)
+
     @draft       = current_user_draft
-    @occurrences = calendar_occurrences_for_range(range_start, range_end, draft: @draft)
+    @occurrences = calendar_occurrences_for_range(range_start, range_end, draft: @draft, filter: @calendar_filter)
 
     # Monthly view data
     month_start = @start_date.beginning_of_month
     month_end   = @start_date.end_of_month
     @month_occurrences = calendar_occurrences_for_range(
-      month_start.beginning_of_day, month_end.end_of_day, draft: @draft
+      month_start.beginning_of_day, month_end.end_of_day, draft: @draft, filter: @calendar_filter
     )
     @month_events_by_date = group_occurrences_by_date(@month_occurrences)
     @month_date = @start_date
@@ -38,7 +42,8 @@ class DashboardController < ApplicationController
 
     render partial: "dashboard/calendar_frame",
            locals: { events: @occurrences, start_date: @start_date, draft: @draft,
-                     month_events_by_date: @month_events_by_date, month_date: @month_date }
+                     month_events_by_date: @month_events_by_date, month_date: @month_date,
+                     courses: @courses, course_filter_id: @course_filter_id }
   end
 
   def agenda

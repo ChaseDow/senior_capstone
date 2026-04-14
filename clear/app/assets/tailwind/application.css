@@ -670,6 +670,7 @@ select.studs-nav-btn {
   -webkit-appearance: none;
   -moz-appearance: none;
   cursor: pointer;
+  min-width: max-content;
   padding-right: 2.25rem;
   background-color: var(--studs-panel-bg);
   color: #e4e4e7;
