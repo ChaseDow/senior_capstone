@@ -34,6 +34,9 @@ application.register("clipboard", ClipboardController)
 import CountdownController from "./countdown_controller"
 application.register("countdown", CountdownController)
 
+import CourseFilterController from "./course_filter_controller"
+application.register("course-filter", CourseFilterController)
+
 import CurrentTimeController from "./current_time_controller"
 application.register("current-time", CurrentTimeController)
 

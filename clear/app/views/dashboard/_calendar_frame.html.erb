@@ -4,13 +4,17 @@
       <%= render "dashboard/calendar",
            events: events,
            start_date: start_date,
-           draft: local_assigns[:draft] %>
+           draft: local_assigns[:draft],
+           courses: local_assigns[:courses],
+           course_filter_id: local_assigns[:course_filter_id] %>
     </div>
     <div data-calendar-view-target="monthlyWrapper" class="hidden h-full min-h-0 w-full min-w-0 flex flex-col">
       <%= render "dashboard/monthly_calendar",
            month_events_by_date: local_assigns[:month_events_by_date] || @month_events_by_date || {},
            month_date: local_assigns[:month_date] || @month_date || Date.current,
-           start_date: start_date %>
+           start_date: start_date,
+           courses: local_assigns[:courses],
+           course_filter_id: local_assigns[:course_filter_id] %>
     </div>
   </div>
 <% end %>
