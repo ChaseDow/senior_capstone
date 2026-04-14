@@ -45,7 +45,7 @@
             data: { duration_fill_target: "startField", action: "change->duration-fill#fill" } %>
     </div>
     <div>
-      <%= f.label :end_time, "End time", class: label_classes, style: label_style %>
+      <%= f.label :end_time, class: label_classes, style: label_style do %>End time <span class="text-red-400">*</span><% end %>
       <%= f.time_field :end_time, class: input_classes, style: input_style,
             data: { duration_fill_target: "endField", action: "change->duration-fill#reverseFill" } %>
     </div>
