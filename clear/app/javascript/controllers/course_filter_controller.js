@@ -4,13 +4,13 @@ export default class extends Controller {
   static values = { baseUrl: String, startDate: String }
 
   navigate(event) {
-    const courseId = event.detail?.value ?? ""
-    const url      = new URL(this.baseUrlValue, window.location.origin)
+    const filterValue = event.detail?.value ?? ""
+    const url         = new URL(this.baseUrlValue, window.location.origin)
     url.searchParams.set("start_date", this.startDateValue)
-    if (courseId) {
-      url.searchParams.set("course_id", courseId)
+    if (filterValue) {
+      url.searchParams.set("filter", filterValue)
     } else {
-      url.searchParams.delete("course_id")
+      url.searchParams.delete("filter")
     }
 
     // Navigate the frame directly (same mechanism as Prev/Next/Today links) so
