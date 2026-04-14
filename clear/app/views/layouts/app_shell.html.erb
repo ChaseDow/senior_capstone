@@ -191,17 +191,6 @@
     </div>
     <!-- Toast notifications -->
     <%= render "shared/toasts" %>
-    <% unless controller_name == 'ai_chat' %>
-      <%= link_to ai_chat_index_path,
-            class: "fixed bottom-6 right-6 z-50 inline-flex items-center justify-center
-                    w-14 h-14 rounded-2xl shadow-lg transition hover:brightness-110 hover:scale-105 active:scale-95",
-            style: "background-color: var(--studs-accent); box-shadow: 0 0 20px color-mix(in srgb, var(--studs-accent) 40%, transparent);",
-            "aria-label": "Open AI Chat" do %>
-        <span class="[&>svg]:h-7 [&>svg]:w-7 text-white [&_svg]:text-current [&_svg_*]:stroke-current [&_svg_*]:fill-none">
-          <%= icon "chat-bot-stroke-rounded" %>
-        </span>
-      <% end %>
-    <% end %>
     <script>
       function bindPasswordToggles() {
         document.querySelectorAll('[data-password-toggle]').forEach((button) => {
