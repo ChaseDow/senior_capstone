@@ -13,6 +13,6 @@
   </div>
   <div class="min-w-0 group-data-[collapsed=true]/sidebar:hidden">
     <div class="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Welcome</div>
-    <div class="text-sm font-semibold text-zinc-100 truncate"><%= user.try(:name) || user.try(:first_name) || user.email.to_s.split("@").first %></div>
+    <div class="text-sm font-semibold text-zinc-100 truncate"><%= user.try(:username) || user.try(:first_name) || user.email.to_s.split("@").first %></div>
   </div>
 <% end %>

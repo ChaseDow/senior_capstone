@@ -1,10 +1,15 @@
 class User < ApplicationRecord
   has_many :events, dependent: :destroy
-  has_many :courses, dependent: :destroy
   has_many :syllabuses, dependent: :destroy
   has_many :documents, dependent: :destroy
   has_many :work_shifts, dependent: :destroy
   has_one :calendar_draft, dependent: :destroy
+  has_many :notifications, dependent: :destroy
+  has_many :owned_projects, class_name: "Project", dependent: :destroy
+  has_many :courses, dependent: :destroy
+  has_many :project_memberships, dependent: :destroy
+  has_many :projects, through: :project_memberships
+  has_many :sent_project_invitations, class_name: "ProjectInvitation", foreign_key: :sender_id, dependent: :destroy
 
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable, :confirmable,
@@ -12,8 +17,10 @@ class User < ApplicationRecord
 
   enum :role, { user: 0, admin: 1 }
   has_one_attached :avatar
+  validates :username, length: { in: 2..32 }
 
   # ── Theme ────────────────────────────────────────────────
+  THEMES = %w[green blue purple rose amber cyan pink red lime slate orange mono nebula aurora sunset latech].freeze
   THEMES = %w[green blue purple rose amber cyan pink red lime slate orange mono nebula aurora sunset latech].freeze
   THEME_DEFAULT = "green".freeze
 

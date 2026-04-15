@@ -98,11 +98,16 @@
   </div>
   <!-- Footer actions -->
   <div class="flex items-center gap-1.5 pt-2" style="border-top: 1px solid var(--studs-divider);">
-    <%= link_to dashboard_path, class: "studs-nav-btn" do %>
+    <% path = @event.project.present? ? project_path(@event.project) : dashboard_path %>
+    <%= link_to path, class: "studs-nav-btn" do %>
       <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
         <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
       </svg>
-      Back to dashboard
+      <%if @event.project.present? %>
+        Back to project
+      <% else %>
+        Back to dashboard
+      <% end %>
     <% end %>
     <%= link_to events_path, class: "studs-nav-btn" do %>
       <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">

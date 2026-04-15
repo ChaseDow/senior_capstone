@@ -19,11 +19,23 @@ application.register("ai-usage", AiUsageController)
 import AvatarCropController from "./avatar_crop_controller"
 application.register("avatar-crop", AvatarCropController)
 
+import CalendarViewController from "./calendar_view_controller"
+application.register("calendar-view", CalendarViewController)
+
 import ChatController from "./chat_controller"
 application.register("chat", ChatController)
 
+import ChatDrawerController from "./chat_drawer_controller"
+application.register("chat-drawer", ChatDrawerController)
+
+import ClipboardController from "./clipboard_controller"
+application.register("clipboard", ClipboardController)
+
 import CountdownController from "./countdown_controller"
 application.register("countdown", CountdownController)
+
+import CourseFilterController from "./course_filter_controller"
+application.register("course-filter", CourseFilterController)
 
 import CurrentTimeController from "./current_time_controller"
 application.register("current-time", CurrentTimeController)
@@ -33,6 +45,9 @@ application.register("delete-options", DeleteOptionsController)
 
 import DrawerController from "./drawer_controller"
 application.register("drawer", DrawerController)
+
+import DropdownController from "./dropdown_controller"
+application.register("dropdown", DropdownController)
 
 import DurationFillController from "./duration_fill_controller"
 application.register("duration-fill", DurationFillController)
@@ -51,6 +66,9 @@ application.register("hello", HelloController)
 
 import ModalController from "./modal_controller"
 application.register("modal", ModalController)
+
+import NotificationsDropdownController from "./notifications_dropdown_controller"
+application.register("notifications-dropdown", NotificationsDropdownController)
 
 import PollFrameController from "./poll_frame_controller"
 application.register("poll-frame", PollFrameController)
@@ -75,3 +93,6 @@ application.register("toast", ToastController)
 
 import TypewriterController from "./typewriter_controller"
 application.register("typewriter", TypewriterController)
+
+import UsernameEditController from "./username_edit_controller"
+application.register("username-edit", UsernameEditController)

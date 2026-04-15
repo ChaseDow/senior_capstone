@@ -1,0 +1,82 @@
+<% content_for :page_title, "Invite to #{@project.title}" %>
+<% content_for :page_subtitle, "Send an email invitation to collaborate" %>
+
+<div class="mx-auto max-w-lg">
+  <div class="rounded-2xl p-6" style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg);">
+    <%= form_with model: [@project, @invitation],
+                  class: "space-y-5" do |f| %>
+      <% if @invitation.errors.any? %>
+        <div class="rounded-2xl p-4 text-red-300"
+             style="border: 1px solid rgba(239,68,68,0.3); background-color: rgba(127,29,29,0.2);">
+          <p class="text-sm font-semibold mb-1">Please fix the following:</p>
+          <ul class="list-disc pl-5 text-sm space-y-0.5">
+            <% @invitation.errors.full_messages.each do |msg| %>
+              <li><%= msg %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <% label_classes = "block text-[10px] font-bold uppercase tracking-widest mb-1.5" %>
+      <% label_style   = "color: var(--studs-accent); opacity: 0.8;" %>
+      <% input_classes = "w-full rounded-2xl px-4 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-600 " \
+                         "bg-zinc-950/60 focus:outline-none focus:ring-2 transition-all duration-150 border" %>
+      <% input_style   = "border-color: var(--studs-border); --tw-ring-color: var(--studs-accent);" %>
+
+      <div>
+        <%= f.label :email, class: label_classes, style: label_style do %>Email address <span class="text-red-400">*</span><% end %>
+        <%= f.email_field :email,
+              class: input_classes,
+              style: input_style,
+              placeholder: "colleague@example.com",
+              autofocus: true %>
+      </div>
+
+      <div class="flex items-center gap-3 pt-4"
+           style="border-top: 1px solid var(--studs-divider);">
+        <button type="submit" class="studs-btn-accent">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+          </svg>
+          Send Invitation
+        </button>
+        <%= link_to "Cancel", project_path(@project), class: "studs-nav-btn" %>
+      </div>
+    <% end %>
+
+    <% pending = @project.project_invitations.pending %>
+    <% if pending.any? %>
+      <div class="mt-6 pt-5" style="border-top: 1px solid var(--studs-divider);">
+        <h3 class="text-[10px] font-bold uppercase tracking-widest mb-3" style="color: var(--studs-accent); opacity: 0.8;">
+          Pending Invitations
+        </h3>
+        <div class="space-y-2">
+          <% pending.each do |inv| %>
+            <div class="flex items-center justify-between rounded-xl px-3 py-2 text-sm"
+                 style="background-color: var(--studs-panel-bg-2); border: 1px solid var(--studs-border);">
+              <span class="text-zinc-300"><%= inv.email %></span>
+              <span class="text-[10px] text-zinc-500">Sent <%= time_ago_in_words(inv.created_at) %> ago</span>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <% members = @project.users %>
+    <% if members.any? %>
+      <div class="mt-6 pt-5" style="border-top: 1px solid var(--studs-divider);">
+        <h3 class="text-[10px] font-bold uppercase tracking-widest mb-3" style="color: var(--studs-accent); opacity: 0.8;">
+          Current Members
+        </h3>
+        <div class="space-y-2">
+          <% members.each do |member| %>
+            <div class="flex items-center justify-between rounded-xl px-3 py-2 text-sm"
+                 style="background-color: var(--studs-panel-bg-2); border: 1px solid var(--studs-border);">
+              <span class="text-zinc-300"><%= member.email %></span>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

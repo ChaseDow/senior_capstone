@@ -3,7 +3,8 @@ import { Controller } from "@hotwired/stimulus";
 export default class extends Controller {
   static targets = ["overlay", "panel", "frame", "skeleton"];
   static values = {
-    url: String, 
+    url: String,
+    projectId: Number, 
   };
 
   connect() {
@@ -20,6 +21,8 @@ export default class extends Controller {
   open(e) {
     e?.preventDefault?.();
     const date = e?.params?.date || e?.currentTarget?.dataset?.date || null;
+    const projectId = e?.params?.projectId || null;
+    if (projectId) this.projectIdValue = projectId;
     this.openForDate(date);
   }
 
@@ -32,6 +35,7 @@ export default class extends Controller {
     this.panelTarget.classList.remove("translate-x-[120%]");
     this.panelTarget.classList.add("translate-x-0");
 
+    this.panelTarget.style.visibility = "visible";
     this.panelTarget.style.width = "360px";
 
     if (this.frameTarget.src !== url) {
@@ -50,6 +54,7 @@ export default class extends Controller {
 
     window.setTimeout(() => {
         this.panelTarget.style.width = "0px";
+        this.panelTarget.style.visibility = "hidden";
     }, 300);
     window.dispatchEvent(new CustomEvent("agenda:clear"))
     }
@@ -78,6 +83,7 @@ export default class extends Controller {
   buildUrl(date) {
     const u = new URL(this.urlValue, window.location.origin);
     if (date) u.searchParams.set("date", date);
+    if (this.projectIdValue) u.searchParams.set("project_id", this.projectIdValue);
     return u.toString();
   }
 }

@@ -31,7 +31,7 @@
   <% input_style   = "border-color: var(--studs-border); --tw-ring-color: var(--studs-accent);" %>
   <!-- Course name -->
   <div>
-    <%= f.label :title, "Course name *", class: label_classes, style: label_style %>
+    <%= f.label :title, class: label_classes, style: label_style do %>Course name <span class="text-red-400">*</span><% end %>
     <%= f.text_field :title,
           class: input_classes,
           style: input_style,
@@ -40,35 +40,38 @@
   <!-- Times -->
   <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
     <div>
-      <%= f.label :start_time, "Start time *", class: label_classes, style: label_style %>
+      <%= f.label :start_time, class: label_classes, style: label_style do %>Start time <span class="text-red-400">*</span><% end %>
       <%= f.time_field :start_time, class: input_classes, style: input_style,
             data: { duration_fill_target: "startField", action: "change->duration-fill#fill" } %>
     </div>
     <div>
-      <%= f.label :end_time, "End time", class: label_classes, style: label_style %>
+      <%= f.label :end_time, class: label_classes, style: label_style do %>End time <span class="text-red-400">*</span><% end %>
       <%= f.time_field :end_time, class: input_classes, style: input_style,
-            data: { duration_fill_target: "endField" } %>
+            data: { duration_fill_target: "endField", action: "change->duration-fill#reverseFill" } %>
     </div>
   </div>
   <!-- Duration -->
   <div>
     <%= f.label :duration_minutes, "Duration (optional)", class: label_classes, style: label_style %>
-    <%= f.select :duration_minutes,
-          options_for_select(ApplicationHelper::DURATION_OPTIONS, course.duration_minutes),
-          { include_blank: "— select duration —" },
-          class: input_classes,
-          style: input_style,
-          data: { duration_fill_target: "durationField", action: "change->duration-fill#fill" } %>
+    <div data-action="dropdown:select->duration-fill#fill">
+      <%= render Studs::DropdownComponent.new(
+        label: "— select duration —",
+        variant: :duration,
+        name: "#{f.object_name}[duration_minutes]",
+        selected_value: course.duration_minutes,
+        items: ApplicationHelper::DURATION_OPTIONS.map { |label, value| { label: label, value: value.to_s } }
+      ) %>
+    </div>
     <p class="mt-1.5 text-xs text-zinc-500">Set a duration if you prefer not to enter an end time.</p>
   </div>
   <!-- Dates -->
   <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
     <div>
-      <%= f.label :start_date, "Start date *", class: label_classes, style: label_style %>
+      <%= f.label :start_date, class: label_classes, style: label_style do %>Start date <span class="text-red-400">*</span><% end %>
       <%= f.date_field :start_date, class: input_classes, style: input_style %>
     </div>
     <div>
-      <%= f.label :end_date, "End date *", class: label_classes, style: label_style %>
+      <%= f.label :end_date, class: label_classes, style: label_style do %>End date <span class="text-red-400">*</span><% end %>
       <%= f.date_field :end_date, class: input_classes, style: input_style %>
     </div>
   </div>
@@ -108,7 +111,7 @@
     <!-- Repeat card -->
     <div class="rounded-2xl p-4"
          style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg-2);">
-      <div class="text-sm font-semibold text-zinc-200">Repeat days *</div>
+      <div class="text-sm font-semibold text-zinc-200">Repeat days <span class="text-red-400">*</span></div>
       <div class="text-xs text-zinc-500 mt-0.5 mb-4">Select which weekdays this course meets</div>
       <div class="text-[10px] font-bold uppercase tracking-widest mb-2"
            style="color: var(--studs-accent); opacity: 0.8;">Days</div>
@@ -116,10 +119,9 @@
         <% [["Su", 0], ["Mo", 1], ["Tu", 2], ["We", 3], ["Th", 4], ["Fr", 5], ["Sa", 6]].each do |lbl, wday| %>
           <label class="relative cursor-pointer">
             <%= f.check_box :repeat_days, { multiple: true, class: "peer sr-only" }, wday, nil %>
-            <div class="flex h-9 items-center justify-center rounded-xl border text-xs font-semibold transition-all
+            <div class="repeat-day-btn flex h-9 items-center justify-center rounded-xl border text-xs font-semibold transition-all
                         border-zinc-700 bg-zinc-900/40 text-zinc-400
-                        hover:border-zinc-500 hover:text-zinc-200
-                        peer-checked:border-white/40 peer-checked:bg-white/10 peer-checked:text-white">
+                        hover:border-zinc-500 hover:text-zinc-200">
               <%= lbl %>
             </div>
           </label>

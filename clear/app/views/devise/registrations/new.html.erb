@@ -28,14 +28,18 @@
                 placeholder: "your email" %>
         </div>
 
-        <div class="relative">
-          <div class="flex items-baseline justify-between">
-            <%= f.label :password, class: label_classes, style: label_style %>
-            <% if @minimum_password_length %>
-              <span class="text-xs text-zinc-600"><%= @minimum_password_length %>+ characters</span>
-            <% end %>
-          </div>
+        <div>
+          <%= f.label :username, class: label_classes, style: label_style %>
+          <%= f.text_field :username,
+                autofocus: true,
+                autocomplete: "username",
+                class: "#{input_classes} mt-2",
+                style: input_style,
+                placeholder: "your username" %>
+        </div>
 
+        <div class="relative">
+          <%= f.label :password, class: label_classes, style: label_style %>
           <%= f.password_field :password,
                 id: "current-password",
                 autocomplete: "new-password",

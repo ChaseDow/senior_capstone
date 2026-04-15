@@ -1,0 +1,62 @@
+<% content_for :page_title, @project.title + "'s Dashboard" %>
+<div
+  class="-mx-6 -my-6 h-full min-h-0 relative"
+  data-controller="agenda-drawer chat-drawer"
+  data-agenda-drawer-url-value="<%= agenda_project_path(@project) %>"
+  data-chat-drawer-url-value="<%= chat_project_path(@project) %>"
+>
+  <div class="flex h-full min-h-0 min-w-0 p-4">
+    <section class="min-w-0 w-full flex-1 min-h-0">
+      <%= render "dashboard/calendar_frame", events: @occurrences, start_date: @start_date, month_events_by_date: @month_events_by_date, month_date: @month_date %>
+    </section>
+  </div>
+  <!-- Agenda overlay -->
+  <div
+    data-agenda-drawer-target="overlay"
+    data-action="click->agenda-drawer#close"
+    class="absolute inset-0 z-40 bg-black/0 opacity-0 pointer-events-none transition-opacity duration-300">
+  </div>
+  <!-- Agenda panel -->
+  <div
+    data-agenda-drawer-target="panel"
+    role="dialog"
+    aria-modal="true"
+    class="absolute right-4 top-4 bottom-4 z-50 pointer-events-auto
+           overflow-hidden rounded-2xl shadow-2xl
+           translate-x-[120%] transition-transform duration-300 ease-in-out"
+    style="width: 0px; visibility: hidden; border: 1px solid var(--studs-border); background-color: var(--studs-sidebar-bg);"
+  >
+    <%= turbo_frame_tag "agenda_drawer",
+          class: "block h-full w-full",
+          data: {
+            agenda_drawer_target: "frame",
+            action: "turbo:before-fetch-request->agenda-drawer#showSkeleton turbo:frame-load->agenda-drawer#frameLoaded"
+          } do %>
+    <% end %>
+  </div>
+  <!-- Skeleton -->
+  <template data-agenda-drawer-target="skeleton">
+    <%= render "dashboard/agenda_drawer_skeleton" %>
+  </template>
+  <!-- Chat overlay -->
+  <div
+    data-chat-drawer-target="overlay"
+    data-action="click->chat-drawer#close"
+    class="absolute inset-0 z-40 bg-black/0 opacity-0 pointer-events-none transition-opacity duration-300">
+  </div>
+  <!-- Chat panel -->
+  <div
+    data-chat-drawer-target="panel"
+    role="dialog"
+    aria-modal="true"
+    class="absolute right-4 top-4 bottom-4 z-50 pointer-events-auto
+           overflow-hidden rounded-2xl shadow-2xl
+           translate-x-[120%] transition-transform duration-300 ease-in-out"
+    style="width: 0px; border: 1px solid var(--studs-border); background-color: var(--studs-sidebar-bg);"
+  >
+    <%= turbo_frame_tag "chat_drawer",
+          class: "block h-full w-full",
+          data: { chat_drawer_target: "frame" } do %>
+    <% end %>
+  </div>
+</div>

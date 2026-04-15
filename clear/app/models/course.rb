@@ -2,8 +2,10 @@
 
 class Course < ApplicationRecord
   belongs_to :user
+  belongs_to :project, optional: true
   has_many :course_items, dependent: :destroy
   has_many :syllabuses, dependent: :nullify
+  has_many :notifications, as: :notifiable, dependent: :destroy
 
   validates :title, presence: true
   validates :start_time, presence: true
@@ -24,6 +26,8 @@ class Course < ApplicationRecord
             },
             allow_nil: true
 
+  after_create_commit :create_notification
+
   # Normalize fields before validation
   before_validation :derive_end_time_from_duration
   before_validation :normalize_color
@@ -39,6 +43,18 @@ class Course < ApplicationRecord
   # Used by the dashboard calendar
   Occurrence = Struct.new(:event, :starts_at, :ends_at, :draft_status, keyword_init: true) do
     delegate :id, :title, :location, :description, :color, :contrast_text_color, to: :event
+  end
+
+  def next_occurrence_at(from: Time.current)
+    from_date = [ from.to_date, start_date ].max
+    d = from_date
+    while d <= end_date
+      if repeat_days.include?(d.wday)
+        return Time.zone.local(d.year, d.month, d.day, start_time.hour, start_time.min, 0)
+      end
+      d += 1.day
+    end
+    nil
   end
 
   # Generate course occurrences within the given date range
@@ -81,6 +97,15 @@ class Course < ApplicationRecord
   end
 
   private
+
+  def create_notification
+    Notification.create!(
+      user: user,
+      notifiable: self,
+      category: "course_added",
+      message: start_time ? "#{title} at #{start_time.strftime("%-I:%M %p")}" : title
+    )
+  end
 
   def derive_end_time_from_duration
     return if end_time.present? || start_time.blank? || duration_minutes.blank?

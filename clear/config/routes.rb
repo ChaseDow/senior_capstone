@@ -2,8 +2,18 @@ Rails.application.routes.draw do
   devise_for :users, controllers: {
     omniauth_callbacks: "users/omniauth_callbacks"
   }
+  resources :projects do
+    get :agenda, on: :member
+    get :chat, on: :member
+    get :join, on: :collection
+    resources :project_invitations, only: %i[new create]
+    resources :project_messages, only: [ :create ]
+  end
+  get "project_invitations/accept", to: "project_invitations#accept", as: :accept_project_invitation
+  devise_for :users
 
   resource :profile, only: [ :show, :edit, :update ] do
+    patch :update_username
     get :edit_password
     patch :update_password
     get :edit_avatar
@@ -54,6 +64,15 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :notifications, only: [ :index, :destroy ] do
+    member do
+      patch :mark_read
+    end
+    collection do
+      delete :destroy_all
+    end
+  end
+
   # Admin-only pages (guarded in controllers via current_user.admin?)
   namespace :admin do
     resources :users, only: [ :index, :destroy ]
@@ -82,6 +101,7 @@ Rails.application.routes.draw do
   patch  "dashboard/draft/apply",   to: "draft#apply",   as: :apply_draft
   delete "dashboard/draft",         to: "draft#discard", as: :discard_draft
 
+  get "projects/join", to: "projects#join", as: :join_project
   get "/ui",             to: "ui#show"
   get "/schedule",       to: "schedule#week"
   get "/schedule/week",  to: "schedule#week"

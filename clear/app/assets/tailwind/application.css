@@ -569,6 +569,34 @@ body {
     inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
+/* ── Calendar view selector (themed <select>) ──────────── */
+select.studs-nav-btn {
+  overflow: visible;
+  min-width: 7.5rem;
+}
+
+.studs-view-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  cursor: pointer;
+  min-width: max-content;
+  padding-right: 2.25rem;
+  background-color: var(--studs-panel-bg);
+  color: #e4e4e7;
+  font-family: inherit;
+  font-size: inherit;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23a1a1aa' stroke-width='2.5'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: 12px;
+  background-position: right 0.75rem center;
+}
+
+.studs-view-select option {
+  background-color: var(--studs-panel-bg-2, #27272a);
+  color: #e4e4e7;
+}
+
 /* ── Accent filled button (theme-aware CTA) ─────────────── */
 .studs-btn-accent {
   display: inline-flex;
@@ -577,6 +605,7 @@ body {
   gap: 0.375rem;
   border-radius: 9999px;
   border: 1px solid var(--studs-accent);
+  background: linear-gradient(135deg, var(--studs-accent), var(--studs-accent-secondary));
   background: linear-gradient(135deg, var(--studs-accent), var(--studs-accent-secondary));
   color: white;
   padding: 0.4rem 1.1rem;
@@ -716,9 +745,57 @@ body[data-theme="cyan"] .studs-today-badge {
   text-shadow: none;
 }
 
+/* ── Avatar circle (theme-aware text contrast) ─────────── */
+.studs-avatar-circle {
+  background: linear-gradient(135deg, var(--studs-accent), var(--studs-accent-secondary));
+  color: #ffffff;
+  transition: background 0.3s ease;
+}
+
+body[data-theme="mono"] .studs-avatar-circle {
+  color: #111111;
+}
+
+body[data-theme="mono"] .studs-btn-accent {
+  color: #111111;
+}
+
+/* ── Today badge (calendar header) ─────────────────────── */
+.studs-today-badge {
+  background: linear-gradient(135deg, var(--studs-accent), var(--studs-accent-secondary));
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  transition: background 0.3s ease;
+}
+
+body[data-theme="mono"] .studs-today-badge,
+body[data-theme="amber"] .studs-today-badge,
+body[data-theme="lime"] .studs-today-badge,
+body[data-theme="cyan"] .studs-today-badge {
+  color: #09090b;
+  text-shadow: none;
+}
+
 /* ── Active nav link ────────────────────────────────────── */
 .studs-nav-link--active {
   color: #f4f4f5;
+}
+
+/* ── Active nav pill (glassmorphic, theme-aware) ───────── */
+.studs-nav-link--active-pill {
+  background: linear-gradient(135deg,
+      color-mix(in srgb, var(--studs-accent) 22%, transparent) 0%,
+      color-mix(in srgb, var(--studs-accent-secondary) 10%, transparent) 100%);
+  border: 1px solid color-mix(in srgb, var(--studs-accent) 30%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow:
+    0 0 12px color-mix(in srgb, var(--studs-accent) 15%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transition:
+    background 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 /* ── Active nav pill (glassmorphic, theme-aware) ───────── */
@@ -755,6 +832,24 @@ body[data-theme="cyan"] .studs-today-badge {
 .studs-icon--inactive [stroke],
 .studs-icon--inactive *[stroke] {
   stroke: #d4d4d8 !important;
+}
+
+.studs-icon-accent-soft {
+  color: color-mix(in srgb, var(--studs-accent) 55%, transparent);
+}
+
+.studs-eye-toggle {
+  border: 1px solid var(--studs-border);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--studs-accent) 22%, transparent),
+    0 0 12px color-mix(in srgb, var(--studs-accent) 18%, transparent);
+}
+
+.studs-eye-toggle:hover {
+  border-color: color-mix(in srgb, var(--studs-accent) 55%, var(--studs-border));
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--studs-accent) 34%, transparent),
+    0 0 16px color-mix(in srgb, var(--studs-accent) 26%, transparent);
 }
 
 .studs-icon-accent-soft {
@@ -840,6 +935,26 @@ body[data-theme="cyan"] .studs-today-badge {
   background: linear-gradient(135deg, #002F8B 50%, #E31B23 50%);
 }
 
+.theme-swatch--mono {
+  background: linear-gradient(135deg, #ffffff 50%, #111111 50%);
+}
+
+.theme-swatch--nebula {
+  background: linear-gradient(135deg, #935AF0, #F897FE);
+}
+
+.theme-swatch--aurora {
+  background: linear-gradient(135deg, #5A7DF0, #5CC0E3);
+}
+
+.theme-swatch--sunset {
+  background: linear-gradient(135deg, #8C3572, #D47990);
+}
+
+.theme-swatch--latech {
+  background: linear-gradient(135deg, #002F8B 50%, #E31B23 50%);
+}
+
 /* ── FilePond (theme-aware dropzone) ────────────────────── */
 
 .filepond-host .filepond--root {
@@ -891,8 +1006,8 @@ body[data-theme="cyan"] .studs-today-badge {
   select:-webkit-autofill,
   select:-webkit-autofill:hover,
   select:-webkit-autofill:focus {
-    -webkit-text-fill-color: #e4e4e7;
-    caret-color: #e4e4e7;
+    -webkit-text-fill-color: #f4f4f5;
+    caret-color: #f4f4f5;
     -webkit-box-shadow: 0 0 0px 1000px rgba(9, 9, 11, 0.60) inset;
     box-shadow: 0 0 0px 1000px rgba(9, 9, 11, 0.60) inset;
     transition: background-color 9999s ease-in-out 0s;
@@ -901,8 +1016,8 @@ body[data-theme="cyan"] .studs-today-badge {
   input:autofill,
   textarea:autofill,
   select:autofill {
-    -webkit-text-fill-color: #e4e4e7;
-    caret-color: #e4e4e7;
+    -webkit-text-fill-color: #f4f4f5;
+    caret-color: #f4f4f5;
     box-shadow: 0 0 0px 1000px rgba(9, 9, 11, 0.60) inset;
   }
 }
@@ -1011,6 +1126,7 @@ body[data-theme="cyan"] .studs-today-badge {
   }
 }
 
+/* Old Scrollbar Styles (kept for easy rollback)
 /* Old Scrollbar Styles (kept for easy rollback)
 @layer base {
   :root {
