@@ -4,7 +4,7 @@
 <%= form_with model: work_shift,
               url: form_url,
               class: "space-y-5",
-              data: { turbo: turbo_enabled } do |f| %>
+              data: { turbo: turbo_enabled, controller: "duration-fill" } do |f| %>
   <% if work_shift.errors.any? %>
     <div class="rounded-2xl p-4 text-red-300"
          style="border: 1px solid rgba(239,68,68,0.3); background-color: rgba(127,29,29,0.2);">
@@ -33,15 +33,30 @@
   <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
     <div>
       <%= f.label :start_time, class: label_classes, style: label_style do %>Start Time <span class="text-red-400">*</span><% end %>
-      <%= f.time_field :start_time, class: input_classes, style: input_style %>
+      <%= f.time_field :start_time, class: input_classes, style: input_style,
+            data: { duration_fill_target: "startField", action: "change->duration-fill#fill" } %>
     </div>
     <div>
       <%= f.label :end_time, class: label_classes, style: label_style do %>End Time <span class="text-red-400">*</span><% end %>
-      <%= f.time_field :end_time, class: input_classes, style: input_style %>
+      <%= f.time_field :end_time, class: input_classes, style: input_style,
+            data: { duration_fill_target: "endField", action: "change->duration-fill#reverseFill" } %>
+    </div>
+  </div>
+  <!-- Duration -->
+  <div>
+    <%= f.label :duration_minutes, "Duration", class: label_classes, style: label_style %>
+    <div data-action="dropdown:select->duration-fill#fill">
+      <%= render Studs::DropdownComponent.new(
+        label: "— select duration —",
+        variant: :duration,
+        name: "#{f.object_name}[duration_minutes]",
+        selected_value: work_shift.duration_minutes,
+        items: ApplicationHelper::DURATION_OPTIONS.map { |label, value| { label: label, value: value.to_s } }
+      ) %>
     </div>
   </div>
   <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-  <!-- Starting Date --> 
+    <!-- Starting Date -->
     <div>
       <%= f.label :start_date, class: label_classes, style: label_style do %>Start Date <span class="text-red-400">*</span><% end %>
       <%= f.date_field :start_date, class: input_classes, style: input_style %>

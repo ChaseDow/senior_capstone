@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_13_012139) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_15_133144) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -250,6 +250,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_13_012139) do
     t.string "color", default: "#34D399", null: false
     t.datetime "created_at", null: false
     t.text "description"
+    t.integer "duration_minutes"
     t.time "end_time"
     t.string "location"
     t.boolean "recurring", default: true, null: false
