@@ -7,6 +7,11 @@ class AiChatController < ApplicationController
     @rate = GeminiRateTracker.usage
   end
 
+  def panel
+    @rate = GeminiRateTracker.usage
+    render layout: false
+  end
+
   def usage
     render json: GeminiRateTracker.usage
   end
@@ -92,7 +97,8 @@ class AiChatController < ApplicationController
             partial: "ai_chat/message",
             locals: { m: { "role" => "assistant", "content" => assistant_text } }
           ),
-          turbo_stream.update("ai_chat_history", history.to_json),
+          turbo_stream.update("ai_chat_history_wrapper",
+            "<input type=\"hidden\" name=\"history\" value=\"#{ERB::Util.html_escape(history.to_json)}\">"),
           turbo_stream.replace("ai_chat_flash", partial: "ai_chat/flash"),
           turbo_stream.update("ai_chat_input", ""),
           turbo_stream.replace("ai_chat_usage", partial: "ai_chat/usage", locals: { rate: updated_rate })
