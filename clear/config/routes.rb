@@ -60,6 +60,7 @@ Rails.application.routes.draw do
   resources :ai_chat, only: [ :index, :create ] do
     collection do
       get :usage
+      get :panel
     end
   end
 

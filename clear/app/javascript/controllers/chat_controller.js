@@ -45,6 +45,9 @@ export default class extends Controller {
     `
     messages.appendChild(thinking)
     messages.scrollTop = messages.scrollHeight
+
+    // Clear the input immediately so it doesn't show alongside the bubble
+    input.value = ""
   }
 
   sendOnEnter(event) {
@@ -61,8 +64,11 @@ export default class extends Controller {
     const pending = document.getElementById("ai_chat_user_pending")
     if (pending) pending.remove()
 
-    const input = this.element.querySelector("#ai_chat_input")
-    if (input) input.value = ""
+    const input = document.getElementById("ai_chat_input")
+    if (input) {
+      input.value = ""
+      input.focus()
+    }
 
     const messages = document.getElementById("ai_chat_messages")
     if (messages) messages.scrollTop = messages.scrollHeight
