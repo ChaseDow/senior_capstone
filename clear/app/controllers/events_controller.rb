@@ -72,6 +72,7 @@ class EventsController < ApplicationController
               locals: { events: occurrences, start_date: start_date, draft: nil }
             ),
             turbo_stream.replace("agenda_list", partial: "agenda/list"),
+            turbo_stream.replace("agenda_list", partial: "agenda/list"),
             turbo_stream.update("event_drawer", "")
           ]
         end
@@ -145,8 +146,7 @@ class EventsController < ApplicationController
               locals: { events: occurrences, start_date: start_date, draft: nil }
             ),
             turbo_stream.replace("agenda_list", partial: "agenda/list"),
-            turbo_stream.update("event_drawer", ""),
-            turbo_stream.update("event_popover", "")
+            turbo_stream.update("event_drawer", "")
           ]
           end
         end
@@ -202,29 +202,16 @@ class EventsController < ApplicationController
         range_end   = (week_start + 6.days).end_of_day
         occurrences = calendar_occurrences_for_range(range_start, range_end)
 
-        if project.present?
-          render turbo_stream: [
-            turbo_stream.replace(
-              "dashboard_calendar",
-              partial: "dashboard/calendar_frame",
-              locals: { events: project.occurrences_for_week(start_date), start_date: start_date, draft: nil }
-            ),
-            turbo_stream.replace("agenda_list", partial: "agenda/list"),
-            turbo_stream.update("event_drawer", ""),
-            turbo_stream.update("event_popover", "")
-          ]
-        else
-          render turbo_stream: [
-            turbo_stream.replace(
-              "dashboard_calendar",
-              partial: "dashboard/calendar_frame",
-              locals: { events: occurrences, start_date: start_date, draft: nil }
-            ),
-            turbo_stream.replace("agenda_list", partial: "agenda/list"),
-            turbo_stream.update("event_drawer", ""),
-            turbo_stream.update("event_popover", "")
-          ]
-        end
+        render turbo_stream: [
+          turbo_stream.replace(
+            "dashboard_calendar",
+            partial: "dashboard/calendar_frame",
+            locals: { events: occurrences, start_date: start_date, draft: nil }
+          ),
+          turbo_stream.replace("agenda_list", partial: "agenda/list"),
+          turbo_stream.update("event_drawer", ""),
+          turbo_stream.update("event_popover", "")
+        ]
       end
     end
   end
@@ -263,6 +250,7 @@ class EventsController < ApplicationController
             partial: "dashboard/calendar_frame",
             locals: { events: occurrences, start_date: start_date, draft: draft }
           ),
+          turbo_stream.replace("agenda_list", partial: "agenda/list"),
           turbo_stream.replace("agenda_list", partial: "agenda/list"),
           turbo_stream.update("event_drawer", ""),
           turbo_stream.update("event_popover", "")
