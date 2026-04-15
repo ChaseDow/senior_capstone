@@ -138,4 +138,119 @@ class EventTest < ActiveSupport::TestCase
     event.valid?
     assert_equal event.starts_at + 480.minutes, event.ends_at
   end
+
+  # color validation
+
+  test "accepts a valid hex color" do
+    event = Event.new(title: "Colored", starts_at: Time.current, user: @user, color: "#FF5733")
+    assert event.valid?, event.errors.full_messages.to_sentence
+  end
+
+  test "rejects a color that is not a valid hex format" do
+    event = Event.new(title: "Bad color", starts_at: Time.current, user: @user, color: "not-a-color")
+    assert_not event.valid?
+    assert event.errors[:color].any?
+  end
+
+  test "rejects a hex color missing the leading hash" do
+    event = Event.new(title: "No hash", starts_at: Time.current, user: @user, color: "FF5733")
+    assert_not event.valid?
+    assert event.errors[:color].any?
+  end
+
+  test "defaults color to #34D399 when nil is given" do
+    event = Event.new(title: "Default color", starts_at: Time.current, user: @user, color: nil)
+    event.valid?
+    assert_equal "#34D399", event.color
+    assert event.valid?, event.errors.full_messages.to_sentence
+  end
+
+  # recurrence validations
+
+  test "recurring event is valid with repeat_days and repeat_until" do
+    event = Event.new(
+      title: "Weekly standup",
+      starts_at: Time.zone.parse("2026-06-02 09:00:00"),
+      user: @user,
+      recurring: true,
+      repeat_days: [ 1, 3, 5 ],
+      repeat_until: Date.new(2026, 8, 29)
+    )
+    assert event.valid?, event.errors.full_messages.to_sentence
+  end
+
+  test "recurring event requires repeat_until" do
+    event = Event.new(
+      title: "No end",
+      starts_at: Time.zone.parse("2026-06-02 09:00:00"),
+      user: @user,
+      recurring: true,
+      repeat_days: [ 1 ],
+      repeat_until: nil
+    )
+    assert_not event.valid?
+    assert event.errors[:repeat_until].any?
+  end
+
+  test "recurring event requires at least one repeat_day" do
+    event = Event.new(
+      title: "No days",
+      starts_at: Time.zone.parse("2026-06-02 09:00:00"),
+      user: @user,
+      recurring: true,
+      repeat_days: [],
+      repeat_until: Date.new(2026, 8, 29)
+    )
+    assert_not event.valid?
+    assert event.errors[:repeat_days].any?
+  end
+
+  test "repeat_days rejects values outside 0-6" do
+    event = Event.new(
+      title: "Bad days",
+      starts_at: Time.zone.parse("2026-06-02 09:00:00"),
+      user: @user,
+      recurring: true,
+      repeat_days: [ 1, 7 ],
+      repeat_until: Date.new(2026, 8, 29)
+    )
+    assert_not event.valid?
+    assert event.errors[:repeat_days].any?
+  end
+
+  test "repeat_until must not be before the start date" do
+    event = Event.new(
+      title: "End before start",
+      starts_at: Time.zone.parse("2026-06-02 09:00:00"),
+      user: @user,
+      recurring: true,
+      repeat_days: [ 1 ],
+      repeat_until: Date.new(2026, 5, 1)
+    )
+    assert_not event.valid?
+    assert event.errors[:repeat_until].any?
+  end
+
+  test "repeat_until on same date as start is valid" do
+    starts_at = Time.zone.parse("2026-06-02 09:00:00")
+    event = Event.new(
+      title: "Same day end",
+      starts_at: starts_at,
+      user: @user,
+      recurring: true,
+      repeat_days: [ starts_at.wday ],
+      repeat_until: starts_at.to_date
+    )
+    assert event.valid?, event.errors.full_messages.to_sentence
+  end
+
+  test "non-recurring event does not require repeat_days or repeat_until" do
+    event = Event.new(
+      title: "One-off",
+      starts_at: Time.current,
+      user: @user,
+      recurring: false
+    )
+    assert event.valid?, event.errors.full_messages.to_sentence
+  end
 end
