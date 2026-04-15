@@ -1240,4 +1240,11 @@ body[data-theme="cyan"] .studs-today-badge {
   .scrollbars::-webkit-scrollbar-thumb:hover {
     background: linear-gradient(180deg, var(--sb-thumb-hover), var(--sb-thumb)) !important;
   }
+
+  @layer base {
+  input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    cursor: pointer;
+  }
+}
 }
