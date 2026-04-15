@@ -32,7 +32,7 @@
   <% input_style   = "border-color: var(--studs-border); --tw-ring-color: var(--studs-accent);" %>
   <!-- Title -->
   <div>
-    <%= f.label :title, class: label_classes, style: label_style %>
+    <%= f.label :title, class: label_classes, style: label_style do %>Title <span class="text-red-400">*</span><% end %>
     <%= f.text_field :title,
           class: input_classes,
           style: input_style,
@@ -41,7 +41,7 @@
   <!-- Time -->
   <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
     <div>
-      <%= f.label :starts_at, "Start time", class: label_classes, style: label_style %>
+      <%= f.label :starts_at, class: label_classes, style: label_style do %>Start time <span class="text-red-400">*</span><% end %>
       <%= f.datetime_local_field :starts_at,
             value: event.starts_at&.strftime("%Y-%m-%dT%H:%M"),
             class: input_classes,
@@ -53,18 +53,21 @@
       <%= f.datetime_local_field :ends_at,
             class: input_classes,
             style: input_style,
-            data: { duration_fill_target: "endField" } %>
+            data: { duration_fill_target: "endField", action: "change->duration-fill#reverseFill" } %>
     </div>
   </div>
   <!-- Duration -->
   <div>
     <%= f.label :duration_minutes, "Duration (optional)", class: label_classes, style: label_style %>
-    <%= f.select :duration_minutes,
-          options_for_select(ApplicationHelper::DURATION_OPTIONS, event.duration_minutes),
-          { include_blank: "— select duration —" },
-          class: input_classes,
-          style: input_style,
-          data: { duration_fill_target: "durationField", action: "change->duration-fill#fill" } %>
+    <div data-action="dropdown:select->duration-fill#fill">
+      <%= render Studs::DropdownComponent.new(
+        label: "— select duration —",
+        variant: :duration,
+        name: "#{f.object_name}[duration_minutes]",
+        selected_value: event.duration_minutes,
+        items: ApplicationHelper::DURATION_OPTIONS.map { |label, value| { label: label, value: value.to_s } }
+      ) %>
+    </div>
     <p class="mt-1.5 text-xs text-zinc-500">Set a duration if you prefer not to enter an end time.</p>
   </div>
   <!-- Location + Priority -->
@@ -112,10 +115,9 @@
           <% [["Su", 0], ["Mo", 1], ["Tu", 2], ["We", 3], ["Th", 4], ["Fr", 5], ["Sa", 6]].each do |lbl, wday| %>
             <label class="relative cursor-pointer">
               <%= f.check_box :repeat_days, { multiple: true, class: "peer sr-only" }, wday, nil %>
-              <div class="flex h-9 items-center justify-center rounded-xl border text-xs font-semibold transition-all
+              <div class="repeat-day-btn flex h-9 items-center justify-center rounded-xl border text-xs font-semibold transition-all
                           border-zinc-700 bg-zinc-900/40 text-zinc-400
-                          hover:border-zinc-500 hover:text-zinc-200
-                          peer-checked:border-white/40 peer-checked:bg-white/10 peer-checked:text-white">
+                          hover:border-zinc-500 hover:text-zinc-200">
                 <%= lbl %>
               </div>
             </label>

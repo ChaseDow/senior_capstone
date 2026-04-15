@@ -8,7 +8,7 @@ export default class extends Controller {
     const messages = document.getElementById("ai_chat_messages")
     if (!messages) return
 
-    const text = input.value.trim()
+    const text = this.normalizeUserMessage(input.value)
 
     const userBubble = document.createElement("div")
     userBubble.id = "ai_chat_user_pending"
@@ -20,7 +20,7 @@ export default class extends Controller {
           <span class="text-[10px] font-bold uppercase tracking-widest"
                 style="color: var(--studs-accent);">You</span>
         </div>
-        <div class="whitespace-normal break-words">${text.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}</div>
+        <div class="whitespace-pre-wrap break-words">${text.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}</div>
       </div>
     `
     messages.appendChild(userBubble)
@@ -45,6 +45,9 @@ export default class extends Controller {
     `
     messages.appendChild(thinking)
     messages.scrollTop = messages.scrollHeight
+
+    // Clear the input immediately so it doesn't show alongside the bubble
+    input.value = ""
   }
 
   sendOnEnter(event) {
@@ -61,10 +64,19 @@ export default class extends Controller {
     const pending = document.getElementById("ai_chat_user_pending")
     if (pending) pending.remove()
 
-    const input = this.element.querySelector("#ai_chat_input")
-    if (input) input.value = ""
+    const input = document.getElementById("ai_chat_input")
+    if (input) {
+      input.value = ""
+      input.focus()
+    }
 
     const messages = document.getElementById("ai_chat_messages")
     if (messages) messages.scrollTop = messages.scrollHeight
+  }
+
+  normalizeUserMessage(text) {
+    return text
+      .replace(/^[ \t]+/, "")
+      .replace(/\s+$/, "")
   }
 }

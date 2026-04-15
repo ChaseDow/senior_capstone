@@ -8,6 +8,7 @@ class UniversityCalendarController < ApplicationController
   IMPORT_COLOR = "#60A5FA"
 
   def preview
+    @mode = :rss
     @rss_url = params[:rss_url].to_s.strip
     return unless @rss_url.present?
 
@@ -19,19 +20,44 @@ class UniversityCalendarController < ApplicationController
     @existing_keys = Set.new
   end
 
+  def pdf_preview_page
+    @mode = :pdf
+    render :preview
+  end
+
+  def pdf_preview
+    @mode = :pdf
+
+    unless params[:pdf_file].present?
+      flash.now[:alert] = "Please select a PDF file."
+      render :preview and return
+    end
+
+    file = params[:pdf_file]
+    unless file.content_type == "application/pdf"
+      flash.now[:alert] = "Only PDF files are supported."
+      render :preview and return
+    end
+
+    pdf_data = file.read
+    @items = UniversityCalendar::PdfParser.call(pdf_data)
+    @existing_keys = existing_event_keys
+    render :preview
+  rescue => e
+    flash.now[:alert] = "Could not parse PDF: #{e.message}"
+    @items = []
+    @existing_keys = Set.new
+    render :preview
+  end
+
   def import
-    @rss_url = params[:rss_url].to_s.strip
-    items = UniversityCalendar::RssFetcher.call(@rss_url)
-    existing = existing_event_keys
-
+    items    = params[:items] || {}
     imported = 0
-    skipped  = 0
+    removed  = 0
 
-    items.each do |item|
-      key = event_key(item[:title], item[:starts_at])
-
-      if existing.include?(key)
-        skipped += 1
+    items.each_value do |item|
+      if item[:_remove] == "1"
+        removed += 1
         next
       end
 
@@ -39,15 +65,15 @@ class UniversityCalendarController < ApplicationController
         title:       item[:title],
         description: item[:description],
         location:    item[:location],
-        starts_at:   item[:starts_at],
-        ends_at:     item[:ends_at],
-        all_day:     item[:all_day] || false,
+        starts_at:   item[:starts_at].present? ? Time.zone.parse(item[:starts_at]) : nil,
+        ends_at:     item[:ends_at].present? ? Time.zone.parse(item[:ends_at]) : nil,
+        all_day:     item[:all_day] == "true",
         color:       IMPORT_COLOR
       )
       imported += 1
     end
 
-    redirect_to events_path, notice: "Imported #{imported} event(s) from the calendar feed. #{skipped} duplicate(s) skipped."
+    redirect_to events_path, notice: "Imported #{imported} event(s). #{removed} event(s) removed."
   rescue => e
     redirect_to events_path, alert: "Import failed: #{e.message}"
   end

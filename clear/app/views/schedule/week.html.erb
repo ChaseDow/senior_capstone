@@ -26,7 +26,7 @@
       <div class="overflow-hidden rounded-2xl"
          style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg-2);">
         <%# Day header %>
-        <div class="mb-3 text-center">
+        <div class="mb-3 pt-3 text-center">
           <div class="text-sm font-semibold text-zinc-200">
             <%= day.strftime("%A") %>
           </div>
@@ -38,12 +38,14 @@
         <div class="flex-1 space-y-2 overflow-y-auto p-2">
           <% if @items_by_day[day].present? %>
             <% @items_by_day[day].each do |item| %>
-              <div class="rounded-xl px-2 py-2 text-sm" style="background-color: <%= item.color %>;">
-                <div class="font-medium text-zinc-200">
+              <% bg = item.try(:color).presence || "#3f3f46" %>
+              <% text_color = item.try(:contrast_text_color) || "#F9FAFB" %>
+              <div class="rounded-xl px-2 py-2 text-sm" style="background-color: <%= bg %>;">
+                <div class="font-medium" style="color: <%= text_color %>;">
                   <%= item.title %>
                 </div>
                 <% if item.starts_at.present? %>
-                  <div class="text-xs text-zinc-200">
+                  <div class="text-xs" style="color: <%= text_color %>">
                     <%= item.starts_at.strftime("%I:%M %p") %>
                   </div>
                 <% end %>

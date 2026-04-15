@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_25_040638) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_13_012139) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -40,24 +40,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_040638) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
-  end
-
-  create_table "ai_chat_messages", force: :cascade do |t|
-    t.bigint "ai_conversation_id", null: false
-    t.text "content", null: false
-    t.datetime "created_at", null: false
-    t.string "role", null: false
-    t.datetime "updated_at", null: false
-    t.index ["ai_conversation_id", "created_at"], name: "index_ai_chat_messages_on_ai_conversation_id_and_created_at"
-    t.index ["ai_conversation_id"], name: "index_ai_chat_messages_on_ai_conversation_id"
-    t.index ["role"], name: "index_ai_chat_messages_on_role"
-  end
-
-  create_table "ai_conversations", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.bigint "user_id", null: false
-    t.index ["user_id"], name: "index_ai_conversations_on_user_id", unique: true
   end
 
   create_table "calendar_drafts", force: :cascade do |t|
@@ -91,9 +73,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_040638) do
     t.time "end_time"
     t.time "ends_at"
     t.string "instructor"
-    t.bigint "label_id"
     t.string "location"
     t.string "meeting_days"
+    t.string "office"
+    t.text "office_hours"
     t.string "professor"
     t.bigint "project_id"
     t.boolean "recurring", default: false, null: false
@@ -136,7 +119,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_040638) do
     t.text "description"
     t.integer "duration_minutes"
     t.datetime "ends_at"
-    t.bigint "label_id"
     t.string "location"
     t.integer "priority"
     t.bigint "project_id"
@@ -151,16 +133,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_040638) do
     t.index ["user_id", "repeat_until"], name: "index_events_on_user_id_and_repeat_until"
     t.index ["user_id", "starts_at"], name: "index_events_on_user_id_and_starts_at"
     t.index ["user_id"], name: "index_events_on_user_id"
-  end
-
-  create_table "labels", force: :cascade do |t|
-    t.string "color", default: "#78866B", null: false
-    t.datetime "created_at", null: false
-    t.string "name", null: false
-    t.datetime "updated_at", null: false
-    t.bigint "user_id", null: false
-    t.index ["user_id", "name"], name: "index_labels_on_user_id_and_name", unique: true
-    t.index ["user_id"], name: "index_labels_on_user_id"
   end
 
   create_table "notifications", force: :cascade do |t|
@@ -199,6 +171,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_040638) do
     t.bigint "user_id", null: false
     t.index ["project_id"], name: "index_project_memberships_on_project_id"
     t.index ["user_id"], name: "index_project_memberships_on_user_id"
+  end
+
+  create_table "project_messages", force: :cascade do |t|
+    t.text "body", null: false
+    t.datetime "created_at", null: false
+    t.bigint "project_id", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["project_id"], name: "index_project_messages_on_project_id"
+    t.index ["user_id"], name: "index_project_messages_on_user_id"
   end
 
   create_table "projects", force: :cascade do |t|
@@ -248,21 +230,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_040638) do
     t.integer "invitations_count", default: 0
     t.bigint "invited_by_id"
     t.string "invited_by_type"
-    t.string "provider"
     t.datetime "remember_created_at"
     t.datetime "reset_password_sent_at"
     t.string "reset_password_token"
     t.integer "role", default: 0, null: false
     t.string "theme", default: "green", null: false
-    t.string "uid"
     t.datetime "updated_at", null: false
+    t.string "username", null: false
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token", unique: true
     t.index ["invited_by_id"], name: "index_users_on_invited_by_id"
     t.index ["invited_by_type", "invited_by_id"], name: "index_users_on_invited_by"
-    t.index ["provider", "uid"], name: "index_users_on_provider_and_uid", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["role"], name: "index_users_on_role"
+    t.index ["username"], name: "index_users_on_username"
   end
 
   create_table "work_shifts", force: :cascade do |t|
@@ -284,8 +265,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_040638) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
-  add_foreign_key "ai_chat_messages", "ai_conversations"
-  add_foreign_key "ai_conversations", "users"
   add_foreign_key "calendar_drafts", "users"
   add_foreign_key "course_items", "courses"
   add_foreign_key "courses", "projects"
@@ -294,13 +273,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_040638) do
   add_foreign_key "event_exceptions", "events"
   add_foreign_key "events", "projects"
   add_foreign_key "events", "users"
-  add_foreign_key "labels", "users"
   add_foreign_key "notifications", "users"
   add_foreign_key "project_invitations", "projects"
   add_foreign_key "project_invitations", "users", column: "sender_id"
   add_foreign_key "project_memberships", "projects"
   add_foreign_key "project_memberships", "users"
-  add_foreign_key "projects", "users"
+  add_foreign_key "project_messages", "projects"
+  add_foreign_key "project_messages", "users"
   add_foreign_key "schedules", "users"
   add_foreign_key "syllabuses", "courses", on_delete: :nullify
   add_foreign_key "syllabuses", "users"

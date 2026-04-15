@@ -72,6 +72,28 @@
       </div>
     </div>
   </div>
+  <!-- Office card -->
+  <% if @course.office.present? || @course.office_hours.present? %>
+    <div class="rounded-2xl p-5"
+         style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg-2);">
+      <div class="text-[10px] font-bold uppercase tracking-widest mb-3"
+           style="color: var(--studs-accent); opacity: 0.8;">Office</div>
+      <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <% if @course.office.present? %>
+          <div>
+            <div class="text-[10px] font-semibold uppercase tracking-widest text-zinc-500 mb-1">Location</div>
+            <p class="text-sm text-zinc-200"><%= @course.office %></p>
+          </div>
+        <% end %>
+        <% if @course.office_hours.present? %>
+          <div>
+            <div class="text-[10px] font-semibold uppercase tracking-widest text-zinc-500 mb-1">Hours</div>
+            <p class="whitespace-pre-wrap text-sm text-zinc-200"><%= @course.office_hours %></p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
   <!-- Description card -->
   <div class="rounded-2xl p-5"
        style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg-2);">

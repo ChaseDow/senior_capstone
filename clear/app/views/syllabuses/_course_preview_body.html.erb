@@ -10,13 +10,18 @@
 <% if syllabus.parse_status.in?(%w[queued processing]) %>
   <div class="text-sm text-zinc-400">Parsing…</div>
 <% elsif syllabus.parse_status == "failed" %>
-  <div class="text-sm text-red-200">
-    Parsing failed: <%= syllabus.parse_error %>
+  <div class="space-y-3">
+    <div class="text-sm text-red-200">
+      Parsing failed: <%= syllabus.parse_error %>
+    </div>
+    <%= link_to "Retry parsing",
+          create_course_syllabus_path(syllabus),
+          class: "studs-btn-accent",
+          data: { turbo_method: :post, turbo_frame: "_top" } %>
   </div>
 <% else %>
   <%= form_with model: course,
         url: confirm_course_syllabus_path(syllabus),
-
         method: :post,
         data: { turbo_frame: "_top" } do |f| %>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -49,6 +54,16 @@
       <div id="field_location">
         <div class="<%= "#{label_base} #{needs ? label_miss : label_ok}" %>" style="<%= (needs ? nil : label_ok_style) %>">Location</div>
         <%= f.text_field :location, class: "#{input_base} #{needs ? input_miss : input_ok}", style: (needs ? nil : input_ok_style) %>
+      </div>
+      <% needs = missing.include?(:office) %>
+      <div id="field_office">
+        <div class="<%= "#{label_base} #{needs ? label_miss : label_ok}" %>" style="<%= (needs ? nil : label_ok_style) %>">Office</div>
+        <%= f.text_field :office, class: "#{input_base} #{needs ? input_miss : input_ok}", style: (needs ? nil : input_ok_style), placeholder: "e.g. IESB 216" %>
+      </div>
+      <% needs = missing.include?(:office_hours) %>
+      <div id="field_office_hours">
+        <div class="<%= "#{label_base} #{needs ? label_miss : label_ok}" %>" style="<%= (needs ? nil : label_ok_style) %>">Office Hours</div>
+        <%= f.text_field :office_hours, class: "#{input_base} #{needs ? input_miss : input_ok}", style: (needs ? nil : input_ok_style), placeholder: "e.g. MW 1:00 - 3:00 pm, by appointment" %>
       </div>
       <% needs = missing.include?(:start_time) %>
       <div id="field_start_time">

@@ -1,76 +1,155 @@
 <% content_for :page_title, "Import Calendar" %>
-<% content_for :page_subtitle, "Import events from an RSS calendar feed" %>
-
+<% content_for :page_subtitle, "Import university calendar events" %>
 <div class="rounded-2xl p-6" style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg);">
-  <!-- URL entry form -->
-  <%= form_with url: university_calendar_preview_path, method: :get do |f| %>
-    <div class="flex items-center gap-3 mb-6">
-      <%= f.text_field :rss_url,
-            value: @rss_url,
-            placeholder: "Paste your calendar RSS feed URL…",
-            class: "flex-1 rounded-xl border px-3 py-2 text-sm bg-transparent text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-1",
-            style: "border-color: var(--studs-border); focus:border-color: var(--studs-accent);" %>
-      <%= f.submit "Preview",
-            class: "studs-nav-btn cursor-pointer" %>
-      <%= link_to "Cancel", events_path, class: "studs-nav-btn" %>
+  <%# Source tabs %>
+  <div class="flex items-center gap-1 mb-6 p-1 rounded-xl w-fit" style="background-color: var(--studs-panel-bg-2); border: 1px solid var(--studs-border);">
+    <%= link_to university_calendar_preview_path,
+      class: "px-4 py-1.5 rounded-lg text-sm font-medium transition #{ @mode == :pdf ? 'text-zinc-400 hover:text-zinc-200' : 'text-zinc-100' }",
+      style: @mode == :pdf ? '' : 'background-color: var(--studs-panel-bg); border: 1px solid var(--studs-border);' do %>
+      RSS Feed
+    <% end %>
+    <%= link_to university_calendar_pdf_preview_page_path,
+      class: "px-4 py-1.5 rounded-lg text-sm font-medium transition #{ @mode == :pdf ? 'text-zinc-100' : 'text-zinc-400 hover:text-zinc-200' }",
+      style: @mode == :pdf ? 'background-color: var(--studs-panel-bg); border: 1px solid var(--studs-border);' : '' do %>
+      PDF Upload
+    <% end %>
+  </div>
+  <% if flash[:alert].present? || flash.now[:alert].present? %>
+    <p class="mb-4 text-sm text-red-400"><%= flash[:alert] || flash.now[:alert] %></p>
+  <% end %>
+  <% if @mode == :pdf %>
+    <%# PDF upload form %>
+    <div data-controller="pdf-preview">
+      <%= form_with url: university_calendar_pdf_preview_path, method: :post, multipart: true, data: { turbo: false } do |f| %>
+        <div class="flex items-center gap-3 mb-6">
+          <%= f.file_field :pdf_file,
+                accept: "application/pdf",
+                class: "flex-1 rounded-xl border px-3 py-2 text-sm text-zinc-300 bg-transparent focus:outline-none focus:ring-1 file:mr-3 file:rounded-lg file:border-0 file:bg-zinc-700 file:px-3 file:py-1 file:text-xs file:font-medium file:text-zinc-200 hover:file:bg-zinc-600",
+                style: "border-color: var(--studs-border);",
+                data: { pdf_preview_target: "input", action: "change->pdf-preview#select" } %>
+          <%= f.submit "Preview",
+                class: "studs-nav-btn cursor-pointer" %>
+          <%= link_to "Cancel", events_path, class: "studs-nav-btn" %>
+        </div>
+      <% end %>
+      <iframe data-pdf-preview-target="viewer"
+              class="hidden w-full rounded-2xl mb-6"
+              style="height: 600px; border: 1px solid var(--studs-border);">
+      </iframe>
     </div>
+  <% else %>
+    <%# RSS URL form %>
+    <%= form_with url: university_calendar_preview_path, method: :get do |f| %>
+      <div class="flex items-center gap-3 mb-6">
+        <%= f.text_field :rss_url,
+              value: @rss_url,
+              placeholder: "Paste your calendar RSS feed URL…",
+              class: "flex-1 rounded-xl border px-3 py-2 text-sm bg-transparent text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-1",
+              style: "border-color: var(--studs-border);" %>
+        <%= f.submit "Preview",
+              class: "studs-nav-btn cursor-pointer" %>
+        <%= link_to "Cancel", events_path, class: "studs-nav-btn" %>
+      </div>
+    <% end %>
   <% end %>
-
-  <% if flash[:alert].present? %>
-    <p class="mb-4 text-sm text-red-400"><%= flash[:alert] %></p>
-  <% end %>
-
   <% if @items %>
-    <div class="flex items-center justify-between mb-4">
-      <p class="text-sm text-zinc-400">
-        <%= @items.size %> event(s) found. Events already in your calendar are marked as duplicates.
-      </p>
-      <% if @items.any? %>
-        <%= button_to "Import All New Events", university_calendar_import_path,
-              method: :post,
-              params: { rss_url: @rss_url },
-              class: "inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-medium
-                      bg-blue-600 text-white hover:bg-blue-500 transition" %>
-      <% end %>
-    </div>
-
-    <div class="overflow-hidden rounded-2xl" style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg-2);">
-      <% if @items.any? %>
-        <% @items.each_with_index do |item, i| %>
-          <% key = "#{item[:title].to_s.downcase.strip}|#{item[:starts_at]&.to_date}" %>
-          <% duplicate = @existing_keys.include?(key) %>
-
-          <div class="flex items-start justify-between gap-4 p-4 <%= duplicate ? 'opacity-50' : '' %>"
-               style="<%= i > 0 ? 'border-top: 1px solid var(--studs-divider);' : '' %>
-                      border-left: 4px solid #60A5FA;">
-            <div class="min-w-0 flex-1">
-              <p class="font-medium text-zinc-100 flex items-center gap-2 flex-wrap">
-                <%= item[:title] %>
-                <% if duplicate %>
-                  <span class="rounded-full px-2 py-0.5 text-[10px] font-semibold"
-                        style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-hover); color: var(--studs-accent);">
-                    Already imported
-                  </span>
-                <% end %>
-              </p>
-              <p class="mt-1 text-sm text-zinc-400">
-                <%= item[:starts_at]&.strftime("%b %d, %Y") %>
-                <% if item[:ends_at].present? %>
-                  &ndash; <%= item[:ends_at].strftime("%b %d, %Y") %>
-                <% end %>
-              </p>
-              <% if item[:location].present? %>
-                <p class="text-sm text-zinc-500">📍 <%= item[:location] %></p>
-              <% end %>
-              <% if item[:description].present? %>
-                <p class="mt-1 text-xs text-zinc-500 line-clamp-2"><%= item[:description] %></p>
-              <% end %>
+    <% if @items.any? %>
+      <%= form_with url: university_calendar_import_path, method: :post do %>
+        <div class="flex items-center justify-between mb-4">
+          <p class="text-sm text-zinc-400">
+            <%= @items.size %> event(s) found. Remove any you don't need, then import.
+          </p>
+          <button type="submit"
+                  class="inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-medium
+                         bg-blue-600 text-white hover:bg-blue-500 transition cursor-pointer">
+            Import Selected Events
+          </button>
+        </div>
+        <div class="space-y-3">
+          <% @items.each_with_index do |item, i| %>
+            <% key = "#{item[:title].to_s.downcase.strip}|#{item[:starts_at]&.to_date}" %>
+            <% duplicate = @existing_keys.include?(key) %>
+            <div data-controller="removable-card" class="relative">
+              <input type="hidden" name="items[<%= i %>][_remove]" value="<%= duplicate ? '1' : '0' %>" data-removable-card-target="flag">
+              <input type="hidden" name="items[<%= i %>][title]" value="<%= item[:title] %>">
+              <input type="hidden" name="items[<%= i %>][description]" value="<%= item[:description] %>">
+              <input type="hidden" name="items[<%= i %>][location]" value="<%= item[:location] %>">
+              <input type="hidden" name="items[<%= i %>][starts_at]" value="<%= item[:starts_at]&.iso8601 %>">
+              <input type="hidden" name="items[<%= i %>][ends_at]" value="<%= item[:ends_at]&.iso8601 %>">
+              <input type="hidden" name="items[<%= i %>][all_day]" value="<%= item[:all_day] || false %>">
+              <%# Buttons live OUTSIDE the card so undo stays clickable when card is disabled %>
+              <div class="absolute top-3 right-3 z-10">
+                <button type="button"
+                        data-removable-card-target="removeBtn"
+                        data-action="removable-card#remove"
+                        class="inline-flex items-center gap-1.5 rounded-xl px-2.5 py-1.5 text-xs font-medium transition
+                               border border-red-500/30 text-red-300 hover:bg-red-500/15 hover:border-red-500/50"
+                        style="background-color: rgba(127,29,29,0.15); <%= 'display: none;' if duplicate %>">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                  </svg>
+                  Remove
+                </button>
+                <button type="button"
+                        data-removable-card-target="undoBtn"
+                        data-action="removable-card#undo"
+                        class="inline-flex items-center gap-1.5 rounded-xl px-2.5 py-1.5 text-xs font-medium transition
+                               border text-emerald-300 hover:bg-emerald-500/15 hover:border-emerald-500/50"
+                        style="border-color: rgba(52,211,153,0.3);
+                               background-color: rgba(6,78,59,0.15);
+                               <%= 'display: none;' unless duplicate %>">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3"/>
+                  </svg>
+                  Undo
+                </button>
+              </div>
+              <div data-removable-card-target="card"
+                   class="rounded-2xl p-4 transition-opacity duration-200"
+                   style="border: 1px solid var(--studs-border);
+                          background-color: var(--studs-panel-bg-2);
+                          border-left: 4px solid #60A5FA;
+                          <%= 'opacity: 0.3; pointer-events: none;' if duplicate %>">
+                <div class="min-w-0 flex-1 pr-24">
+                  <p class="font-medium text-zinc-100 flex items-center gap-2 flex-wrap">
+                    <%= item[:title] %>
+                    <% if duplicate %>
+                      <span class="rounded-full px-2 py-0.5 text-[10px] font-semibold"
+                            style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-hover); color: var(--studs-accent);">
+                        Already imported
+                      </span>
+                    <% end %>
+                  </p>
+                  <p class="mt-1 text-sm text-zinc-400">
+                    <%= item[:starts_at]&.strftime("%b %d, %Y") %>
+                    <% if item[:ends_at].present? %>
+                      &ndash; <%= item[:ends_at].strftime("%b %d, %Y") %>
+                    <% end %>
+                  </p>
+                  <% if item[:location].present? %>
+                    <p class="text-sm text-zinc-500"><%= item[:location] %></p>
+                  <% end %>
+                  <% if item[:description].present? %>
+                    <p class="mt-1 text-xs text-zinc-500 line-clamp-2"><%= item[:description] %></p>
+                  <% end %>
+                </div>
+              </div>
             </div>
-          </div>
-        <% end %>
-      <% else %>
-        <div class="p-8 text-center text-sm text-zinc-400">No events found in this feed.</div>
+          <% end %>
+        </div>
+        <div class="mt-6 flex items-center gap-3">
+          <button type="submit"
+                  class="inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-medium
+                         bg-blue-600 text-white hover:bg-blue-500 transition cursor-pointer">
+            Import Selected Events
+          </button>
+          <%= link_to "Cancel", events_path, class: "studs-nav-btn" %>
+        </div>
       <% end %>
-    </div>
+    <% else %>
+      <div class="overflow-hidden rounded-2xl" style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg-2);">
+        <div class="p-8 text-center text-sm text-zinc-400">No events found.</div>
+      </div>
+    <% end %>
   <% end %>
 </div>

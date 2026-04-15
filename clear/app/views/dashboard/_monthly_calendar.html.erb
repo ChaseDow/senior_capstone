@@ -1,0 +1,185 @@
+<% month_events_by_date = local_assigns[:month_events_by_date] || {} %>
+<% month_date = (local_assigns[:month_date] || Date.current).to_date %>
+<% course_filter_id   = local_assigns[:course_filter_id].presence || params[:filter].presence %>
+<% courses_for_filter = local_assigns[:courses] || course_filter_courses %>
+<% start_date = local_assigns[:start_date] || Date.current %>
+<% month_start = month_date.beginning_of_month %>
+<% month_end   = month_date.end_of_month %>
+<% grid_start  = month_start.beginning_of_week %>
+<% grid_end    = month_end.end_of_week %>
+<% weeks       = (grid_start..grid_end).each_slice(7).to_a %>
+<% today       = Date.current %>
+<% nav_btn     = "studs-nav-btn" %>
+<% prev_month  = month_start - 1.month %>
+<% next_month  = month_start + 1.month %>
+<% week_start_date = start_date.to_date.beginning_of_week %>
+<% hex_to_rgba = ->(hex, alpha) {
+     hex = hex.to_s.gsub("#", "")[0..5]
+     r = hex[0..1].to_i(16)
+     g = hex[2..3].to_i(16)
+     b = hex[4..5].to_i(16)
+     "rgba(#{r},#{g},#{b},#{alpha})"
+   }
+%>
+<% record_for = ->(e) { e.respond_to?(:event) ? e.event : e } %>
+<div class="w-full flex h-full min-h-0 flex-col" data-calendar-view-target="monthlyContent">
+  <!-- Toolbar -->
+  <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <div class="text-2xl font-bold tracking-tight text-zinc-100">
+        <%= month_start.strftime("%B %Y") %>
+      </div>
+    </div>
+    <nav class="flex items-center gap-1.5">
+      <div data-action="dropdown:select->calendar-view#toggle">
+        <%= render Studs::DropdownComponent.new(
+          label: "Monthly",
+          variant: :dashboard_view,
+          name: "calendar_dashboard",
+          selected_value: "monthly",
+          items: [
+            { label: "Weekly", value: "weekly" },
+            { label: "Monthly", value: "monthly" },
+          ]
+        ) %>
+      </div>
+      <div class="mx-1 h-5 w-px rounded-full" style="background-color: var(--studs-border);"></div>
+      <div
+        data-controller="course-filter"
+        data-course-filter-base-url-value="<%= dashboard_path %>"
+        data-course-filter-start-date-value="<%= month_date.iso8601 %>"
+        data-action="dropdown:select->course-filter#navigate">
+        <%= render Studs::DropdownComponent.new(
+          label: "All",
+          variant: :dashboard_view,
+          name: "course_filter",
+          selected_value: course_filter_id,
+          items: [
+            { label: "All", value: "" },
+            { label: "All Events", value: "events" },
+            { label: "All Courses", value: "courses" },
+          ] + courses_for_filter.map { |c| { label: c.title, value: c.id.to_s } } + [
+            { label: "All Work Shifts", value: "work_shifts" },
+          ]
+        ) %>
+      </div>
+      <div class="mx-1 h-5 w-px rounded-full" style="background-color: var(--studs-border);"></div>
+      <% if @project %>
+        <%= link_to project_path(@project, start_date: prev_month), class: nav_btn, data: { turbo_frame: "dashboard_calendar" } do %>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+          </svg>
+          Prev
+        <% end %>
+        <%= link_to "Today", project_path(@project, start_date: today), class: nav_btn, data: { turbo_frame: "dashboard_calendar" } %>
+        <%= link_to project_path(@project, start_date: next_month), class: nav_btn, data: { turbo_frame: "dashboard_calendar" } do %>
+          Next
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+          </svg>
+        <% end %>
+        <div class="mx-1 h-5 w-px rounded-full" style="background-color: var(--studs-border);"></div>
+        <button
+          type="button"
+          class="<%= nav_btn %>"
+          data-action="click->agenda-drawer#open"
+          data-agenda-drawer-date-param="<%= today.iso8601 %>"
+          data-agenda-drawer-project-id-param="<%= @project&.id %>"
+          >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h10"/>
+          </svg>
+          Agenda
+        </button>
+      <% else %>
+        <%= link_to dashboard_path(start_date: prev_month, filter: course_filter_id), class: nav_btn, data: { turbo_frame: "dashboard_calendar" } do %>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+          </svg>
+          Prev
+        <% end %>
+        <%= link_to "Today", dashboard_path(start_date: today, filter: course_filter_id), class: nav_btn, data: { turbo_frame: "dashboard_calendar" } %>
+        <%= link_to dashboard_path(start_date: next_month, filter: course_filter_id), class: nav_btn, data: { turbo_frame: "dashboard_calendar" } do %>
+          Next
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+          </svg>
+        <% end %>
+        <div class="mx-1 h-5 w-px rounded-full" style="background-color: var(--studs-border);"></div>
+        <button
+          type="button"
+          class="<%= nav_btn %>"
+          data-action="click->agenda-drawer#open"
+          data-agenda-drawer-date-param="<%= today.iso8601 %>"
+          >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h10"/>
+          </svg>
+          Agenda
+        </button>
+      <% end %>
+    </nav>
+  </div>
+  <!-- Monthly grid -->
+  <div class="overflow-auto rounded-2xl"
+       style="flex: 1 1 0%; min-height: 0; border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg-2); box-shadow: 0 1px 3px rgba(0,0,0,0.3), 0 4px 20px rgba(0,0,0,0.15);">
+    <table class="w-full border-collapse table-fixed" style="height: 100%;">
+      <thead>
+        <tr style="background-color: var(--studs-panel-header); height: 38px;">
+          <% %w[Mon Tue Wed Thu Fri Sat Sun].each_with_index do |day_name, i| %>
+            <th class="px-3 py-2.5 text-center text-[11px] font-medium uppercase tracking-widest <%= %w[Sat Sun].include?(day_name) ? 'text-zinc-500' : 'text-zinc-400' %>"
+                style="border-bottom: 1px solid var(--studs-border); <%= i < 6 ? 'border-right: 1px solid var(--studs-border);' : '' %>">
+              <%= day_name %>
+            </th>
+          <% end %>
+        </tr>
+      </thead>
+      <tbody>
+        <% weeks.each do |week| %>
+          <tr>
+            <% week.each_with_index do |day, i| %>
+              <% is_today  = (day == today) %>
+              <% in_month  = (day.month == month_start.month && day.year == month_start.year) %>
+              <% is_weekend = day.saturday? || day.sunday? %>
+              <% day_items = month_events_by_date[day] || [] %>
+              <td class="align-top px-2 py-1.5 relative"
+                  style="height: 110px; vertical-align: top;
+                         border-bottom: 1px solid var(--studs-border);
+                         <%= i < 6 ? 'border-right: 1px solid var(--studs-divider);' : '' %>
+                         <%= is_today ? 'background-color: color-mix(in srgb, var(--studs-accent) 14%, transparent);' : '' %>
+                         <%= is_weekend && !is_today ? 'background-color: rgba(0,0,0,0.12);' : '' %>
+                         <%= !in_month ? 'opacity: 0.35;' : '' %>">
+                <div class="flex items-center justify-between mb-1">
+                  <% if is_today %>
+                    <span class="inline-flex h-6 w-6 items-center justify-center rounded-full text-[12px] font-bold studs-today-badge"
+                          style="box-shadow: 0 0 8px color-mix(in srgb, var(--studs-accent) 50%, transparent);">
+                      <%= day.day %>
+                    </span>
+                  <% else %>
+                    <span class="text-[13px] font-semibold <%= in_month ? (is_weekend ? 'text-zinc-400' : 'text-zinc-200') : 'text-zinc-600' %>">
+                      <%= day.day %>
+                    </span>
+                  <% end %>
+                  <% if day_items.size > 3 %>
+                    <span class="text-[10px] text-zinc-500 font-medium">+<%= day_items.size - 3 %></span>
+                  <% end %>
+                </div>
+                <div class="space-y-0.5">
+                  <% day_items.first(3).each do |e| %>
+                    <% record = record_for.(e) %>
+                    <% bg = record.respond_to?(:color) && record.color.present? ? record.color : "#60A5FA" %>
+                    <% text_color = record.respond_to?(:contrast_text_color) ? record.contrast_text_color : "#F9FAFB" %>
+                    <div class="truncate rounded px-1.5 py-0.5 text-[10px] font-semibold leading-tight cursor-pointer hover:brightness-110"
+                         style="background-color: <%= hex_to_rgba.(bg, 0.55) %>; color: <%= text_color %>; border-left: 2px solid <%= bg %>;">
+                      <%= record.respond_to?(:title) ? (record.title.presence || "(Untitled)") : record[:title].presence || "(Untitled)" %>
+                    </div>
+                  <% end %>
+                </div>
+              </td>
+            <% end %>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
