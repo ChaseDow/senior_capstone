@@ -24,14 +24,6 @@
   <div class="shrink-0 px-6 pt-3">
     <%= render "ai_chat/usage", rate: @rate || { rpm: 0, rpm_limit: 10, rpd: 0, rpd_limit: 250 } %>
   </div>
-  <!-- Flash -->
-  <div id="ai_chat_flash" class="shrink-0 px-6 pt-3 empty:hidden">
-    <% if flash[:alert].present? %>
-      <div class="rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
-        <%= flash[:alert] %>
-      </div>
-    <% end %>
-  </div>
   <!-- Messages -->
   <div
     id="ai_chat_messages"

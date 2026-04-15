@@ -30,8 +30,6 @@
     <div class="shrink-0 px-4 pt-3">
       <%= render "ai_chat/usage", rate: @rate || { rpm: 0, rpm_limit: 10, rpd: 0, rpd_limit: 250 } %>
     </div>
-    <!-- Flash -->
-    <div id="ai_chat_flash" class="shrink-0 px-4 pt-3 empty:hidden"></div>
     <!-- Messages -->
     <div
       id="ai_chat_messages"
