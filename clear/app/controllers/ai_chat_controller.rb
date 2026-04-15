@@ -17,14 +17,16 @@ class AiChatController < ApplicationController
   end
 
   def create
-    user_text = params[:content].to_s.strip
+    user_text = params[:content].to_s
+                               .sub(/\A[ \t]+/, "")
+                               .sub(/[[:space:]]+\z/, "")
     history   = parse_history(params[:history])
 
     if user_text.blank?
       respond_to do |format|
         format.turbo_stream do
           flash.now[:alert] = "Message can't be blank."
-          render turbo_stream: turbo_stream.replace("ai_chat_flash", partial: "ai_chat/flash")
+          render turbo_stream: turbo_stream.replace("toast-container", partial: "shared/toasts")
         end
         format.html { redirect_to ai_chat_index_path, alert: "Message can't be blank." }
       end
@@ -36,7 +38,7 @@ class AiChatController < ApplicationController
       respond_to do |format|
         format.turbo_stream do
           flash.now[:alert] = "Daily AI limit reached (#{rate[:rpd_limit]} requests). Resets at midnight."
-          render turbo_stream: turbo_stream.replace("ai_chat_flash", partial: "ai_chat/flash")
+          render turbo_stream: turbo_stream.replace("toast-container", partial: "shared/toasts")
         end
         format.html { redirect_to ai_chat_index_path, alert: "Daily AI limit reached." }
       end
@@ -47,7 +49,7 @@ class AiChatController < ApplicationController
       respond_to do |format|
         format.turbo_stream do
           flash.now[:alert] = "Slow down — rate limit is #{rate[:rpm_limit]} requests per minute. Wait a moment and try again."
-          render turbo_stream: turbo_stream.replace("ai_chat_flash", partial: "ai_chat/flash")
+          render turbo_stream: turbo_stream.replace("toast-container", partial: "shared/toasts")
         end
         format.html { redirect_to ai_chat_index_path, alert: "Rate limit reached, try again shortly." }
       end
@@ -99,7 +101,7 @@ class AiChatController < ApplicationController
           ),
           turbo_stream.update("ai_chat_history_wrapper",
             "<input type=\"hidden\" name=\"history\" value=\"#{ERB::Util.html_escape(history.to_json)}\">"),
-          turbo_stream.replace("ai_chat_flash", partial: "ai_chat/flash"),
+          turbo_stream.replace("toast-container", partial: "shared/toasts"),
           turbo_stream.update("ai_chat_input", ""),
           turbo_stream.replace("ai_chat_usage", partial: "ai_chat/usage", locals: { rate: updated_rate })
         ]
@@ -116,7 +118,7 @@ class AiChatController < ApplicationController
     respond_to do |format|
       format.turbo_stream do
         flash.now[:alert] = e.message
-        render turbo_stream: turbo_stream.replace("ai_chat_flash", partial: "ai_chat/flash")
+        render turbo_stream: turbo_stream.replace("toast-container", partial: "shared/toasts")
       end
       format.html { redirect_to ai_chat_index_path, alert: e.message }
     end
@@ -124,7 +126,7 @@ class AiChatController < ApplicationController
     respond_to do |format|
       format.turbo_stream do
         flash.now[:alert] = "AI error: #{e.message}"
-        render turbo_stream: turbo_stream.replace("ai_chat_flash", partial: "ai_chat/flash")
+        render turbo_stream: turbo_stream.replace("toast-container", partial: "shared/toasts")
       end
       format.html { redirect_to ai_chat_index_path, alert: "AI error: #{e.message}" }
     end
