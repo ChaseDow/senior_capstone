@@ -75,7 +75,12 @@ Rails.application.routes.draw do
 
   # Admin-only pages (guarded in controllers via current_user.admin?)
   namespace :admin do
-    resources :users, only: [ :index, :destroy ]
+    resources :users, only: [ :index, :destroy ] do
+      member do
+        get  :edit_password
+        patch :update_password
+      end
+    end
   end
 
   if Rails.env.development?
