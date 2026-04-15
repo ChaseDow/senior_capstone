@@ -21,9 +21,6 @@ module Syllabuses
     /x
 
     # Supports:
-    # - MWF, TR, MW, etc.
-    # - Monday, Tuesday, Thursday
-    # - Tue/Thu, Tues/Thurs, Mon/Wed/Fri, etc.
     DAYS = /
       (?<days>
         MWF|MW|WF|TR|TTH|TH|M|T|W|R|F|
@@ -63,7 +60,8 @@ module Syllabuses
     SECTION_SPLIT = /Section\s*\d+\s*:\s*/i
 
     def self.call(lines)
-      candidates = build_candidates(lines)
+      office_line_indices = office_section_indices(lines)
+      candidates = build_candidates(lines, office_line_indices)
       best = nil
 
       candidates.each do |raw|
@@ -84,25 +82,49 @@ module Syllabuses
       best
     end
 
-    def self.build_candidates(lines)
+    # Identify line indices that fall under an "OFFICE HOURS" heading
+    # (up to the next all-caps heading). Lines in this range should be
+    # skipped even if they don't individually mention "office".
+    def self.office_section_indices(lines)
+      indices = Set.new
+      header = lines.first(180)
+
+      i = 0
+      while i < header.length
+        if header[i].match?(/\A\s*office\s*hours\b/i)
+          indices << i
+          j = i + 1
+          while j < header.length
+            break if header[j].match?(/\A[A-Z][A-Z ]{2,}\z/) # next heading
+            indices << j
+            j += 1
+          end
+        end
+        i += 1
+      end
+
+      indices
+    end
+
+    def self.build_candidates(lines, office_indices = Set.new)
       header = lines.first(180)
       out = []
 
       header.each_with_index do |l, i|
+        next if office_indices.include?(i)
         out << l
-        out << "#{l} #{header[i + 1]}" if header[i + 1]
-        out << "#{l} #{header[i + 1]} #{header[i + 2]}" if header[i + 1] && header[i + 2]
+        if header[i + 1] && !office_indices.include?(i + 1)
+          out << "#{l} #{header[i + 1]}"
+          if header[i + 2] && !office_indices.include?(i + 2)
+            out << "#{l} #{header[i + 1]} #{header[i + 2]}"
+          end
+        end
       end
 
       out.map { |s| normalize(s) }.uniq
     end
 
     # Prevent office hours from ever being treated as the class meeting.
-    #
-    # Examples to skip:
-    # - "MW: 1:00 pm - 3:00 pm"
-    # - "Office: IESB 216 MW 1:00 pm - 3:00 pm"
-    # - "Office Hours: Tues/Thurs 1-3pm"
     def self.office_candidate?(s)
       s = normalize(s)
       return false if s.blank?

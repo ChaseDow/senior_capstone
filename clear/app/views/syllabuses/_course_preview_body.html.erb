@@ -50,6 +50,16 @@
         <div class="<%= "#{label_base} #{needs ? label_miss : label_ok}" %>" style="<%= (needs ? nil : label_ok_style) %>">Location</div>
         <%= f.text_field :location, class: "#{input_base} #{needs ? input_miss : input_ok}", style: (needs ? nil : input_ok_style) %>
       </div>
+      <% needs = missing.include?(:office) %>
+      <div id="field_office">
+        <div class="<%= "#{label_base} #{needs ? label_miss : label_ok}" %>" style="<%= (needs ? nil : label_ok_style) %>">Office</div>
+        <%= f.text_field :office, class: "#{input_base} #{needs ? input_miss : input_ok}", style: (needs ? nil : input_ok_style), placeholder: "e.g. IESB 216" %>
+      </div>
+      <% needs = missing.include?(:office_hours) %>
+      <div id="field_office_hours">
+        <div class="<%= "#{label_base} #{needs ? label_miss : label_ok}" %>" style="<%= (needs ? nil : label_ok_style) %>">Office Hours</div>
+        <%= f.text_field :office_hours, class: "#{input_base} #{needs ? input_miss : input_ok}", style: (needs ? nil : input_ok_style), placeholder: "e.g. MW 1:00 - 3:00 pm, by appointment" %>
+      </div>
       <% needs = missing.include?(:start_time) %>
       <div id="field_start_time">
         <div class="<%= "#{label_base} #{needs ? label_miss : label_ok}" %>" style="<%= (needs ? nil : label_ok_style) %>">Start Time</div>

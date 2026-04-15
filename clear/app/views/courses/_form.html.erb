@@ -97,6 +97,23 @@
             placeholder: "e.g. IESB 220, NETH 153" %>
     </div>
   </div>
+  <!-- Office + Office hours -->
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+    <div>
+      <%= f.label :office, "Office", class: label_classes, style: label_style %>
+      <%= f.text_field :office,
+            class: input_classes,
+            style: input_style,
+            placeholder: "e.g. IESB 216" %>
+    </div>
+    <div>
+      <%= f.label :office_hours, "Office hours", class: label_classes, style: label_style %>
+      <%= f.text_field :office_hours,
+            class: input_classes,
+            style: input_style,
+            placeholder: "e.g. MW 1:00 - 3:00 pm" %>
+    </div>
+  </div>
   <!-- Description -->
   <div>
     <%= f.label :description, "Description", class: label_classes, style: label_style %>
