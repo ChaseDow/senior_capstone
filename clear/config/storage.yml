@@ -6,6 +6,14 @@ local:
   service: Disk
   root: <%= Rails.root.join("storage") %>
 
+digital_ocean:
+  service: S3
+  endpoint: https://sfo3.digitaloceanspaces.com
+  access_key_id: <%= ENV["DO_SPACES_KEY"] %>
+  secret_access_key: <%= ENV["DO_SPACES_SECRET"] %>
+  bucket: clearplanner-uploads
+  region: sfo3
+
 # Use bin/rails credentials:edit to set the AWS secrets (as aws:access_key_id|secret_access_key)
 # amazon:
 #   service: S3

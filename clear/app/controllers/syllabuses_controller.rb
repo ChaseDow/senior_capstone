@@ -40,19 +40,12 @@ class SyllabusesController < ApplicationController
   end
 
   def create_course
-    if @syllabus.parse_status.in?(%w[queued processing])
-      redirect_to course_preview_syllabus_path(@syllabus), notice: "Parsing in progress."
-      return
+    unless @syllabus.parse_status.in?(%w[queued processing])
+      @syllabus.update!(parse_status: "queued", parse_error: nil, course_draft: {})
+      SyllabusParseJob.perform_now(@syllabus.id)
     end
 
-    @syllabus.update!(parse_status: "queued", parse_error: nil, course_draft: {})
-    begin
-      SyllabusParseJob.perform_now(@syllabus.id)
-      redirect_to course_preview_syllabus_path(@syllabus), notice: "Parsing complete."
-    rescue StandardError
-      @syllabus.destroy
-      redirect_to courses_path, alert: "Parsing failed. The upload was removed."
-    end
+    redirect_to course_preview_syllabus_path(@syllabus), notice: "Parsing started…"
   end
 
   def status
