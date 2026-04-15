@@ -130,7 +130,7 @@ class WorkShiftsController < ApplicationController
   def work_shift_params
     params.require(:work_shift).permit(
       :title, :location, :start_time, :end_time, :start_date,
-      :color, :description, :recurring, :repeat_until,
+      :color, :description, :recurring, :repeat_until, :duration_minutes,
       repeat_days: []
     )
   end
