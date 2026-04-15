@@ -6,11 +6,24 @@
     <p class="text-sm text-zinc-100">
       We'll parse the syllabus, then show you a pre-filled course. Review and fix anything before creating.
     </p>
-    <%= link_to syllabuses_path, class: "studs-nav-btn", data: { turbo_frame: "_top" } do %>
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-      </svg>
-      Back
+    <% if @syllabus.course_id.present? %>
+      <%= link_to courses_path, class: "studs-nav-btn", data: { turbo_frame: "_top" } do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+        </svg>
+        Back
+      <% end %>
+    <% else %>
+      <%= button_to syllabus_path(@syllabus),
+            method: :delete,
+            params: { return_to: "new" },
+            form: { data: { turbo_confirm: "Go back and remove this upload?", turbo_frame: "_top" } },
+            class: "studs-nav-btn" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+        </svg>
+        Back
+      <% end %>
     <% end %>
   </div>
 

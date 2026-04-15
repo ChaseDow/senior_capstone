@@ -26,6 +26,13 @@
               }
             ) %>
         <div class="mx-1 h-5 w-px rounded-full" style="background-color: var(--studs-border);"></div>
+        <%= link_to new_syllabus_path, class: "studs-nav-btn", data: { turbo_frame: "_top" } do %>
+          <span class="[&>svg]:h-3.5 [&>svg]:w-3.5 [&>svg]:text-current [&>svg_*]:stroke-current">
+            <%= icon "file-01-stroke-rounded" %>
+          </span>
+          Import from Syllabus
+        <% end %>
+        <div class="mx-1 h-5 w-px rounded-full" style="background-color: var(--studs-border);"></div>
         <%= link_to new_course_path, class: "studs-nav-btn", data: { turbo_frame: "_top" } do %>
           <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
@@ -44,6 +51,7 @@
           <% color = course.try(:color).presence || "#34D399" %>
           <% day_labels = { 0 => "Sun", 1 => "Mon", 2 => "Tue", 3 => "Wed", 4 => "Thu", 5 => "Fri", 6 => "Sat" } %>
           <% selected_days = Array(course.repeat_days).sort.map { |d| day_labels[d] }.compact %>
+          <% syllabus = course.syllabuses.max_by(&:created_at) %>
           <div class="course-row flex items-start justify-between gap-4 p-4"
                style="border-left: 4px solid <%= color %>;
                       <%= i > 0 ? "border-top: 1px solid var(--studs-divider);" : "" %>">
@@ -94,6 +102,17 @@
                   <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                 </svg>
                 Items
+              <% end %>
+              <% if syllabus.present? %>
+                <%= link_to syllabus_path(syllabus),
+                      class: "studs-nav-btn",
+                      data: { turbo_frame: "_top" } do %>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12S5.25 6.75 12 6.75 21.75 12 21.75 12 18.75 17.25 12 17.25 2.25 12 2.25 12z"/>
+                    <circle cx="12" cy="12" r="2.25"/>
+                  </svg>
+                  Syllabus
+                <% end %>
               <% end %>
               <%= button_to course_path(course),
                     method: :delete,
