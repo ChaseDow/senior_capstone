@@ -17,7 +17,9 @@ class AiChatController < ApplicationController
   end
 
   def create
-    user_text = params[:content].to_s.strip
+    user_text = params[:content].to_s
+                               .sub(/\A[ \t]+/, "")
+                               .sub(/[[:space:]]+\z/, "")
     history   = parse_history(params[:history])
 
     if user_text.blank?
