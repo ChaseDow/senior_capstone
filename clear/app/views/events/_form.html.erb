@@ -49,7 +49,7 @@
             data: { duration_fill_target: "startField", action: "change->duration-fill#fill" } %>
     </div>
     <div>
-      <%= f.label :ends_at, "End time (optional)", class: label_classes, style: label_style %>
+      <%= f.label :ends_at, "End time", class: label_classes, style: label_style %>
       <%= f.datetime_local_field :ends_at,
             class: input_classes,
             style: input_style,
@@ -58,7 +58,7 @@
   </div>
   <!-- Duration -->
   <div>
-    <%= f.label :duration_minutes, "Duration (optional)", class: label_classes, style: label_style %>
+    <%= f.label :duration_minutes, "Duration", class: label_classes, style: label_style %>
     <div data-action="dropdown:select->duration-fill#fill">
       <%= render Studs::DropdownComponent.new(
         label: "— select duration —",
@@ -68,7 +68,6 @@
         items: ApplicationHelper::DURATION_OPTIONS.map { |label, value| { label: label, value: value.to_s } }
       ) %>
     </div>
-    <p class="mt-1.5 text-xs text-zinc-500">Set a duration if you prefer not to enter an end time.</p>
   </div>
   <!-- Location + Priority -->
   <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
