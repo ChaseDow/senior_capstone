@@ -52,9 +52,9 @@
         controller: "chat",
         action: "turbo:submit-start->chat#submit turbo:submit-end->chat#reset"
       } do %>
-      <%= hidden_field_tag :history,
-        (@messages || []).to_json,
-        id: "ai_chat_history" %>
+      <div id="ai_chat_history_wrapper">
+        <%= hidden_field_tag :history, (@messages || []).to_json %>
+      </div>
       <div class="flex-1">
         <%= text_area_tag :content, "",
           id: "ai_chat_input",
