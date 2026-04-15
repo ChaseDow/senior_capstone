@@ -169,6 +169,66 @@ class AiChatController < ApplicationController
             },
             required: [ "event_id" ]
           }
+        },
+        {
+          name: "create_work_shift",
+          description: "Create a new work shift on the user's schedule. Use this when the user asks to add or schedule a work shift or job shift.",
+          parameters: {
+            type: "OBJECT",
+            properties: {
+              title: { type: "STRING", description: "Title/name of the shift (e.g. 'Work', 'Barista shift')" },
+              start_date: { type: "STRING", description: "Start date in YYYY-MM-DD format" },
+              start_time: { type: "STRING", description: "Shift start time in HH:MM 24-hour format (e.g. '09:00')" },
+              end_time: { type: "STRING", description: "Shift end time in HH:MM 24-hour format (e.g. '17:00')" },
+              description: { type: "STRING", description: "Optional description or notes" },
+              location: { type: "STRING", description: "Optional location" },
+              color: { type: "STRING", description: "Optional hex color like #34D399" },
+              recurring: { type: "BOOLEAN", description: "Whether the shift repeats weekly (default true)" },
+              repeat_days: {
+                type: "ARRAY",
+                items: { type: "INTEGER" },
+                description: "Weekday numbers to repeat on: 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat. Required if recurring is true."
+              },
+              repeat_until: { type: "STRING", description: "Optional end date for recurring shifts in YYYY-MM-DD format" }
+            },
+            required: [ "title", "start_date", "start_time", "end_time" ]
+          }
+        },
+        {
+          name: "edit_work_shift",
+          description: "Edit an existing work shift. Use this when the user asks to change, update, or reschedule a work shift. Only include fields that should be changed.",
+          parameters: {
+            type: "OBJECT",
+            properties: {
+              shift_id: { type: "INTEGER", description: "The ID of the work shift to edit" },
+              title: { type: "STRING", description: "New title" },
+              start_date: { type: "STRING", description: "New start date in YYYY-MM-DD format" },
+              start_time: { type: "STRING", description: "New start time in HH:MM 24-hour format" },
+              end_time: { type: "STRING", description: "New end time in HH:MM 24-hour format" },
+              description: { type: "STRING", description: "New description" },
+              location: { type: "STRING", description: "New location" },
+              color: { type: "STRING", description: "New hex color like #34D399" },
+              recurring: { type: "BOOLEAN", description: "Whether the shift repeats weekly" },
+              repeat_days: {
+                type: "ARRAY",
+                items: { type: "INTEGER" },
+                description: "New weekday numbers: 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat"
+              },
+              repeat_until: { type: "STRING", description: "New end date for recurring shifts in YYYY-MM-DD format" }
+            },
+            required: [ "shift_id" ]
+          }
+        },
+        {
+          name: "delete_work_shift",
+          description: "Delete a work shift. Use this when the user asks to remove or delete a work shift.",
+          parameters: {
+            type: "OBJECT",
+            properties: {
+              shift_id: { type: "INTEGER", description: "The ID of the work shift to delete" }
+            },
+            required: [ "shift_id" ]
+          }
         }
       ]
     } ]
@@ -180,6 +240,12 @@ class AiChatController < ApplicationController
       create_event_from_ai(args)
     when "edit_event"
       edit_event_from_ai(args)
+    when "create_work_shift"
+      create_work_shift_from_ai(args)
+    when "edit_work_shift"
+      edit_work_shift_from_ai(args)
+    when "delete_work_shift"
+      delete_work_shift_from_ai(args)
     else
       { error: "Unknown function: #{name}" }
     end
@@ -221,6 +287,59 @@ class AiChatController < ApplicationController
     else
       { success: false, errors: event.errors.full_messages }
     end
+  end
+
+  def create_work_shift_from_ai(args)
+    shift = current_user.work_shifts.new(
+      title: args["title"],
+      description: args["description"],
+      start_date: Date.parse(args["start_date"]),
+      start_time: args["start_time"],
+      end_time: args["end_time"],
+      location: args["location"],
+      color: args["color"].presence || "#34D399",
+      recurring: args.key?("recurring") ? args["recurring"] : true,
+      repeat_days: args["repeat_days"] || [],
+      repeat_until: args["repeat_until"].present? ? Date.parse(args["repeat_until"]) : nil
+    )
+
+    if shift.save
+      { success: true, shift_id: shift.id, title: shift.title, start_date: shift.start_date.iso8601 }
+    else
+      { success: false, errors: shift.errors.full_messages }
+    end
+  end
+
+  def edit_work_shift_from_ai(args)
+    shift = current_user.work_shifts.find_by(id: args["shift_id"])
+    return { success: false, errors: [ "Work shift not found" ] } unless shift
+
+    updates = {}
+    updates[:title] = args["title"] if args["title"].present?
+    updates[:description] = args["description"] if args.key?("description")
+    updates[:start_date] = Date.parse(args["start_date"]) if args["start_date"].present?
+    updates[:start_time] = args["start_time"] if args["start_time"].present?
+    updates[:end_time] = args["end_time"] if args["end_time"].present?
+    updates[:location] = args["location"] if args.key?("location")
+    updates[:color] = args["color"] if args["color"].present?
+    updates[:recurring] = args["recurring"] if args.key?("recurring")
+    updates[:repeat_days] = args["repeat_days"] if args.key?("repeat_days")
+    updates[:repeat_until] = args["repeat_until"].present? ? Date.parse(args["repeat_until"]) : nil if args.key?("repeat_until")
+
+    if shift.update(updates)
+      { success: true, shift_id: shift.id, title: shift.title }
+    else
+      { success: false, errors: shift.errors.full_messages }
+    end
+  end
+
+  def delete_work_shift_from_ai(args)
+    shift = current_user.work_shifts.find_by(id: args["shift_id"])
+    return { success: false, errors: [ "Work shift not found" ] } unless shift
+
+    title = shift.title
+    shift.destroy
+    { success: true, shift_id: args["shift_id"], title: title }
   end
 
   def build_system_instruction
@@ -279,6 +398,20 @@ class AiChatController < ApplicationController
       parts << "\nUpcoming assignments & deadlines (next 14 days):\n#{item_lines.join("\n")}"
     end
 
+    # Gather active work shifts
+    work_shifts = user.work_shifts.active.ordered
+
+    if work_shifts.any?
+      shift_lines = work_shifts.map do |s|
+        line = "- [ID:#{s.id}] #{s.title} #{s.formatted_time_range}"
+        line += " (#{s.repeat_days_labels})" if s.recurring? && s.repeat_days.any?
+        line += " until #{s.repeat_until.strftime('%b %d, %Y')}" if s.repeat_until.present?
+        line += " at #{s.location}" if s.location.present?
+        line
+      end
+      parts << "\nUser's work shifts:\n#{shift_lines.join("\n")}"
+    end
+
     parts << "\nUse this context to give personalized advice, reminders, and insights. " \
              "You can suggest study strategies, flag busy days, warn about upcoming deadlines, " \
              "and help with time management. Keep responses concise and friendly."
@@ -286,6 +419,9 @@ class AiChatController < ApplicationController
              "When the user asks to schedule or add something, use create_event. " \
              "When the user asks to change, move, reschedule, or update an event, use edit_event with the event's ID. " \
              "Each event listed above has an [ID:...] you can use. Always confirm what was created or changed."
+    parts << "\nYou can also manage work shifts: create with create_work_shift, edit with edit_work_shift, " \
+             "or delete with delete_work_shift. Each work shift listed above has an [ID:...] you can use. " \
+             "For recurring shifts, repeat_days uses weekday numbers (0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat)."
 
     parts.join("\n")
   end
