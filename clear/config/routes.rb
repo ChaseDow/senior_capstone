@@ -35,8 +35,10 @@ Rails.application.routes.draw do
   resources :work_shifts
 
   scope :university_calendar do
-    get  "preview", to: "university_calendar#preview", as: :university_calendar_preview
-    post "import",  to: "university_calendar#import",  as: :university_calendar_import
+    get  "preview",     to: "university_calendar#preview",     as: :university_calendar_preview
+    get  "pdf_preview", to: "university_calendar#pdf_preview_page", as: :university_calendar_pdf_preview_page
+    post "pdf_preview", to: "university_calendar#pdf_preview", as: :university_calendar_pdf_preview
+    post "import",      to: "university_calendar#import",      as: :university_calendar_import
   end
   resources :courses do
     resources :course_items, only: %i[index create show edit update destroy]
@@ -60,6 +62,7 @@ Rails.application.routes.draw do
   resources :ai_chat, only: [ :index, :create ] do
     collection do
       get :usage
+      get :panel
     end
   end
 
@@ -74,7 +77,12 @@ Rails.application.routes.draw do
 
   # Admin-only pages (guarded in controllers via current_user.admin?)
   namespace :admin do
-    resources :users, only: [ :index, :destroy ]
+    resources :users, only: [ :index, :destroy ] do
+      member do
+        get  :edit_password
+        patch :update_password
+      end
+    end
   end
 
   if Rails.env.development?
@@ -102,6 +110,7 @@ Rails.application.routes.draw do
 
   get "projects/join", to: "projects#join", as: :join_project
   get "/ui",             to: "ui#show"
+  get "/analytics",      to: "analytics#show"
   get "/schedule",       to: "schedule#week"
   get "/schedule/week",  to: "schedule#week"
 

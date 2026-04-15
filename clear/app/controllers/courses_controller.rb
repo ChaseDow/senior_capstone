@@ -6,7 +6,7 @@ class CoursesController < ApplicationController
 
   def index
     @q = params[:q].to_s.strip
-    @courses = current_user.courses.order(:title)
+    @courses = current_user.courses.includes(:syllabuses).order(:title)
     @courses = @courses.where("title ILIKE ? OR professor ILIKE ? OR term ILIKE ? OR location ILIKE ?",
                               "%#{@q}%", "%#{@q}%", "%#{@q}%", "%#{@q}%") if @q.present?
   end
@@ -232,6 +232,8 @@ class CoursesController < ApplicationController
       :duration_minutes,
       :professor,
       :location,
+      :office,
+      :office_hours,
       :description,
       repeat_days: []
     )

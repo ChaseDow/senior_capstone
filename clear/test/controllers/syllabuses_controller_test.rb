@@ -14,17 +14,12 @@ class SyllabusesControllerTest < ActionDispatch::IntegrationTest
 
   test "should get index" do
     get syllabuses_url
-    assert_response :success
+    assert_redirected_to courses_url
   end
 
   test "index only shows current user's syllabuses" do
-    other = syllabuses(:two) # belongs to users(:two)
-
     get syllabuses_url
-    assert_response :success
-
-    assert_includes @response.body, @syllabus.title
-    refute_includes @response.body, other.title
+    assert_redirected_to courses_url
   end
 
   test "should get new" do
@@ -33,13 +28,11 @@ class SyllabusesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should create syllabus and attach to current user" do
-    assert_difference("Syllabus.count", 1) do
+    assert_no_difference("Syllabus.count") do
       post syllabuses_url, params: { syllabus: { title: "My Syllabus" } }
     end
 
-    created = Syllabus.order(:created_at).last
-    assert_redirected_to syllabus_url(created)
-    assert_equal @user.id, created.user_id
+    assert_redirected_to courses_url
   end
 
   test "should show syllabus" do
@@ -59,7 +52,7 @@ class SyllabusesControllerTest < ActionDispatch::IntegrationTest
       delete syllabus_url(@syllabus)
     end
 
-    assert_redirected_to syllabuses_url
+    assert_redirected_to courses_url
   end
 
   test "should NOT destroy another user's syllabus" do

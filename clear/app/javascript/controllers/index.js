@@ -13,6 +13,9 @@ application.register("agenda-highlight", AgendaHighlightController)
 import AgendaItemController from "./agenda_item_controller"
 application.register("agenda-item", AgendaItemController)
 
+import AiChatDrawerController from "./ai_chat_drawer_controller"
+application.register("ai-chat-drawer", AiChatDrawerController)
+
 import AiUsageController from "./ai_usage_controller"
 application.register("ai-usage", AiUsageController)
 
@@ -69,6 +72,9 @@ application.register("modal", ModalController)
 
 import NotificationsDropdownController from "./notifications_dropdown_controller"
 application.register("notifications-dropdown", NotificationsDropdownController)
+
+import PdfPreviewController from "./pdf_preview_controller"
+application.register("pdf-preview", PdfPreviewController)
 
 import PollFrameController from "./poll_frame_controller"
 application.register("poll-frame", PollFrameController)

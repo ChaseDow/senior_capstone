@@ -18,9 +18,7 @@
       </span>
     </div>
     <% if is_user %>
-      <div class="whitespace-normal break-words">
-        <%= h(raw_text.strip) %>
-      </div>
+      <div class="whitespace-pre-wrap break-words"><%= h(raw_text) %></div>
     <% else %>
       <div
         data-controller="typewriter"
