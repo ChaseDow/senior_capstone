@@ -278,6 +278,34 @@ body[data-theme="latech"] {
   --studs-sidebar-bg: #0A0F1A;
 }
 
+/* ── ULM: maroon + gold collegiate ───────────────────── */
+body[data-theme="ulm"] {
+  --studs-panel-bg: #241215;
+  --studs-panel-bg-2: #241215;
+  --studs-panel-hover: #2F171C;
+  --studs-panel-header: #6F1D2A;
+  --studs-border: rgba(111, 29, 42, 0.42);
+  --studs-border-subtle: rgba(111, 29, 42, 0.16);
+  --studs-divider: rgba(111, 29, 42, 0.22);
+  --studs-accent: #B29666;
+  --studs-accent-secondary: #6F1D2A;
+  --studs-sidebar-bg: #170A0E;
+}
+
+/* ── LSU: purple + gold collegiate ────────────────────── */
+body[data-theme="lsu"] {
+  --studs-panel-bg: #1C1230;
+  --studs-panel-bg-2: #1C1230;
+  --studs-panel-hover: #241841;
+  --studs-panel-header: #461D7C;
+  --studs-border: rgba(70, 29, 124, 0.42);
+  --studs-border-subtle: rgba(70, 29, 124, 0.16);
+  --studs-divider: rgba(70, 29, 124, 0.22);
+  --studs-accent: #FDD023;
+  --studs-accent-secondary: #461D7C;
+  --studs-sidebar-bg: #120A20;
+}
+
 /* ── Space theme gradient backgrounds ─────────────────── */
 body[data-theme="nebula"] {
   background:
@@ -302,6 +330,14 @@ body[data-theme="sunset"] {
 
 body[data-theme="latech"] {
   background: #0C1220 !important;
+}
+
+body[data-theme="ulm"] {
+  background: #13080D !important;
+}
+
+body[data-theme="lsu"] {
+  background: #10091C !important;
 }
 
 /* ── Space theme sidebar: semi-transparent + blur ─────── */
@@ -339,13 +375,43 @@ body[data-theme="latech"] main {
   box-shadow: none;
 }
 
+body[data-theme="ulm"] main {
+  box-shadow: none;
+}
+
+body[data-theme="lsu"] main {
+  box-shadow: none;
+}
+
 body[data-theme="latech"] [data-sidebar-target="sidebar"] {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+body[data-theme="ulm"] [data-sidebar-target="sidebar"] {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+body[data-theme="lsu"] [data-sidebar-target="sidebar"] {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
 
 body[data-theme="latech"] .studs-topbar {
   background-color: #0A0F1A;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+body[data-theme="ulm"] .studs-topbar {
+  background-color: #170A0E;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+body[data-theme="lsu"] .studs-topbar {
+  background-color: #120A20;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
@@ -379,7 +445,26 @@ body[data-theme="latech"] .studs-nav-btn {
   -webkit-backdrop-filter: none;
 }
 
+body[data-theme="ulm"] .studs-nav-btn {
+  background-color: #2F171C;
+  border-color: rgba(111, 29, 42, 0.38);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+body[data-theme="lsu"] .studs-nav-btn {
+  background-color: #241841;
+  border-color: rgba(70, 29, 124, 0.38);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
 body[data-theme="latech"] .studs-nav-btn::before {
+  display: none;
+}
+
+body[data-theme="ulm"] .studs-nav-btn::before,
+body[data-theme="lsu"] .studs-nav-btn::before {
   display: none;
 }
 
@@ -387,6 +472,18 @@ body[data-theme="latech"] .studs-nav-btn:hover {
   background-color: #002F8B;
   border-color: #002F8B;
   box-shadow: 0 4px 12px rgba(0, 47, 139, 0.25);
+}
+
+body[data-theme="ulm"] .studs-nav-btn:hover {
+  background-color: #6F1D2A;
+  border-color: #6F1D2A;
+  box-shadow: 0 4px 12px rgba(111, 29, 42, 0.30);
+}
+
+body[data-theme="lsu"] .studs-nav-btn:hover {
+  background-color: #461D7C;
+  border-color: #461D7C;
+  box-shadow: 0 4px 12px rgba(70, 29, 124, 0.30);
 }
 
 /* ── Space theme event popover ────────────────────────── */
@@ -419,6 +516,22 @@ body[data-theme="latech"] [data-event-popover-target="popover"] {
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 47, 139, 0.10) !important;
 }
 
+body[data-theme="ulm"] [data-event-popover-target="popover"] {
+  background-color: #231017 !important;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-color: rgba(178, 150, 102, 0.25) !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(178, 150, 102, 0.10) !important;
+}
+
+body[data-theme="lsu"] [data-event-popover-target="popover"] {
+  background-color: #1B1230 !important;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-color: rgba(253, 208, 35, 0.22) !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(253, 208, 35, 0.10) !important;
+}
+
 /* ── Space theme drawer panel ─────────────────────────── */
 body[data-theme="nebula"] [data-drawer-target="panel"] {
   background-color: rgba(15, 10, 26, 0.92) !important;
@@ -440,6 +553,18 @@ body[data-theme="sunset"] [data-drawer-target="panel"] {
 
 body[data-theme="latech"] [data-drawer-target="panel"] {
   background-color: #0A0F1A !important;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+body[data-theme="ulm"] [data-drawer-target="panel"] {
+  background-color: #170A0E !important;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+body[data-theme="lsu"] [data-drawer-target="panel"] {
+  background-color: #120A20 !important;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
@@ -470,6 +595,20 @@ body[data-theme="latech"] [data-modal-target="panel"]>div {
   border-color: rgba(0, 47, 139, 0.20) !important;
 }
 
+body[data-theme="ulm"] [data-modal-target="panel"]>div {
+  background-color: #231017 !important;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-color: rgba(111, 29, 42, 0.30) !important;
+}
+
+body[data-theme="lsu"] [data-modal-target="panel"]>div {
+  background-color: #1B1230 !important;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-color: rgba(167, 139, 250, 0.28) !important;
+}
+
 /* ── LaTech: active nav — solid blue with red left border ── */
 body[data-theme="latech"] .studs-nav-link--active-pill {
   background: #002F8B !important;
@@ -480,12 +619,46 @@ body[data-theme="latech"] .studs-nav-link--active-pill {
   box-shadow: 0 2px 8px rgba(0, 47, 139, 0.30) !important;
 }
 
+body[data-theme="ulm"] .studs-nav-link--active-pill {
+  background: #6F1D2A !important;
+  border: none !important;
+  border-left: 3px solid #B29666 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: 0 2px 8px rgba(111, 29, 42, 0.35) !important;
+}
+
+body[data-theme="lsu"] .studs-nav-link--active-pill {
+  background: #461D7C !important;
+  border: none !important;
+  border-left: 3px solid #FDD023 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: 0 2px 8px rgba(70, 29, 124, 0.35) !important;
+}
+
 body[data-theme="latech"] .studs-avatar-circle {
   background: #002F8B;
 }
 
+body[data-theme="ulm"] .studs-avatar-circle {
+  background: #6F1D2A;
+}
+
+body[data-theme="lsu"] .studs-avatar-circle {
+  background: #461D7C;
+}
+
 body[data-theme="latech"] .studs-today-badge {
   background: #E31B23 !important;
+}
+
+body[data-theme="ulm"] .studs-today-badge {
+  background: #B29666 !important;
+}
+
+body[data-theme="lsu"] .studs-today-badge {
+  background: #FDD023 !important;
 }
 
 body[data-theme="latech"] .studs-btn-accent {
@@ -494,8 +667,28 @@ body[data-theme="latech"] .studs-btn-accent {
   box-shadow: 0 0 12px rgba(0, 47, 139, 0.35), 0 1px 3px rgba(0, 0, 0, 0.25) !important;
 }
 
+body[data-theme="ulm"] .studs-btn-accent {
+  background: linear-gradient(135deg, #6F1D2A, #8E2A3A) !important;
+  border-color: #6F1D2A !important;
+  box-shadow: 0 0 12px rgba(111, 29, 42, 0.35), 0 1px 3px rgba(0, 0, 0, 0.25) !important;
+}
+
+body[data-theme="lsu"] .studs-btn-accent {
+  background: linear-gradient(135deg, #461D7C, #5C2B9A) !important;
+  border-color: #461D7C !important;
+  box-shadow: 0 0 12px rgba(70, 29, 124, 0.35), 0 1px 3px rgba(0, 0, 0, 0.25) !important;
+}
+
 body[data-theme="latech"] .studs-btn-accent:hover {
   box-shadow: 0 0 22px rgba(0, 47, 139, 0.50), 0 4px 14px rgba(0, 0, 0, 0.35), 0 2px 0 0 #E31B23 !important;
+}
+
+body[data-theme="ulm"] .studs-btn-accent:hover {
+  box-shadow: 0 0 22px rgba(111, 29, 42, 0.55), 0 4px 14px rgba(0, 0, 0, 0.35), 0 2px 0 0 #B29666 !important;
+}
+
+body[data-theme="lsu"] .studs-btn-accent:hover {
+  box-shadow: 0 0 22px rgba(70, 29, 124, 0.55), 0 4px 14px rgba(0, 0, 0, 0.35), 0 2px 0 0 #FDD023 !important;
 }
 
 /* ── Smooth theme transition ──────────────────────────── */
@@ -958,6 +1151,15 @@ body[data-theme="cyan"] .studs-today-badge {
   background: linear-gradient(135deg, #002F8B 50%, #E31B23 50%);
 }
 
+.theme-swatch--ulm {
+  background: linear-gradient(135deg, #6F1D2A 50%, #B29666 50%);
+}
+
+.theme-swatch--lsu {
+  background: linear-gradient(135deg, #461D7C 50%, #FDD023 50%);
+}
+
+
 /* ── FilePond (theme-aware dropzone) ────────────────────── */
 
 .filepond-host .filepond--root {
@@ -1159,7 +1361,7 @@ body[data-theme="cyan"] .studs-today-badge {
   }
 
   * {
-    scrollbar-width: thin;
+    scrollbar-width: auto;
     scrollbar-color: var(--sb-thumb) var(--sb-track);
   }
 
@@ -1225,7 +1427,7 @@ body[data-theme="cyan"] .studs-today-badge {
   }
 
   .scrollbars {
-    scrollbar-width: thin;
+    scrollbar-width: auto;
     scrollbar-color: var(--sb-thumb) var(--sb-track);
   }
 
