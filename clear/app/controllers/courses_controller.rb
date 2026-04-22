@@ -235,6 +235,7 @@ class CoursesController < ApplicationController
       :office,
       :office_hours,
       :description,
+      :trackable,
       repeat_days: []
     )
   end

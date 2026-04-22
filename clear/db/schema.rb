@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_15_133144) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_22_110000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -87,6 +87,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_15_133144) do
     t.time "starts_at"
     t.string "term"
     t.string "title"
+    t.boolean "trackable", default: false, null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.index ["project_id"], name: "index_courses_on_project_id"
@@ -127,6 +128,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_15_133144) do
     t.date "repeat_until"
     t.datetime "starts_at"
     t.string "title"
+    t.boolean "trackable", default: false, null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.index ["project_id"], name: "index_events_on_project_id"
@@ -246,6 +248,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_15_133144) do
     t.index ["username"], name: "index_users_on_username"
   end
 
+  create_table "widget_configs", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.decimal "goal", precision: 10, scale: 2
+    t.integer "gs_h"
+    t.integer "gs_w"
+    t.integer "gs_x"
+    t.integer "gs_y"
+    t.string "metric"
+    t.string "period"
+    t.bigint "source_id"
+    t.string "source_type"
+    t.string "title"
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.string "widget_type", null: false
+    t.index ["user_id"], name: "index_widget_configs_on_user_id"
+  end
+
   create_table "work_shifts", force: :cascade do |t|
     t.string "color", default: "#34D399", null: false
     t.datetime "created_at", null: false
@@ -259,6 +279,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_15_133144) do
     t.date "start_date"
     t.time "start_time"
     t.string "title"
+    t.boolean "trackable", default: false, null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.index ["user_id"], name: "index_work_shifts_on_user_id"
@@ -284,5 +305,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_15_133144) do
   add_foreign_key "schedules", "users"
   add_foreign_key "syllabuses", "courses", on_delete: :nullify
   add_foreign_key "syllabuses", "users"
+  add_foreign_key "widget_configs", "users"
   add_foreign_key "work_shifts", "users"
 end

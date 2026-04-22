@@ -19,6 +19,9 @@ application.register("ai-chat-drawer", AiChatDrawerController)
 import AiUsageController from "./ai_usage_controller"
 application.register("ai-usage", AiUsageController)
 
+import AnalyticsTabsController from "./analytics_tabs_controller"
+application.register("analytics-tabs", AnalyticsTabsController)
+
 import AvatarCropController from "./avatar_crop_controller"
 application.register("avatar-crop", AvatarCropController)
 
@@ -102,3 +105,12 @@ application.register("typewriter", TypewriterController)
 
 import UsernameEditController from "./username_edit_controller"
 application.register("username-edit", UsernameEditController)
+
+import WidgetDashboardController from "./widget_dashboard_controller"
+application.register("widget-dashboard", WidgetDashboardController)
+
+import WidgetDrawerController from "./widget_drawer_controller"
+application.register("widget-drawer", WidgetDrawerController)
+
+import WidgetGridController from "./widget_grid_controller"
+application.register("widget-grid", WidgetGridController)
