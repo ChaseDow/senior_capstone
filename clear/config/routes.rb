@@ -108,7 +108,10 @@ Rails.application.routes.draw do
 
   get "projects/join", to: "projects#join", as: :join_project
   get "/ui",             to: "ui#show"
-  get "/analytics",      to: "analytics#show"
+  get "/analytics",         to: "analytics#show"
+  get "/analytics/widgets",      to: "analytics#widgets"
+  get "/analytics/widget_items", to: "analytics#widget_items"
+  resources :widget_configs, only: [:create, :update, :destroy]
   get "/schedule",       to: "schedule#week"
   get "/schedule/week",  to: "schedule#week"
 

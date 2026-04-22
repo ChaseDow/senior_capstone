@@ -144,6 +144,17 @@
       </div>
     </div>
   </div>
+  <!-- Track on dashboard -->
+  <div class="rounded-2xl p-4 flex items-center justify-between gap-4"
+       style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg-2);">
+    <div>
+      <div class="text-sm font-semibold text-zinc-200">Track on dashboard</div>
+      <div class="text-xs text-zinc-500 mt-0.5">Include this event in analytics widgets</div>
+    </div>
+    <%= f.check_box :trackable,
+          class: "h-5 w-5 rounded cursor-pointer shrink-0",
+          style: "accent-color: var(--studs-accent);" %>
+  </div>
   <!-- Submit -->
   <div class="flex items-center gap-3 pt-4"
        style="border-top: 1px solid var(--studs-divider);">
