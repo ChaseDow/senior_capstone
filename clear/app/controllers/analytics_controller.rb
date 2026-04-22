@@ -2,6 +2,22 @@ class AnalyticsController < ApplicationController
   layout "app_shell"
   before_action :authenticate_user!
 
+  # GET /analytics/widgets.json
+  def widgets
+    configs = current_user.widget_configs.order(:created_at)
+    render json: configs.map(&:as_widget_json)
+  end
+
+  # GET /analytics/widget_items?source_type=Event
+  def widget_items
+    klass = WidgetConfig::SOURCE_CLASSES[params[:source_type]]&.constantize
+    return render json: [] unless klass
+    items = klass.where(user: current_user, trackable: true)
+                 .order(:title)
+                 .map { |i| { id: i.id, name: i.title } }
+    render json: items
+  end
+
   MAX_DAILY_MINUTES = 16 * 60 # 16-hour day = 100%
 
   def show
