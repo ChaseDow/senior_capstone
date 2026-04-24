@@ -1,0 +1,37 @@
+<%= turbo_frame_tag "draft_changes_modal",
+      data: {
+        modal_target: "frame",
+        action: "turbo:frame-load->modal#frameLoaded turbo:submit-end->modal#submitEnded"
+      } do %>
+  <div class="h-[85vh] w-full flex flex-col">
+    <div class="px-4 py-3 studs-topbar"
+         style="background-color: var(--studs-panel-bg-2); border-bottom: 1px solid var(--studs-border);">
+      <div class="flex items-center justify-between">
+        <div class="min-w-0">
+          <div class="text-base font-semibold text-zinc-100 truncate">
+            Edit Draft Changes
+          </div>
+        </div>
+
+        <%= link_to "x",
+              draft_changes_path(start_date: start_date),
+              data: { turbo_frame: "draft_changes_modal", turbo_prefetch: false },
+              class: "studs-nav-btn" %>
+      </div>
+    </div>
+
+    <div class="flex-1 min-h-0" style="background-color: var(--studs-panel-bg);">
+      <div class="scrollbars h-full min-h-0 overflow-y-auto px-3 py-3">
+        <div class="px-1 py-1">
+          <%= render "events/form",
+                event: event,
+                start_date: start_date,
+                source: "draft_changes",
+                temp_id: params[:temp_id],
+                cancel_path: draft_changes_path(start_date: start_date),
+                cancel_turbo_frame: "draft_changes_modal" %>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>

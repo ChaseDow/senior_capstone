@@ -25,7 +25,7 @@ class Event < ApplicationRecord
 
   after_create_commit :create_notification
 
-  Occurrence = Struct.new(:event, :starts_at, :ends_at, :draft_status, keyword_init: true) do
+  Occurrence = Struct.new(:event, :starts_at, :ends_at, :draft_status, :draft_change_index, keyword_init: true) do
     delegate :id, :title, :location, :description, :color, :contrast_text_color, to: :event
   end
 

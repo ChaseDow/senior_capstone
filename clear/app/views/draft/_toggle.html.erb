@@ -1,0 +1,26 @@
+<%= turbo_frame_tag "draft_toggle", data: { controller: "draft-cache" } do %>
+  <% draft_start_date = local_assigns[:start_date].presence || Date.current.iso8601 %>
+  <% active_draft = local_assigns[:active_draft] %>
+
+  <% if active_draft.present? %>
+    <%= link_to exit_draft_path(start_date: draft_start_date),
+          data: { turbo_method: :patch, turbo_stream: true, action: "click->draft-cache#clearSearch" },
+          class: "studs-topbar-icon-btn studs-topbar-icon-btn--draft studs-topbar-icon-btn--draft-active",
+          title: "Exit Draft Mode",
+          aria: { label: "Exit Draft Mode" } do %>
+      <span class="[&>svg]:h-5 [&>svg]:w-5">
+        <%= icon "pencil-edit-02-stroke-rounded" %>
+      </span>
+    <% end %>
+  <% else %>
+    <%= link_to enter_draft_path(start_date: draft_start_date),
+          data: { turbo_method: :post, turbo_stream: true, action: "click->draft-cache#clearSearch" },
+          class: "studs-topbar-icon-btn studs-topbar-icon-btn--draft",
+          title: "Enter Draft Mode",
+          aria: { label: "Enter Draft Mode" } do %>
+      <span class="[&>svg]:h-5 [&>svg]:w-5">
+        <%= icon "pencil-edit-02-stroke-rounded" %>
+      </span>
+    <% end %>
+  <% end %>
+<% end %>

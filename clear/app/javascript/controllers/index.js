@@ -46,6 +46,9 @@ application.register("current-time", CurrentTimeController)
 import DeleteOptionsController from "./delete_options_controller"
 application.register("delete-options", DeleteOptionsController)
 
+import DraftCacheController from "./draft_cache_controller"
+application.register("draft-cache", DraftCacheController)
+
 import DrawerController from "./drawer_controller"
 application.register("drawer", DrawerController)
 

@@ -1,4 +1,6 @@
-<meta name="turbo-cache-control" content="no-cache">
+<% if @draft.present? %>
+  <meta name="turbo-cache-control" content="no-cache">
+<% end %>
 <div
   class="-mx-6 -my-6 h-full min-h-0 relative"
   data-controller="agenda-drawer"
@@ -9,6 +11,7 @@
       <%= render "dashboard/calendar_frame",
         events: @occurrences,
         start_date: @start_date,
+        draft: @draft,
         month_events_by_date: @month_events_by_date,
         month_date: @month_date,
         courses: @courses,

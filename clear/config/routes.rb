@@ -103,6 +103,9 @@ Rails.application.routes.draw do
   get "dashboard/agenda", to: "dashboard#agenda", as: :dashboard_agenda
 
   post   "dashboard/draft",         to: "draft#enter",   as: :enter_draft
+  get    "dashboard/draft/changes", to: "draft#changes", as: :draft_changes
+  patch  "dashboard/draft/restore", to: "draft#restore", as: :restore_draft_change
+  patch  "dashboard/draft/exit",    to: "draft#exit",    as: :exit_draft
   patch  "dashboard/draft/apply",   to: "draft#apply",   as: :apply_draft
   delete "dashboard/draft",         to: "draft#discard", as: :discard_draft
 

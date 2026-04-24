@@ -1,6 +1,10 @@
 <% start_date_param = local_assigns[:start_date].presence || params[:start_date].presence %>
 <% turbo_enabled = local_assigns.key?(:turbo) ? local_assigns[:turbo] : true %>
 <% cancel_drawer = local_assigns[:cancel_drawer] %>
+<% source_param = local_assigns[:source].presence || params[:source].presence %>
+<% temp_id_param = local_assigns[:temp_id].presence || params[:temp_id].presence %>
+<% cancel_path = local_assigns[:cancel_path].presence %>
+<% cancel_turbo_frame = local_assigns[:cancel_turbo_frame].presence %>
 <% form_url =
     if event.persisted?
       start_date_param ? event_path(event, start_date: start_date_param) : event_path(event)
@@ -13,7 +17,9 @@
               class: "space-y-5",
               data: { drawer_close_on_success: "false", turbo: turbo_enabled, controller: "duration-fill" } do |f| %>
   <%= hidden_field_tag :start_date, start_date_param if start_date_param.present? %>
-  <%= f.hidden_field :project_id, value: @event.project_id || params[:project_id] %>
+  <%= hidden_field_tag :source, source_param if source_param.present? %>
+  <%= hidden_field_tag :temp_id, temp_id_param if temp_id_param.present? %>
+  <%= f.hidden_field :project_id, value: event.project_id || params[:project_id] %>
   <% if event.errors.any? %>
     <div class="rounded-2xl p-4 text-red-300"
          style="border: 1px solid rgba(239,68,68,0.3); background-color: rgba(127,29,29,0.2);">
@@ -151,12 +157,24 @@
       <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
         <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
       </svg>
-      <%= event.persisted? ? "Update event" : "Create event" %>
+      <%= (event.persisted? || source_param == "draft_changes") ? "Update event" : "Create event" %>
     </button>
     <% if cancel_drawer %>
       <button type="button" class="studs-nav-btn" data-action="drawer#close">Cancel</button>
+    <% elsif cancel_path %>
+      <%= link_to "Cancel",
+            cancel_path,
+            class: "studs-nav-btn",
+            data: { turbo_frame: cancel_turbo_frame, turbo_prefetch: false } %>
     <% else %>
-      <% path = @event.project.present? ? project_path(@event.project) : dashboard_path %>
+      <% path =
+           if source_param == "events_index"
+             events_path
+           elsif event.project.present?
+             project_path(event.project)
+           else
+             dashboard_path
+           end %>
       <%= link_to "Cancel", path, class: "studs-nav-btn" %>
     <% end %>
   </div>

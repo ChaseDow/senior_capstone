@@ -1,0 +1,8 @@
+<%= turbo_frame_tag(
+      "draft_changes_modal",
+      src: draft_changes_path(start_date: start_date),
+      data: {
+        modal_target: "frame",
+        action: "turbo:frame-load->modal#frameLoaded turbo:submit-end->modal#submitEnded"
+      }
+    ) %>
