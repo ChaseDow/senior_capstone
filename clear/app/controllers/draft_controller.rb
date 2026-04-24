@@ -35,6 +35,11 @@ class DraftController < ApplicationController
     render_calendar_turbo_stream(draft: nil)
   end
 
+  def exit
+    session.delete(:calendar_draft_mode)
+    render_calendar_turbo_stream(draft: nil)
+  end
+
   private
 
   def render_calendar_turbo_stream(draft:)
@@ -44,12 +49,24 @@ class DraftController < ApplicationController
     range_end   = (week_start + 6.days).end_of_day
 
     occurrences = calendar_occurrences_for_range(range_start, range_end, draft: draft)
-
-    render turbo_stream: turbo_stream.replace(
+    streams = [
+      turbo_stream.replace(
       "dashboard_calendar",
       partial: "dashboard/calendar_frame",
       locals: { events: occurrences, start_date: start_date, draft: draft }
-    )
+      ),
+      turbo_stream.replace(
+      "draft_toggle",
+      partial: "draft/toggle",
+      locals: { start_date: start_date.iso8601, active_draft: draft }
+      ),
+      turbo_stream.replace(
+      "draft_banner",
+      partial: "draft/banner",
+      locals: { start_date: start_date.iso8601, active_draft: draft }
+      )
+    ]
+    render turbo_stream: streams
   end
 
   def parse_start_date(raw)
