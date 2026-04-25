@@ -85,13 +85,24 @@ class ApplicationController < ActionController::Base
   end
   helper_method :course_filter_courses
 
+  # For showing all the different draft options
+  def current_user_drafts
+    @current_user_drafts ||= current_user.calendar_drafts.recent
+  end
+  helper_method :current_user_drafts
+
+  # Whenever a draft is active
   def current_user_draft
     return @current_user_draft if defined?(@current_user_draft)
 
-    @current_user_draft = if session[:calendar_draft_mode]
-      draft = CalendarDraft.find_by(user: current_user)
-      session.delete(:calendar_draft_mode) if draft.nil?
-      draft
+    @current_user_draft = if session[:calendar_draft_mode] && session[:active_calendar_draft_id].present?
+    draft = current_user.calendar_drafts.find_by(id: session[:active_calendar_draft_id])
+      if draft.nil?
+        session.delete(:calendar_draft_mode)
+        session.delete(:active_calendar_draft_id)
+      end
+    draft
     end
   end
+  helper_method :current_user_draft
 end
