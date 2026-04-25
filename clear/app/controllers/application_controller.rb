@@ -8,10 +8,12 @@ class ApplicationController < ActionController::Base
   end
 
   def after_sign_in_path_for(resource)
+    clear_draft_session!
     stored_location_for(resource) || authenticated_root_path
   end
 
   def after_sign_out_path_for(resource_or_scope)
+    clear_draft_session!
     root_path
   end
 
@@ -95,14 +97,21 @@ class ApplicationController < ActionController::Base
   def current_user_draft
     return @current_user_draft if defined?(@current_user_draft)
 
-    @current_user_draft = if session[:calendar_draft_mode] && session[:active_calendar_draft_id].present?
+    return nil unless session[:active_calendar_draft_id].present?
+
     draft = current_user.calendar_drafts.find_by(id: session[:active_calendar_draft_id])
       if draft.nil?
-        session.delete(:calendar_draft_mode)
-        session.delete(:active_calendar_draft_id)
+        clear_draft_session!
+      else
+        session[:calendar_draft_mode] = true
+        @current_user_draft = draft
       end
-    draft
-    end
+    @current_user_draft
   end
   helper_method :current_user_draft
+
+  def clear_draft_session!
+    session.delete(:calendar_draft_mode)
+    session.delete(:active_calendar_draft_id)
+  end
 end
