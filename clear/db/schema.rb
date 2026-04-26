@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_22_110000) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_26_044709) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -112,6 +112,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_22_110000) do
     t.datetime "updated_at", null: false
     t.index ["event_id", "excluded_date"], name: "index_event_exceptions_on_event_id_and_excluded_date", unique: true
     t.index ["event_id"], name: "index_event_exceptions_on_event_id"
+  end
+
+  create_table "event_occurrences", force: :cascade do |t|
+    t.boolean "completed", default: false, null: false
+    t.datetime "completed_at"
+    t.datetime "created_at", null: false
+    t.decimal "duration_hours", precision: 4, scale: 2
+    t.bigint "event_id", null: false
+    t.date "occurs_on", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["event_id"], name: "index_event_occurrences_on_event_id"
+    t.index ["user_id", "event_id", "occurs_on"], name: "index_event_occurrences_unique", unique: true
+    t.index ["user_id"], name: "index_event_occurrences_on_user_id"
   end
 
   create_table "events", force: :cascade do |t|
@@ -221,6 +235,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_22_110000) do
     t.index ["user_id"], name: "index_syllabuses_on_user_id"
   end
 
+  create_table "tracking_entries", force: :cascade do |t|
+    t.boolean "completed", default: false, null: false
+    t.datetime "completed_at"
+    t.datetime "created_at", null: false
+    t.integer "trackable_id", null: false
+    t.string "trackable_label", null: false
+    t.string "trackable_type", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id", "trackable_type", "trackable_id"], name: "index_tracking_entries_on_user_and_trackable", unique: true
+    t.index ["user_id"], name: "index_tracking_entries_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email", default: "", null: false
@@ -294,6 +321,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_22_110000) do
   add_foreign_key "courses", "users"
   add_foreign_key "documents", "users"
   add_foreign_key "event_exceptions", "events"
+  add_foreign_key "event_occurrences", "events"
+  add_foreign_key "event_occurrences", "users"
   add_foreign_key "events", "projects"
   add_foreign_key "events", "users"
   add_foreign_key "notifications", "users"
@@ -306,6 +335,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_22_110000) do
   add_foreign_key "schedules", "users"
   add_foreign_key "syllabuses", "courses", on_delete: :nullify
   add_foreign_key "syllabuses", "users"
+  add_foreign_key "tracking_entries", "users"
   add_foreign_key "widget_configs", "users"
   add_foreign_key "work_shifts", "users"
 end

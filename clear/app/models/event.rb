@@ -3,7 +3,8 @@
 class Event < ApplicationRecord
   belongs_to :user
   belongs_to :project, optional: true
-  has_many :event_exceptions, dependent: :destroy
+  has_many :event_exceptions,  dependent: :destroy
+  has_many :event_occurrences, dependent: :destroy
   has_many :notifications, as: :notifiable, dependent: :destroy
 
   validates :title, presence: true
@@ -68,6 +69,47 @@ class Event < ApplicationRecord
     luminance = (0.2126 * srgb_linear(r) + 0.7152 * srgb_linear(g) + 0.0722 * srgb_linear(b))
 
     luminance > 0.55 ? "#0A0A0A" : "#F9FAFB"
+  end
+
+  # Resolve the event's per-session duration in minutes.
+  # Preference order: explicit duration_minutes > computed from ends_at - starts_at > 60 fallback.
+  # The computed branch matters because many events in this app have ends_at set
+  # but no duration_minutes (e.g. events created before duration_minutes was a column).
+  def effective_duration_minutes
+    return duration_minutes if duration_minutes.present?
+    return ((ends_at - starts_at) / 60.0).round if starts_at.present? && ends_at.present?
+    60
+  end
+
+  # Generate one EventOccurrence per past date this event has occurred on.
+  # Uses the same recurrence logic as occurrences_between so the two stay in sync.
+  # Self-heals duration_hours on existing occurrences so a corrected event
+  # duration propagates the next time the user opens the widget.
+  def generate_past_occurrences_for(user)
+    duration_hrs = effective_duration_minutes.to_f / 60.0
+    today        = Date.current
+
+    upsert = lambda do |date|
+      occ = EventOccurrence.find_or_create_by!(event: self, user: user, occurs_on: date) do |o|
+        o.duration_hours = duration_hrs
+      end
+      occ.update!(duration_hours: duration_hrs) if occ.duration_hours.to_f != duration_hrs
+    end
+
+    if recurring? && repeat_days.present?
+      start  = starts_at.to_date
+      finish = [ repeat_until || today, today ].min
+      excluded = event_exceptions.pluck(:excluded_date).to_set
+
+      date = start
+      while date <= finish
+        upsert.call(date) if repeat_days.include?(date.wday) && !excluded.include?(date)
+        date += 1.day
+      end
+    else
+      return unless starts_at.present? && starts_at.to_date <= today
+      upsert.call(starts_at.to_date)
+    end
   end
 
   private

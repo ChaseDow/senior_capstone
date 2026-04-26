@@ -114,6 +114,19 @@ Rails.application.routes.draw do
   get "/analytics/widgets",      to: "analytics#widgets"
   get "/analytics/widget_items", to: "analytics#widget_items"
   resources :widget_configs, only: [:create, :update, :destroy]
+  resources :tracking_entries, only: [:index, :create, :update, :destroy]
+  resources :event_occurrences, only: [:index, :update] do
+    collection do
+      get :summary
+    end
+  end
+
+  namespace :api do
+    get "search/events",       to: "search#events"
+    get "search/courses",      to: "search#courses"
+    get "search/course_items", to: "search#course_items"
+    get "search/work_shifts",  to: "search#work_shifts"
+  end
   get "/schedule",       to: "schedule#week"
   get "/schedule/week",  to: "schedule#week"
 

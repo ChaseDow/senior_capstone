@@ -1,6 +1,21 @@
 import { Controller } from "@hotwired/stimulus"
 
 const CONFIGURED_TYPES = new Set(["stat", "progress"])
+const TRACKING_TYPES   = new Set(["tracking-card"])
+
+const SEARCH_ENDPOINTS = {
+  Event:      "/api/search/events",
+  Course:     "/api/search/courses",
+  CourseItem: "/api/search/course_items",
+  WorkShift:  "/api/search/work_shifts",
+}
+
+const RESOURCE_LABELS = {
+  Event:      "Event",
+  Course:     "Course",
+  CourseItem: "Course Item",
+  WorkShift:  "Work Shift",
+}
 
 export default class extends Controller {
   static targets = ["panel", "backdrop", "body"]
@@ -14,6 +29,7 @@ export default class extends Controller {
   close() {
     this.panelTarget.style.transform = "translateX(100%)"
     this.backdropTarget.classList.add("hidden")
+    this._currentResourceType = null
   }
 
   selectWidget(event) {
@@ -27,15 +43,249 @@ export default class extends Controller {
 
     if (CONFIGURED_TYPES.has(config.widgetType)) {
       this._showConfigForm(config)
+    } else if (TRACKING_TYPES.has(config.widgetType)) {
+      this._showTrackingTypeSelect()
     } else {
       window.dispatchEvent(new CustomEvent("widget:add", { detail: config }))
       this.close()
     }
   }
 
+  // ── Tracking card flow ────────────────────────────────────────────────────
+
+  _showTrackingTypeSelect() {
+    this._saveCardHTML()
+    this.bodyTarget.style.display = "flex"
+    this.bodyTarget.style.flexDirection = "column"
+    this.bodyTarget.style.gap = "0"
+
+    this.bodyTarget.innerHTML = `
+      <div style="padding:4px 0;">
+        <button class="cfg-back" style="background:none;border:none;color:var(--studs-accent,#6366f1);
+                font-size:13px;cursor:pointer;padding:0;margin-bottom:16px;">← Back</button>
+        <div style="font-size:15px;font-weight:600;color:#f4f4f5;margin-bottom:4px;">
+          What are you tracking?
+        </div>
+        <div style="font-size:12px;color:#71717a;margin-bottom:16px;">
+          Pick a type to search for a specific item
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          ${["Event", "Course", "CourseItem", "WorkShift"].map(type => `
+            <button class="track-type-btn"
+                    data-resource-type="${type}"
+                    style="padding:12px 14px;background:var(--studs-panel-bg,#1e1e2e);
+                           border:1px solid var(--studs-border,#3f3f46);border-radius:10px;
+                           color:#e4e4e7;font-size:13px;font-weight:500;text-align:left;
+                           cursor:pointer;transition:border-color 0.15s;"
+                    onmouseover="this.style.borderColor='var(--studs-accent,#6366f1)'"
+                    onmouseout="this.style.borderColor='var(--studs-border,#3f3f46)'">
+              ${RESOURCE_LABELS[type]}
+            </button>
+          `).join("")}
+        </div>
+      </div>`
+
+    this.bodyTarget.querySelector(".cfg-back")
+      .addEventListener("click", () => this._showCards())
+
+    this.bodyTarget.querySelectorAll(".track-type-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        this._showTrackingSearch(btn.dataset.resourceType)
+      })
+    })
+  }
+
+  _showTrackingSearch(resourceType) {
+    this._currentResourceType = resourceType
+    const label = RESOURCE_LABELS[resourceType]
+
+    this.bodyTarget.innerHTML = `
+      <div style="padding:4px 0;display:flex;flex-direction:column;height:100%;">
+        <button class="cfg-back" style="background:none;border:none;color:var(--studs-accent,#6366f1);
+                font-size:13px;cursor:pointer;padding:0;margin-bottom:16px;">← Back</button>
+        <div style="font-size:15px;font-weight:600;color:#f4f4f5;margin-bottom:4px;">
+          Search ${label}s
+        </div>
+        <div style="font-size:12px;color:#71717a;margin-bottom:12px;">
+          Click a result to add it to your dashboard
+        </div>
+
+        <input id="tracking-search-input" type="text" autocomplete="off"
+               placeholder="Search ${label}s…"
+               style="width:100%;padding:8px 10px;background:rgba(255,255,255,0.05);
+                      border:1px solid var(--studs-border,#3f3f46);border-radius:8px;
+                      color:#f4f4f5;font-size:13px;box-sizing:border-box;outline:none;
+                      margin-bottom:10px;"/>
+
+        <div id="tracking-search-results"
+             style="flex:1;overflow-y:auto;border-radius:8px;">
+          <p style="color:#71717a;font-size:12px;padding:8px 0;">Loading…</p>
+        </div>
+      </div>`
+
+    this.bodyTarget.querySelector(".cfg-back")
+      .addEventListener("click", () => this._showTrackingTypeSelect())
+
+    const input = this.bodyTarget.querySelector("#tracking-search-input")
+    input.addEventListener("input", e => {
+      clearTimeout(this._searchTimeout)
+      this._searchTimeout = setTimeout(() => this._runSearch(e.target.value), 300)
+    })
+    input.focus()
+
+    this._runSearch("")
+  }
+
+  _runSearch(query) {
+    const resultsEl = this.bodyTarget.querySelector("#tracking-search-results")
+    if (!resultsEl) return
+
+    const endpoint = SEARCH_ENDPOINTS[this._currentResourceType]
+    if (!endpoint) return
+
+    fetch(`${endpoint}?q=${encodeURIComponent(query)}`, {
+      credentials: "same-origin",
+      headers: { "Accept": "application/json", "X-CSRF-Token": csrfToken() },
+    })
+      .then(r => r.json())
+      .then(results => this._renderSearchResults(resultsEl, results))
+      .catch(() => {
+        resultsEl.innerHTML = '<p style="color:#f87171;font-size:12px;padding:8px 0;">Failed to load results</p>'
+      })
+  }
+
+  _renderSearchResults(container, results) {
+    if (results.length === 0) {
+      container.innerHTML = '<p style="color:#71717a;font-size:12px;padding:8px 0;">No results found</p>'
+      return
+    }
+
+    container.innerHTML = results.map(r => `
+      <div class="search-result-item"
+           data-resource-id="${r.id}"
+           data-resource-label="${escAttr(r.label)}"
+           style="padding:10px 12px;cursor:pointer;border-radius:6px;
+                  font-size:13px;color:#e4e4e7;transition:background 0.15s;"
+           onmouseover="this.style.background='rgba(99,102,241,0.12)'"
+           onmouseout="this.style.background='transparent'">
+        ${esc(r.label)}
+      </div>
+    `).join("")
+
+    container.querySelectorAll(".search-result-item").forEach(el => {
+      el.addEventListener("click", () => {
+        if (this._currentResourceType === "Event") {
+          this._showGoalStep(el.dataset.resourceId, el.dataset.resourceLabel)
+        } else {
+          this._addTrackingEntry(el.dataset.resourceId, el.dataset.resourceLabel)
+        }
+      })
+    })
+  }
+
+  // Step shown only for Events: ask for a goal before saving
+  _showGoalStep(resourceId, resourceLabel) {
+    this.bodyTarget.innerHTML = `
+      <div style="padding:4px 0;">
+        <button class="cfg-back" style="background:none;border:none;color:var(--studs-accent,#6366f1);
+                font-size:13px;cursor:pointer;padding:0;margin-bottom:16px;">← Back</button>
+        <div style="font-size:15px;font-weight:600;color:#f4f4f5;margin-bottom:4px;">
+          Set a goal for <span style="color:var(--studs-accent,#6366f1);">${esc(resourceLabel)}</span>
+        </div>
+        <div style="font-size:12px;color:#71717a;margin-bottom:20px;">
+          How many hours do you want to complete?
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div>
+            <label style="font-size:12px;font-weight:500;color:#a1a1aa;display:block;margin-bottom:6px;">
+              Goal (hours)
+            </label>
+            <input id="goal-hours-input" type="number" value="10" min="1" max="1000" step="0.5"
+                   autocomplete="off"
+                   style="width:100%;padding:8px 10px;background:rgba(255,255,255,0.05);
+                          border:1px solid var(--studs-border,#3f3f46);border-radius:8px;
+                          color:#f4f4f5;font-size:13px;box-sizing:border-box;outline:none;"/>
+          </div>
+
+          <button id="goal-confirm-btn"
+                  style="padding:10px;background:var(--studs-accent,#6366f1);color:white;
+                         border:none;border-radius:8px;font-size:13px;font-weight:600;
+                         cursor:pointer;">
+            Add Widget
+          </button>
+        </div>
+      </div>`
+
+    this.bodyTarget.querySelector(".cfg-back")
+      .addEventListener("click", () => this._showTrackingSearch("Event"))
+
+    this.bodyTarget.querySelector("#goal-confirm-btn")
+      .addEventListener("click", () => {
+        const goalHours = parseFloat(
+          this.bodyTarget.querySelector("#goal-hours-input").value || "10"
+        )
+        this._addTrackingEntry(resourceId, resourceLabel, goalHours)
+      })
+
+    // Focus the input
+    requestAnimationFrame(() => {
+      this.bodyTarget.querySelector("#goal-hours-input")?.focus()
+    })
+  }
+
+  _addTrackingEntry(resourceId, resourceLabel, goalHours = null) {
+    fetch("/tracking_entries", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "X-CSRF-Token": csrfToken(),
+      },
+      body: JSON.stringify({
+        tracking_entry: {
+          trackable_type: this._currentResourceType,
+          trackable_id:   resourceId,
+        },
+      }),
+    })
+      .then(async r => {
+        if (!r.ok) {
+          const body = await r.json().catch(() => ({}))
+          const msg = body.errors?.join(", ") || "Failed to add widget"
+          alert(msg)
+          return
+        }
+        return r.json()
+      })
+      .then(entry => {
+        if (!entry) return
+        window.dispatchEvent(new CustomEvent("widget:add", {
+          detail: {
+            entryId:       entry.id,
+            widgetType:    "tracking-card",
+            resourceType:  entry.trackable_type,
+            resourceId:    entry.trackable_id,
+            resourceLabel: entry.trackable_label,
+            completed:     entry.completed,
+            completedAt:   entry.completed_at,
+            goalHours:     goalHours,
+            w: 4,
+            h: 3,
+          },
+        }))
+        this.close()
+      })
+      .catch(() => alert("Failed to add widget. Please try again."))
+  }
+
   // ── Card / form switching ─────────────────────────────────────────────────
 
   _showCards() {
+    this.bodyTarget.style.display = ""
+    this.bodyTarget.style.flexDirection = ""
+    this.bodyTarget.style.gap = ""
     if (this._cardHTML) this.bodyTarget.innerHTML = this._cardHTML
   }
 
@@ -228,13 +478,12 @@ export default class extends Controller {
       })
       if (!res.ok) throw new Error(await res.text())
       const data = await res.json()
-      // data comes from as_widget_json — map it to the widget:add shape
       window.dispatchEvent(new CustomEvent("widget:add", { detail: {
         widgetType: data.type,
         label:      data.title,
         w:          data.w,
         h:          data.h,
-        serverData: data,   // pass full server payload for real values
+        serverData: data,
       }}))
       this.close()
     } catch (e) {
@@ -253,4 +502,14 @@ export default class extends Controller {
 
 function csrfToken() {
   return document.querySelector('meta[name="csrf-token"]')?.content ?? ""
+}
+
+function esc(str) {
+  return String(str)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;").replace(/"/g, "&quot;")
+}
+
+function escAttr(str) {
+  return String(str).replace(/"/g, "&quot;").replace(/'/g, "&#39;")
 }
