@@ -49,9 +49,14 @@
             <% @items_by_day[day].each do |item| %>
               <% bg = item.try(:color).presence || "#34D399" %>
               <% text_color = item.try(:contrast_text_color) || "#F9FAFB" %>
+<<<<<<< HEAD
               <div class="rounded-xl border px-2.5 py-1.5 text-sm backdrop-blur-sm"
                    style="background-color: <%= hex_to_rgba.(bg, 0.55) %>; color: <%= text_color %>; border-color: <%= hex_to_rgba.(bg, 0.20) %>; border-left: 3px solid <%= bg %>;">
                 <div class="font-bold truncate text-[12px]">
+=======
+              <div class="rounded-xl px-2 py-2 text-sm" style="background-color: <%= bg %>;">
+                <div class="font-medium truncate" style="color: <%= text_color %>;">
+>>>>>>> 9c40a28 (truncated ti...)
                   <%= item.title %>
                 </div>
                 <% if item.starts_at.present? %>
