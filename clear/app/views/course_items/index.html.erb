@@ -2,8 +2,6 @@
 <% content_for :page_subtitle, "Course items" %>
 <% color = @course.try(:color).presence || "#34D399" %>
 <% draft_course_item_confirm = current_user_draft.present? ? "This action will affect your main calendar. Will you like to continue?" : nil %>
-<div class="rounded-2xl p-6 space-y-5" style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg);">
-
 <div class="rounded-2xl p-6 space-y-5" style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg);"
      data-controller="bulk-select"
      data-bulk-select-url-value="<%= destroy_multiple_course_course_items_path(@course) %>">
@@ -14,40 +12,6 @@
       <div class="text-base font-semibold text-zinc-100 truncate"><%= @course.title.presence || "Course" %></div>
       <div class="text-sm text-zinc-500">Add and manage assignments, exams, presentations, and more.</div>
     </div>
-<<<<<<< HEAD
-<<<<<<< HEAD
-    <div class="flex items-center gap-1.5">
-      <button type="button"
-              class="studs-nav-btn"
-              data-action="click->bulk-select#toggleMode"
-        data-bulk-select-target="selectButton">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-        </svg>
-        Select
-      </button>
-=======
-<<<<<<< HEAD
->>>>>>> 14b3f24 (Added select functionality for users to delete multiple courses/events/work shifts)
-    <div class="flex items-center gap-2 shrink-0">
-      <%= link_to grades_course_path(@course), class: "studs-nav-btn" do %>
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-        </svg>
-        Grades
-      <% end %>
-=======
-<<<<<<< HEAD
-=======
->>>>>>> d569469 (Added confirmation message for Course Items while in draft mode)
-    <%= link_to courses_path, class: "studs-nav-btn shrink-0" do %>
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-      </svg>
-      Back to courses
-    <% end %>
-<<<<<<< HEAD
-=======
     <div class="flex items-center gap-1.5">
       <button type="button"
               class="studs-nav-btn"
@@ -58,7 +22,6 @@
         </svg>
         Select
       </button>
->>>>>>> eabf525 (Added select functionality for users to delete multiple courses/events/work shifts)
       <%= link_to courses_path, class: "studs-nav-btn" do %>
         <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
           <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
@@ -66,25 +29,14 @@
         Back to courses
       <% end %>
     </div>
-<<<<<<< HEAD
-=======
->>>>>>> 33103bf (Added select functionality for users to delete multiple courses/events/work shifts)
->>>>>>> eabf525 (Added select functionality for users to delete multiple courses/events/work shifts)
-=======
->>>>>>> d569469 (Added confirmation message for Course Items while in draft mode)
   </div>
+
   <!-- Add item form -->
   <div class="rounded-2xl p-4" style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg-2);">
     <div class="text-[10px] font-bold uppercase tracking-widest mb-3" style="color: var(--studs-accent); opacity: 0.8;">New item</div>
     <%= render "form", course: @course, course_item: @course_item %>
   </div>
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
 
-=======
->>>>>>> 14b3f24 (Added select functionality for users to delete multiple courses/events/work shifts)
   <!-- Bulk-delete action bar -->
   <div style="display: none; background-color: var(--studs-panel-hover); border: 1px solid var(--studs-border);"
        class="flex items-center justify-between gap-3 px-4 py-2.5 rounded-xl"
@@ -92,25 +44,15 @@
     <span class="text-sm text-zinc-400"><span data-bulk-select-target="countLabel">0 selected</span></span>
     <button type="button"
             data-action="click->bulk-select#deleteSelected"
-<<<<<<< HEAD
-      class="studs-nav-btn"
-      style="border-color: rgba(239,68,68,0.4); color: #fca5a5;">
-=======
             class="studs-nav-btn"
             style="border-color: rgba(239,68,68,0.4); color: #fca5a5;">
->>>>>>> 14b3f24 (Added select functionality for users to delete multiple courses/events/work shifts)
       <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
         <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
       </svg>
       Delete selected
     </button>
   </div>
-<<<<<<< HEAD
-=======
->>>>>>> eabf525 (Added select functionality for users to delete multiple courses/events/work shifts)
->>>>>>> 14b3f24 (Added select functionality for users to delete multiple courses/events/work shifts)
-=======
->>>>>>> d569469 (Added confirmation message for Course Items while in draft mode)
+
   <!-- Items list -->
   <div class="overflow-hidden rounded-2xl" style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg-2);">
     <% if @course_items.any? %>
@@ -118,23 +60,6 @@
         <div class="flex items-start justify-between gap-4 p-4"
              style="border-left: 4px solid <%= color %>;
                     <%= i > 0 ? "border-top: 1px solid var(--studs-divider);" : "" %>">
-<<<<<<< HEAD
-<<<<<<< HEAD
-          <div style="display: none;" class="shrink-0 self-center pr-1" data-bulk-select-target="checkboxWrapper">
-            <input type="checkbox"
-                   value="<%= item.id %>"
-                   data-bulk-select-target="checkbox"
-                   data-action="click->bulk-select#toggle"
-            style="accent-color: var(--studs-accent); width: 1rem; height: 1rem; cursor: pointer;">
-          </div>
-=======
-<<<<<<< HEAD
->>>>>>> 14b3f24 (Added select functionality for users to delete multiple courses/events/work shifts)
-          <div class="min-w-0 flex-1">
-            <p class="font-medium text-zinc-100 truncate"><%= item.title.presence || "(Untitled)" %></p>
-=======
-=======
->>>>>>> d569469 (Added confirmation message for Course Items while in draft mode)
           <div style="display: none;" class="shrink-0 self-center pr-1" data-bulk-select-target="checkboxWrapper">
             <input type="checkbox"
                    value="<%= item.id %>"
@@ -163,10 +88,10 @@
               Edit
             <% end %>
             <%= button_to course_course_item_path(@course, item),
-                  method: :delete,
-                  form: { data: { turbo_confirm: (draft_course_item_confirm || "Delete this item?") } },
-                  class: "studs-nav-btn",
-                  style: "border-color: rgba(239,68,68,0.4); color: #fca5a5;" do %>
+                method: :delete,
+                form: { data: { turbo_confirm: (draft_course_item_confirm || "Delete this item?") } },
+                class: "studs-nav-btn",
+                style: "border-color: rgba(239,68,68,0.4); color: #fca5a5;" do %>
               <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
               </svg>
