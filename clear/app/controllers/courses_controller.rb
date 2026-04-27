@@ -175,6 +175,11 @@ class CoursesController < ApplicationController
   def destroy_all
     current_user.courses.destroy_all
     redirect_to courses_path, notice: "All courses deleted."
+  def destroy_multiple
+    ids = Array(params[:ids]).map(&:to_i)
+    current_user.courses.where(id: ids).destroy_all
+    n = ids.size
+    redirect_to courses_path, notice: "#{n} course#{n == 1 ? '' : 's'} deleted."
   end
 
   def destroy_multiple
@@ -351,4 +356,4 @@ class CoursesController < ApplicationController
       repeat_days: []
     )
   end
-end
+
