@@ -48,6 +48,7 @@ end
     end
   end
 
+<<<<<<< HEAD
   get "auto_schedule/preview", to: "auto_schedule#preview", as: :auto_schedule_preview
 =======
       delete :destroy_multiple
@@ -55,6 +56,8 @@ end
   end
 >>>>>>> 33103bf (Added select functionality for users to delete multiple courses/events/work shifts)
 
+=======
+>>>>>>> 98035b2 (Added select functionality for users to delete multiple courses/events/work shifts)
   scope :university_calendar do
     get  "preview",     to: "university_calendar#preview",     as: :university_calendar_preview
     get  "pdf_preview", to: "university_calendar#pdf_preview_page", as: :university_calendar_pdf_preview_page

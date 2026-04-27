@@ -124,10 +124,18 @@ class WorkShiftsController < ApplicationController
   end
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   def destroy_all
     current_user.work_shifts.destroy_all
     redirect_to work_shifts_path, notice: "All shifts deleted."
 =======
+=======
+  def destroy_all
+    current_user.work_shifts.destroy_all
+    redirect_to work_shifts_path, notice: "All shifts deleted."
+  end
+
+>>>>>>> 98035b2 (Added select functionality for users to delete multiple courses/events/work shifts)
   def destroy_multiple
     ids = Array(params[:ids]).map(&:to_i)
     current_user.work_shifts.where(id: ids).destroy_all
