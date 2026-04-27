@@ -54,10 +54,18 @@ Rails.application.routes.draw do
   resources :work_shifts do
     collection do
       delete :destroy_all
-      delete :destroy_multiple
+<<<<<<< HEAD
     end
     member do
       post :convert
+    end
+  end
+
+  get "auto_schedule/preview", to: "auto_schedule#preview", as: :auto_schedule_preview
+=======
+=======
+>>>>>>> 8863c7c (Added delete all  functionality to courses and workshifts)
+      delete :destroy_multiple
     end
   end
 
@@ -70,15 +78,26 @@ Rails.application.routes.draw do
     post "import",      to: "university_calendar#import",      as: :university_calendar_import
   end
 
+
   resources :courses do
     collection do
       delete :destroy_all
-      delete :destroy_multiple
+<<<<<<< HEAD
     end
     member do
       patch :update_grade_weights
       get   :grades
       post  :convert
+    end
+    resources :course_items, only: %i[index create show edit update destroy]
+=======
+=======
+>>>>>>> 8863c7c (Added delete all  functionality to courses and workshifts)
+      delete :destroy_multiple
+    end
+    member do
+      patch :update_grade_weights
+      get   :grades
     end
     resources :course_items, only: %i[index create show edit update destroy] do
       collection do
@@ -86,6 +105,7 @@ Rails.application.routes.draw do
       end
     end
   end
+
 
   resources :agenda
 
