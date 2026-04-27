@@ -37,16 +37,23 @@ end
   resources :events do
     collection do
       delete :destroy_all
+      delete :destroy_multiple
     end
   end
 
   resources :work_shifts do
     collection do
+<<<<<<< HEAD
       delete :destroy_all
     end
   end
 
   get "auto_schedule/preview", to: "auto_schedule#preview", as: :auto_schedule_preview
+=======
+      delete :destroy_multiple
+    end
+  end
+>>>>>>> 33103bf (Added select functionality for users to delete multiple courses/events/work shifts)
 
   scope :university_calendar do
     get  "preview",     to: "university_calendar#preview",     as: :university_calendar_preview
@@ -56,9 +63,19 @@ end
   end
   resources :courses do
     collection do
+<<<<<<< HEAD
       delete :destroy_all
     end
     resources :course_items, only: %i[index create show edit update destroy]
+=======
+      delete :destroy_multiple
+    end
+    resources :course_items, only: %i[index create show edit update destroy] do
+      collection do
+        delete :destroy_multiple
+      end
+    end
+>>>>>>> 33103bf (Added select functionality for users to delete multiple courses/events/work shifts)
   end
   resources :agenda
 

@@ -106,6 +106,13 @@ class CourseItemsController < ApplicationController
     end
   end
 
+  def destroy_multiple
+    ids = Array(params[:ids]).map(&:to_i)
+    @course.course_items.where(id: ids).destroy_all
+    n = ids.size
+    redirect_to course_course_items_path(@course), notice: "#{n} item#{n == 1 ? '' : 's'} deleted."
+  end
+
   def destroy
     @course_item.destroy!
 
