@@ -2,6 +2,7 @@
 <% content_for :page_subtitle, "Course items" %>
 <% color = @course.try(:color).presence || "#34D399" %>
 <<<<<<< HEAD
+<<<<<<< HEAD
 <% draft_course_item_confirm = current_user_draft.present? ? "This action will affect your main calendar. Will you like to continue?" : nil %>
 <div class="rounded-2xl p-6 space-y-5" style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg);">
 =======
@@ -9,6 +10,10 @@
      data-controller="bulk-select"
      data-bulk-select-url-value="<%= destroy_multiple_course_course_items_path(@course) %>">
 >>>>>>> 33103bf (Added select functionality for users to delete multiple courses/events/work shifts)
+=======
+<% draft_course_item_confirm = current_user_draft.present? ? "This action will affect your main calendar. Will you like to continue?" : nil %>
+<div class="rounded-2xl p-6 space-y-5" style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg);">
+>>>>>>> 2b6730d (Added confirmation message for Course Items while in draft mode)
   <!-- Header -->
   <div class="flex items-center justify-between gap-4">
     <div class="min-w-0 flex-1">
