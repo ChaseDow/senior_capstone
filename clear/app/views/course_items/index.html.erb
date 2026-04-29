@@ -2,15 +2,19 @@
 <% content_for :page_subtitle, "Course items" %>
 <% color = @course.try(:color).presence || "#34D399" %>
 <% draft_course_item_confirm = current_user_draft.present? ? "This action will affect your main calendar. Will you like to continue?" : nil %>
+<div class="rounded-2xl p-6 space-y-5" style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg);">
+
 <div class="rounded-2xl p-6 space-y-5" style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg);"
      data-controller="bulk-select"
      data-bulk-select-url-value="<%= destroy_multiple_course_course_items_path(@course) %>">
+
   <!-- Header -->
   <div class="flex items-center justify-between gap-4">
     <div class="min-w-0 flex-1">
       <div class="text-base font-semibold text-zinc-100 truncate"><%= @course.title.presence || "Course" %></div>
       <div class="text-sm text-zinc-500">Add and manage assignments, exams, presentations, and more.</div>
     </div>
+<<<<<<< HEAD
 <<<<<<< HEAD
     <div class="flex items-center gap-1.5">
       <button type="button"
@@ -34,12 +38,15 @@
       <% end %>
 =======
 <<<<<<< HEAD
+=======
+>>>>>>> d569469 (Added confirmation message for Course Items while in draft mode)
     <%= link_to courses_path, class: "studs-nav-btn shrink-0" do %>
       <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
         <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
       </svg>
       Back to courses
     <% end %>
+<<<<<<< HEAD
 =======
     <div class="flex items-center gap-1.5">
       <button type="button"
@@ -63,13 +70,15 @@
 =======
 >>>>>>> 33103bf (Added select functionality for users to delete multiple courses/events/work shifts)
 >>>>>>> eabf525 (Added select functionality for users to delete multiple courses/events/work shifts)
+=======
+>>>>>>> d569469 (Added confirmation message for Course Items while in draft mode)
   </div>
-
   <!-- Add item form -->
   <div class="rounded-2xl p-4" style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg-2);">
     <div class="text-[10px] font-bold uppercase tracking-widest mb-3" style="color: var(--studs-accent); opacity: 0.8;">New item</div>
     <%= render "form", course: @course, course_item: @course_item %>
   </div>
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
 <<<<<<< HEAD
@@ -100,6 +109,8 @@
 =======
 >>>>>>> eabf525 (Added select functionality for users to delete multiple courses/events/work shifts)
 >>>>>>> 14b3f24 (Added select functionality for users to delete multiple courses/events/work shifts)
+=======
+>>>>>>> d569469 (Added confirmation message for Course Items while in draft mode)
   <!-- Items list -->
   <div class="overflow-hidden rounded-2xl" style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg-2);">
     <% if @course_items.any? %>
@@ -107,6 +118,7 @@
         <div class="flex items-start justify-between gap-4 p-4"
              style="border-left: 4px solid <%= color %>;
                     <%= i > 0 ? "border-top: 1px solid var(--studs-divider);" : "" %>">
+<<<<<<< HEAD
 <<<<<<< HEAD
           <div style="display: none;" class="shrink-0 self-center pr-1" data-bulk-select-target="checkboxWrapper">
             <input type="checkbox"
@@ -121,6 +133,8 @@
           <div class="min-w-0 flex-1">
             <p class="font-medium text-zinc-100 truncate"><%= item.title.presence || "(Untitled)" %></p>
 =======
+=======
+>>>>>>> d569469 (Added confirmation message for Course Items while in draft mode)
           <div style="display: none;" class="shrink-0 self-center pr-1" data-bulk-select-target="checkboxWrapper">
             <input type="checkbox"
                    value="<%= item.id %>"
@@ -130,7 +144,6 @@
           </div>
           <div class="min-w-0">
             <p class="font-medium text-zinc-100"><%= item.title.presence || "(Untitled)" %></p>
->>>>>>> 33103bf (Added select functionality for users to delete multiple courses/events/work shifts)
             <p class="mt-1 text-sm text-zinc-400">
               <span class="inline-block rounded px-1.5 py-0.5 text-[10px] font-semibold mr-1"
                     style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-hover); color: var(--studs-accent);">
