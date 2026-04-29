@@ -117,3 +117,6 @@ application.register("typewriter", TypewriterController)
 
 import UsernameEditController from "./username_edit_controller"
 application.register("username-edit", UsernameEditController)
+
+import WidgetGridController from "./widget_grid_controller"
+application.register("widget-grid", WidgetGridController)

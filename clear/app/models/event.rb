@@ -4,7 +4,10 @@ class Event < ApplicationRecord
   belongs_to :user
   belongs_to :project, optional: true
   has_many :event_exceptions, dependent: :destroy
+  has_many :event_occurrences, dependent: :destroy
   has_many :notifications, as: :notifiable, dependent: :destroy
+
+  scope :trackable, -> { where(trackable: true) }
 
   attr_accessor :auto_schedule
 
@@ -133,7 +136,7 @@ class Event < ApplicationRecord
   end
 
   def self.ransackable_attributes(auth_object = nil)
-    [ "all_day", "color", "created_at", "description", "duration_minutes", "ends_at", "location", "recurring", "repeat_days", "repeat_until", "starts_at", "title", "updated_at" ]
+    [ "all_day", "color", "created_at", "description", "duration_minutes", "ends_at", "location", "recurring", "repeat_days", "repeat_until", "starts_at", "title", "trackable", "updated_at" ]
   end
 
   def self.ransackable_associations(auth_object = nil)

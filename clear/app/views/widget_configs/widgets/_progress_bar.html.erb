@@ -1,0 +1,39 @@
+<%# locals: (widget:) %>
+<%
+  days        = widget.date_range_days
+  range_start = days.days.ago.to_date
+  range_end   = Date.current
+  scope       = widget.user.event_occurrences
+                      .where(event_id: widget.event_ids)
+                      .where(occurred_on: range_start..range_end)
+
+  current = case widget.unit
+  when "hours"      then (scope.where(completed: true).sum(:duration_minutes).to_f / 60).round(1)
+  when "minutes"    then scope.where(completed: true).sum(:duration_minutes).to_i
+  else                   scope.where(completed: true).count
+  end
+
+  goal = [ widget.goal, 1 ].max
+  pct  = [ (current.to_f / goal * 100).round, 100 ].min
+%>
+
+<%= render layout: "widget_configs/widget_chrome", locals: { widget: widget } do %>
+  <% if widget.event_ids.empty? %>
+    <p class="text-xs text-zinc-500">No events selected — edit this widget to choose events.</p>
+  <% else %>
+    <div class="flex flex-col justify-center h-full">
+      <div class="flex items-baseline justify-between mb-2">
+        <div class="flex items-baseline gap-1.5">
+          <span class="text-2xl font-bold text-zinc-100"><%= current %></span>
+          <span class="text-xs font-medium text-zinc-400">/ <%= goal %> <%= widget.unit %></span>
+        </div>
+        <span class="text-sm font-bold" style="color: <%= widget.accent_color %>;"><%= pct %>%</span>
+      </div>
+      <div class="h-3 w-full rounded-full overflow-hidden" style="background-color: var(--studs-panel-bg-2);">
+        <div class="h-full rounded-full transition-all duration-700"
+             style="width: <%= pct %>%; background-color: <%= widget.accent_color %>;"></div>
+      </div>
+      <p class="text-[10px] text-zinc-500 mt-2">Last <%= days %> days</p>
+    </div>
+  <% end %>
+<% end %>

@@ -1,0 +1,53 @@
+<%# locals: (widget:) %>
+<%
+  days        = widget.date_range_days
+  range_start = days.days.ago.to_date
+  range_end   = Date.current
+  occurrences = widget.user.event_occurrences
+                      .where(event_id: widget.event_ids, completed: true)
+                      .where(occurred_on: range_start..range_end)
+  buckets     = occurrences.group(:occurred_on).count
+  series      = (range_start..range_end).map { |d| buckets[d].to_i }
+  max_count   = [ series.max.to_i, 1 ].max
+  total       = series.sum
+  width       = 100.0
+  height      = 100.0
+  step        = series.length > 1 ? width / (series.length - 1) : 0
+  points      = series.each_with_index.map { |v, i|
+    x = i * step
+    y = height - (v.to_f / max_count * (height - 10))
+    "#{x.round(2)},#{y.round(2)}"
+  }.join(" ")
+  area_path = "M0,#{height} L#{points.gsub(' ', ' L')} L#{width.round(2)},#{height} Z"
+%>
+
+<%= render layout: "widget_configs/widget_chrome", locals: { widget: widget } do %>
+  <% if widget.event_ids.empty? %>
+    <p class="text-xs text-zinc-500">No events selected — edit this widget to choose events.</p>
+  <% elsif total.zero? %>
+    <p class="text-xs text-zinc-500">No completions in the last <%= days %> days.</p>
+  <% else %>
+    <div class="flex flex-col h-full">
+      <div class="flex items-baseline gap-2 mb-2 shrink-0">
+        <span class="text-xl font-bold text-zinc-100"><%= total %></span>
+        <span class="text-[10px] font-medium text-zinc-500">completions · last <%= days %> days</span>
+      </div>
+      <div class="flex-1 min-h-0">
+        <svg viewBox="0 0 <%= width %> <%= height %>" preserveAspectRatio="none" class="w-full h-full">
+          <path d="<%= area_path %>" fill="<%= widget.accent_color %>" fill-opacity="0.15"/>
+          <polyline points="<%= points %>"
+                    fill="none"
+                    stroke="<%= widget.accent_color %>"
+                    stroke-width="1.5"
+                    vector-effect="non-scaling-stroke"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="flex justify-between mt-1 shrink-0">
+        <span class="text-[9px] text-zinc-600"><%= range_start.strftime("%-b %-d") %></span>
+        <span class="text-[9px] text-zinc-600"><%= range_end.strftime("%-b %-d") %></span>
+      </div>
+    </div>
+  <% end %>
+<% end %>

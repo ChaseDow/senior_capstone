@@ -122,8 +122,19 @@ Rails.application.routes.draw do
 
   get "projects/join", to: "projects#join", as: :join_project
   get "/ui",             to: "ui#show"
-  get "/analytics",         to: "analytics#show",    as: "analytics"
-  get "/analytics/compare", to: "analytics#compare", as: "analytics_compare"
+  get "/analytics",          to: "analytics#show",     as: "analytics"
+  get "/analytics/compare",  to: "analytics#compare",  as: "analytics_compare"
+  get "/analytics/personal", to: "analytics#personal", as: "analytics_personal"
+
+  resources :widget_configs, only: %i[new create update destroy] do
+    collection do
+      get   :picker
+      get   "configure/:widget_type", to: "widget_configs#configure", as: :configure
+      patch :reorder
+    end
+  end
+
+  resources :event_occurrences, only: %i[create update destroy]
   get "/schedule",       to: "schedule#week"
   get "/schedule/week",  to: "schedule#week"
 

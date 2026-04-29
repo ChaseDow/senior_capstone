@@ -1,0 +1,64 @@
+<%# locals: (widget:) %>
+<%
+  days        = widget.date_range_days
+  range_end   = Date.current
+  range_start = (range_end - (days - 1).days).beginning_of_week(:sunday)
+  buckets     = widget.user.event_occurrences
+                      .where(event_id: widget.event_ids, completed: true)
+                      .where(occurred_on: range_start..range_end)
+                      .group(:occurred_on).count
+
+  weeks = []
+  cursor = range_start
+  while cursor <= range_end
+    week = (0..6).map do |i|
+      d = cursor + i.days
+      d <= range_end ? { date: d, count: buckets[d].to_i } : nil
+    end
+    weeks << week
+    cursor += 7.days
+  end
+
+  max_count = [ buckets.values.max.to_i, 1 ].max
+  total     = buckets.values.sum
+  hex       = widget.accent_color
+%>
+
+<%= render layout: "widget_configs/widget_chrome", locals: { widget: widget } do %>
+  <% if widget.event_ids.empty? %>
+    <p class="text-xs text-zinc-500">No events selected — edit this widget to choose events.</p>
+  <% else %>
+    <div class="flex flex-col h-full">
+      <div class="flex items-baseline gap-2 mb-2 shrink-0">
+        <span class="text-xl font-bold text-zinc-100"><%= total %></span>
+        <span class="text-[10px] font-medium text-zinc-500">completions · last <%= days %> days</span>
+      </div>
+      <div class="flex-1 min-h-0 flex items-center">
+        <div class="flex gap-1 w-full">
+          <% weeks.each do |week| %>
+            <div class="flex flex-col gap-1 flex-1">
+              <% week.each do |cell| %>
+                <% if cell.nil? %>
+                  <div class="aspect-square rounded-sm" style="background-color: transparent;"></div>
+                <% else %>
+                  <% intensity = cell[:count].zero? ? 0 : (cell[:count].to_f / max_count) %>
+                  <% opacity   = cell[:count].zero? ? 0.08 : (0.25 + intensity * 0.75) %>
+                  <div class="aspect-square rounded-sm"
+                       title="<%= cell[:date].strftime("%b %-d") %>: <%= cell[:count] %>"
+                       style="background-color: <%= hex %>; opacity: <%= opacity.round(2) %>;"></div>
+                <% end %>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+      <div class="flex items-center gap-1.5 mt-2 shrink-0 justify-end">
+        <span class="text-[9px] text-zinc-600">less</span>
+        <% [ 0.15, 0.4, 0.65, 1.0 ].each do |o| %>
+          <div class="h-2 w-2 rounded-sm" style="background-color: <%= hex %>; opacity: <%= o %>;"></div>
+        <% end %>
+        <span class="text-[9px] text-zinc-600">more</span>
+      </div>
+    </div>
+  <% end %>
+<% end %>
