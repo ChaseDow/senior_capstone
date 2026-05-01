@@ -35,6 +35,11 @@ class AnalyticsController < ApplicationController
     end
   end
 
+  def personal
+    @widget_configs   = current_user.widget_configs.order(:position, :id)
+    @trackable_events = current_user.events.trackable.order(:title)
+  end
+
   def compare
     range_start = @week_start.beginning_of_day
     range_end   = @week_end.end_of_day

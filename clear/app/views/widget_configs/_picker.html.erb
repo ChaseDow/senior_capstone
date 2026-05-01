@@ -1,0 +1,26 @@
+<%= turbo_frame_tag "widget_modal" do %>
+  <div class="p-6" data-controller="widget-picker">
+    <h3 class="text-base font-semibold text-zinc-100 mb-1">Choose a widget</h3>
+    <p class="text-xs text-zinc-500 mb-5">Pick a visualization to add to your dashboard.</p>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <% WidgetConfig::WIDGET_TYPES.each do |type| %>
+        <a href="<%= configure_widget_configs_path(widget_type: type[:key]) %>"
+           data-action="click->widget-picker#select"
+           class="group block rounded-2xl p-4 text-left transition-all hover:-translate-y-0.5 cursor-pointer"
+           style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg-2);">
+          <div class="flex items-start gap-3 pointer-events-none">
+            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
+                 style="background-color: rgba(52, 211, 153, 0.12); color: var(--studs-accent);">
+              <%= render "widget_configs/picker_icon", key: type[:key] %>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-semibold text-zinc-100 group-hover:text-white"><%= type[:label] %></p>
+              <p class="text-xs text-zinc-500 mt-0.5"><%= type[:description] %></p>
+            </div>
+          </div>
+        </a>
+      <% end %>
+    </div>
+  </div>
+<% end %>

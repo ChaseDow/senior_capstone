@@ -1,0 +1,14 @@
+<%# locals: (widget:) %>
+<div id="<%= dom_id(widget) %>"
+     class="grid-stack-item"
+     gs-id="<%= widget.id %>"
+     gs-x="<%= widget.grid_x %>"
+     gs-y="<%= widget.grid_y %>"
+     gs-w="<%= widget.grid_w %>"
+     gs-h="<%= widget.grid_h %>"
+     gs-min-w="<%= widget.grid_min_w %>"
+     gs-min-h="<%= widget.grid_min_h %>">
+  <div class="grid-stack-item-content">
+    <%= render "widget_configs/widgets/#{widget.widget_type}", widget: widget %>
+  </div>
+</div>

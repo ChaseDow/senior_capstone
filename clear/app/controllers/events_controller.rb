@@ -368,6 +368,7 @@ class EventsController < ApplicationController
     params.require(:event).permit(
       :title, :starts_at, :ends_at, :duration_minutes, :location, :priority,
       :description, :color, :recurring, :repeat_until, :project_id, :auto_schedule,
+      :trackable,
       repeat_days: []
     )
   end

@@ -1,5 +1,7 @@
 class User < ApplicationRecord
   has_many :events, dependent: :destroy
+  has_many :event_occurrences, dependent: :destroy
+  has_many :widget_configs, dependent: :destroy
   has_many :syllabuses, dependent: :destroy
   has_many :documents, dependent: :destroy
   has_many :work_shifts, dependent: :destroy

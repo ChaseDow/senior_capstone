@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_24_173000) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_29_021649) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -88,6 +88,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_24_173000) do
     t.time "starts_at"
     t.string "term"
     t.string "title"
+    t.boolean "trackable", default: false, null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.index ["project_id"], name: "index_courses_on_project_id"
@@ -113,6 +114,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_24_173000) do
     t.index ["event_id"], name: "index_event_exceptions_on_event_id"
   end
 
+  create_table "event_occurrences", force: :cascade do |t|
+    t.boolean "completed", default: false, null: false
+    t.datetime "created_at", null: false
+    t.integer "duration_minutes"
+    t.bigint "event_id", null: false
+    t.text "notes"
+    t.date "occurred_on", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["event_id", "user_id", "occurred_on"], name: "index_event_occurrences_on_event_user_date", unique: true
+    t.index ["event_id"], name: "index_event_occurrences_on_event_id"
+    t.index ["user_id", "occurred_on"], name: "index_event_occurrences_on_user_id_and_occurred_on"
+    t.index ["user_id"], name: "index_event_occurrences_on_user_id"
+  end
+
   create_table "events", force: :cascade do |t|
     t.boolean "all_day", default: false, null: false
     t.string "color", default: "#34D399", null: false
@@ -128,11 +144,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_24_173000) do
     t.date "repeat_until"
     t.datetime "starts_at"
     t.string "title"
+    t.boolean "trackable", default: false, null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.index ["project_id"], name: "index_events_on_project_id"
     t.index ["user_id", "repeat_until"], name: "index_events_on_user_id_and_repeat_until"
     t.index ["user_id", "starts_at"], name: "index_events_on_user_id_and_starts_at"
+    t.index ["user_id", "trackable"], name: "index_events_on_user_id_and_trackable"
     t.index ["user_id"], name: "index_events_on_user_id"
   end
 
@@ -219,6 +237,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_24_173000) do
     t.index ["user_id"], name: "index_syllabuses_on_user_id"
   end
 
+  create_table "tracking_entries", force: :cascade do |t|
+    t.boolean "completed", default: false, null: false
+    t.datetime "completed_at"
+    t.datetime "created_at", null: false
+    t.integer "trackable_id", null: false
+    t.string "trackable_label", null: false
+    t.string "trackable_type", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id", "trackable_type", "trackable_id"], name: "index_tracking_entries_on_user_and_trackable", unique: true
+    t.index ["user_id"], name: "index_tracking_entries_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email", default: "", null: false
@@ -247,6 +278,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_24_173000) do
     t.index ["username"], name: "index_users_on_username"
   end
 
+  create_table "widget_configs", force: :cascade do |t|
+    t.jsonb "config", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.integer "grid_h", default: 3, null: false
+    t.integer "grid_min_h", default: 2, null: false
+    t.integer "grid_min_w", default: 2, null: false
+    t.integer "grid_w", default: 4, null: false
+    t.integer "grid_x", default: 0, null: false
+    t.integer "grid_y", default: 0, null: false
+    t.integer "position", default: 0, null: false
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.string "widget_type", null: false
+    t.index ["user_id", "position"], name: "index_widget_configs_on_user_id_and_position"
+    t.index ["user_id"], name: "index_widget_configs_on_user_id"
+  end
+
   create_table "work_shifts", force: :cascade do |t|
     t.string "color", default: "#34D399", null: false
     t.datetime "created_at", null: false
@@ -260,6 +309,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_24_173000) do
     t.date "start_date"
     t.time "start_time"
     t.string "title"
+    t.boolean "trackable", default: false, null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.index ["user_id"], name: "index_work_shifts_on_user_id"
@@ -273,6 +323,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_24_173000) do
   add_foreign_key "courses", "users"
   add_foreign_key "documents", "users"
   add_foreign_key "event_exceptions", "events"
+  add_foreign_key "event_occurrences", "events"
+  add_foreign_key "event_occurrences", "users"
   add_foreign_key "events", "projects"
   add_foreign_key "events", "users"
   add_foreign_key "notifications", "users"
@@ -285,5 +337,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_24_173000) do
   add_foreign_key "schedules", "users"
   add_foreign_key "syllabuses", "courses", on_delete: :nullify
   add_foreign_key "syllabuses", "users"
+  add_foreign_key "tracking_entries", "users"
+  add_foreign_key "widget_configs", "users"
   add_foreign_key "work_shifts", "users"
 end

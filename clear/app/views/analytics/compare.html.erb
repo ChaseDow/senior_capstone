@@ -8,15 +8,7 @@
   }
 </style>
 
-<!-- Tabs -->
-<div class="flex gap-1 mb-5 rounded-xl p-1 w-fit" style="background-color: var(--studs-panel-bg); border: 1px solid var(--studs-border);">
-  <%= link_to "This Week", analytics_path,
-        class: "rounded-lg px-4 py-1.5 text-sm font-medium text-zinc-400 hover:text-zinc-200 transition-colors" %>
-  <span class="rounded-lg px-4 py-1.5 text-sm font-semibold text-zinc-100"
-        style="background-color: var(--studs-panel-bg-2); box-shadow: 0 1px 3px rgba(0,0,0,0.3);">
-    Compare
-  </span>
-</div>
+<%= render "analytics/tabs", active: :compare %>
 
 <div data-controller="analytics-draft"
      data-analytics-draft-url-value="<%= analytics_compare_path(left: @left_id, right: @right_id) %>">
