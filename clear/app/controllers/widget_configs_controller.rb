@@ -4,12 +4,8 @@ class WidgetConfigsController < ApplicationController
   layout "app_shell"
 
   before_action :authenticate_user!
-  before_action :load_trackable_events, only: %i[new configure create]
+  before_action :load_trackable_events, only: %i[configure create]
   before_action :set_widget_config,     only: %i[update destroy]
-
-  def new
-    @widget_config = current_user.widget_configs.build
-  end
 
   def picker
     render partial: "widget_configs/picker"
@@ -21,15 +17,20 @@ class WidgetConfigsController < ApplicationController
       head :not_found and return
     end
 
+    defaults = WidgetConfig::DEFAULT_GRID[@widget_type]
     @widget_config = current_user.widget_configs.build(
       widget_type: @widget_type,
-      title: default_title_for(@widget_type)
+      title: default_title_for(@widget_type),
+      grid_w: defaults[:w], grid_h: defaults[:h],
+      grid_min_w: defaults[:min_w], grid_min_h: defaults[:min_h]
     )
-    render partial: "widget_configs/configure_#{@widget_type}"
+    render partial: "widget_configs/form",
+           locals: { widget_config: @widget_config, trackable_events: @trackable_events }
   end
 
   def create
     @widget_config = current_user.widget_configs.build(widget_config_params)
+    apply_defaults_for_size(@widget_config)
     place_at_bottom(@widget_config)
 
     if @widget_config.save
@@ -49,8 +50,8 @@ class WidgetConfigsController < ApplicationController
         format.turbo_stream do
           render turbo_stream: turbo_stream.replace(
             "widget_modal",
-            partial: "widget_configs/configure_#{@widget_config.widget_type}",
-            locals: { widget_config: @widget_config }
+            partial: "widget_configs/form",
+            locals: { widget_config: @widget_config, trackable_events: @trackable_events }
           ), status: :unprocessable_entity
         end
         format.html { render :new, status: :unprocessable_entity }
@@ -105,8 +106,7 @@ class WidgetConfigsController < ApplicationController
   def widget_config_params
     permitted = params.require(:widget_config).permit(
       :widget_type, :title,
-      :grid_x, :grid_y, :grid_w, :grid_h, :grid_min_w, :grid_min_h,
-      config: [ :date_range, :goal, :unit, :stat_metric, :color, { event_ids: [] } ]
+      config: [ :date_range, :goal, :unit, :color, { event_ids: [] } ]
     )
 
     if permitted[:config].is_a?(ActionController::Parameters)
@@ -116,6 +116,16 @@ class WidgetConfigsController < ApplicationController
     end
 
     permitted
+  end
+
+  def apply_defaults_for_size(wc)
+    d = WidgetConfig::DEFAULT_GRID[wc.widget_type]
+    return unless d
+
+    wc.grid_w     = d[:w]
+    wc.grid_h     = d[:h]
+    wc.grid_min_w = d[:min_w]
+    wc.grid_min_h = d[:min_h]
   end
 
   def place_at_bottom(wc)

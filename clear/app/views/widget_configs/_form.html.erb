@@ -1,9 +1,16 @@
-<%# Used as a layout. Locals: widget_config, trackable_events. %>
+<%# Locals: widget_config, trackable_events %>
+<%
+  label_classes = "block text-[10px] font-bold uppercase tracking-widest mb-1.5"
+  label_style   = "color: var(--studs-accent); opacity: 0.8;"
+  input_classes = "w-full rounded-2xl px-4 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-600 " \
+                  "bg-zinc-950/60 focus:outline-none focus:ring-2 transition-all duration-150 border"
+  input_style   = "border-color: var(--studs-border); --tw-ring-color: var(--studs-accent);"
+  type_label    = WidgetConfig::WIDGET_TYPES.find { |t| t[:key] == widget_config.widget_type }&.dig(:label)
+%>
+
 <%= turbo_frame_tag "widget_modal" do %>
   <div class="p-6 max-h-[80vh] overflow-y-auto">
-    <h3 class="text-base font-semibold text-zinc-100 mb-1">
-      Configure <%= WidgetConfig::WIDGET_TYPES.find { |t| t[:key] == widget_config.widget_type }&.dig(:label) %>
-    </h3>
+    <h3 class="text-base font-semibold text-zinc-100 mb-1">Configure <%= type_label %></h3>
     <p class="text-xs text-zinc-500 mb-5">Set up how this widget will display your data.</p>
 
     <% if widget_config.errors.any? %>
@@ -16,26 +23,25 @@
       </div>
     <% end %>
 
-    <% label_classes = "block text-[10px] font-bold uppercase tracking-widest mb-1.5" %>
-    <% label_style   = "color: var(--studs-accent); opacity: 0.8;" %>
-    <% input_classes = "w-full rounded-2xl px-4 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-600 " \
-                       "bg-zinc-950/60 focus:outline-none focus:ring-2 transition-all duration-150 border" %>
-    <% input_style   = "border-color: var(--studs-border); --tw-ring-color: var(--studs-accent);" %>
-
-    <%= form_with model: widget_config,
-                  url: widget_configs_path,
-                  class: "space-y-5" do |f| %>
+    <%= form_with model: widget_config, url: widget_configs_path, class: "space-y-5" do |f| %>
       <%= f.hidden_field :widget_type %>
 
       <%# Title %>
       <div>
-        <%= f.label :title, class: label_classes, style: label_style do %>Title <span class="text-red-400">*</span><% end %>
+        <%= f.label :title, class: label_classes, style: label_style do %>
+          Title <span class="text-red-400">*</span>
+        <% end %>
         <%= f.text_field :title, class: input_classes, style: input_style, placeholder: "e.g. Workouts this month" %>
       </div>
 
-      <%# Event selector %>
+      <%# Event selector — multi-select for both widget types %>
       <div>
-        <label class="<%= label_classes %>" style="<%= label_style %>">Trackable events</label>
+        <label class="<%= label_classes %>" style="<%= label_style %>">
+          Trackable events
+          <% if widget_config.widget_type == "pie_chart" %>
+            <span class="ml-1 text-zinc-500 normal-case font-normal tracking-normal">(pick 2 or more for a meaningful chart)</span>
+          <% end %>
+        </label>
         <% if trackable_events.any? %>
           <div class="rounded-2xl p-3 max-h-44 overflow-y-auto space-y-1.5"
                style="border: 1px solid var(--studs-border); background-color: var(--studs-panel-bg-2);">
@@ -51,7 +57,6 @@
               </label>
             <% end %>
           </div>
-          <p class="text-[11px] text-zinc-500 mt-1.5">Check the events this widget should track.</p>
         <% else %>
           <div class="rounded-2xl p-4 text-center"
                style="border: 1px dashed var(--studs-border); background-color: var(--studs-panel-bg-2);">
@@ -75,7 +80,26 @@
       </div>
 
       <%# Type-specific fields %>
-      <%= yield f if block_given? %>
+      <% if widget_config.widget_type == "progress_bar" %>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label for="wc_goal" class="<%= label_classes %>" style="<%= label_style %>">Goal</label>
+            <input type="number" id="wc_goal" min="1"
+                   name="widget_config[config][goal]"
+                   value="<%= widget_config.goal.positive? ? widget_config.goal : 10 %>"
+                   class="<%= input_classes %>" style="<%= input_style %>">
+          </div>
+          <div>
+            <label for="wc_unit" class="<%= label_classes %>" style="<%= label_style %>">Unit</label>
+            <select id="wc_unit" name="widget_config[config][unit]"
+                    class="<%= input_classes %>" style="<%= input_style %>">
+              <% [ %w[completions Completions], %w[hours Hours], %w[minutes Minutes] ].each do |val, label| %>
+                <option value="<%= val %>" <%= "selected" if widget_config.unit == val %>><%= label %></option>
+              <% end %>
+            </select>
+          </div>
+        </div>
+      <% end %>
 
       <%# Accent color %>
       <div>
@@ -86,7 +110,9 @@
                  value="<%= widget_config.accent_color %>"
                  class="h-12 w-20 cursor-pointer rounded-xl border bg-zinc-950/40"
                  style="border-color: var(--studs-border);">
-          <span class="text-xs text-zinc-500">Used as the primary highlight color.</span>
+          <span class="text-xs text-zinc-500">
+            <%= widget_config.widget_type == "pie_chart" ? "Used as the base color (other slices use event colors)." : "Used as the primary highlight color." %>
+          </span>
         </div>
       </div>
 
