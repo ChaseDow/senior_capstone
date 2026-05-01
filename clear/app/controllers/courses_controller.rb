@@ -327,4 +327,4 @@ class CoursesController < ApplicationController
       repeat_days: []
     )
   end
-
+end
