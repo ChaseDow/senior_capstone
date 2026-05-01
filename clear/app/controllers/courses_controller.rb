@@ -158,14 +158,18 @@ class CoursesController < ApplicationController
     end
   end
 
+
   def destroy_all
     current_user.courses.destroy_all
     redirect_to courses_path, notice: "All courses deleted."
 <<<<<<< HEAD
 =======
   end
+<<<<<<< HEAD
 
 >>>>>>> 98035b2 (Added select functionality for users to delete multiple courses/events/work shifts)
+=======
+>>>>>>> da15f9b (.)
   def destroy_multiple
     ids = Array(params[:ids]).map(&:to_i)
     current_user.courses.where(id: ids).destroy_all
