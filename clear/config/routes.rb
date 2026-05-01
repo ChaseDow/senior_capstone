@@ -71,6 +71,11 @@ end
         delete :destroy_multiple
       end
     end
+    member do
+      patch :update_grade_weights
+      get   :grades
+    end
+    resources :course_items, only: %i[index create show edit update destroy]
   end
 
   resources :agenda
