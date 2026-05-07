@@ -172,16 +172,6 @@ class CoursesController < ApplicationController
     end
   end
 
-  def update_grade_calculation
-    mode = params[:grade_calculation].to_s
-    unless Course::GRADE_CALCULATION_MODES.include?(mode)
-      redirect_to grades_course_path(@course), alert: "Invalid grade calculation mode."
-      return
-    end
-    @course.update_columns(grade_calculation: mode)
-    redirect_to grades_course_path(@course), notice: "Grade calculation updated."
-  end
-
   def destroy_all
     current_user.courses.destroy_all
     redirect_to courses_path, notice: "All courses deleted."
