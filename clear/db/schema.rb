@@ -10,11 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-<<<<<<< HEAD
-ActiveRecord::Schema[8.1].define(version: 2026_05_01_003734) do
-=======
-ActiveRecord::Schema[8.1].define(version: 2026_05_01_021949) do
->>>>>>> f842bff (.)
+ActiveRecord::Schema[8.1].define(version: 2026_05_06_065932) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -73,8 +69,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_01_021949) do
     t.integer "kind", default: 0, null: false
     t.decimal "points_earned"
     t.decimal "points_possible"
-    t.decimal "points_earned"
-    t.decimal "points_possible"
     t.string "title", null: false
     t.datetime "updated_at", null: false
     t.index ["course_id", "due_at"], name: "index_course_items_on_course_id_and_due_at"
@@ -90,7 +84,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_01_021949) do
     t.date "end_date"
     t.time "end_time"
     t.time "ends_at"
-    t.jsonb "grade_weights", default: {}, null: false
+    t.string "grade_calculation", default: "points", null: false
     t.jsonb "grade_weights", default: {}, null: false
     t.string "instructor"
     t.string "location"
@@ -240,6 +234,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_01_021949) do
   end
 
   create_table "users", force: :cascade do |t|
+    t.string "confirmation_token"
+    t.datetime "confirmation_sent_at"
+    t.datetime "confirmed_at"
     t.datetime "created_at", null: false
     t.jsonb "custom_themes", default: {}
     t.string "email", default: "", null: false
@@ -257,12 +254,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_01_021949) do
     t.string "reset_password_token"
     t.integer "role", default: 0, null: false
     t.string "theme", default: "green", null: false
+    t.string "provider"
+    t.string "uid"
+    t.string "unconfirmed_email"
     t.datetime "updated_at", null: false
     t.string "username", null: false
+    t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token", unique: true
     t.index ["invited_by_id"], name: "index_users_on_invited_by_id"
     t.index ["invited_by_type", "invited_by_id"], name: "index_users_on_invited_by"
+    t.index ["provider", "uid"], name: "index_users_on_provider_and_uid", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["role"], name: "index_users_on_role"
     t.index ["username"], name: "index_users_on_username"
