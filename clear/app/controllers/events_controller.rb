@@ -219,6 +219,13 @@ class EventsController < ApplicationController
     redirect_to events_path, notice: "All events deleted."
   end
 
+  def destroy_multiple
+    ids = Array(params[:ids]).map(&:to_i)
+    current_user.events.where(id: ids).destroy_all
+    n = ids.size
+    redirect_to events_path, notice: "#{n} event#{n == 1 ? '' : 's'} deleted."
+  end
+
   def destroy
     if @draft_temp_id.present?
       unless current_user_draft&.delete_create("event", @draft_temp_id)

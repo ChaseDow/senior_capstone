@@ -130,6 +130,13 @@ class WorkShiftsController < ApplicationController
     redirect_to work_shifts_path, notice: "All shifts deleted."
   end
 
+  def destroy_multiple
+    ids = Array(params[:ids]).map(&:to_i)
+    current_user.work_shifts.where(id: ids).destroy_all
+    n = ids.size
+    redirect_to work_shifts_path, notice: "#{n} shift#{n == 1 ? '' : 's'} deleted."
+  end
+
   def destroy
     if @draft_temp_id.present?
       unless current_user_draft&.delete_create("shift", @draft_temp_id)

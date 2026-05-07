@@ -44,6 +44,10 @@ Rails.application.routes.draw do
   resources :events do
     collection do
       delete :destroy_all
+      delete :destroy_multiple
+    end
+    member do
+      post :convert
     end
     member do
       post :convert
@@ -53,6 +57,10 @@ Rails.application.routes.draw do
   resources :work_shifts do
     collection do
       delete :destroy_all
+      delete :destroy_multiple
+    end
+    member do
+      post :convert
     end
     member do
       post :convert
@@ -67,9 +75,22 @@ Rails.application.routes.draw do
     post "pdf_preview", to: "university_calendar#pdf_preview", as: :university_calendar_pdf_preview
     post "import",      to: "university_calendar#import",      as: :university_calendar_import
   end
+
   resources :courses do
     collection do
       delete :destroy_all
+      delete :destroy_multiple
+    end
+    member do
+      patch :update_grade_weights
+      patch :update_grade_calculation
+      get   :grades
+      post  :convert
+    end
+    resources :course_items, only: %i[index create show edit update destroy] do
+      collection do
+        delete :destroy_multiple
+      end
     end
     member do
       patch :update_grade_weights
@@ -78,6 +99,7 @@ Rails.application.routes.draw do
     end
     resources :course_items, only: %i[index create show edit update destroy]
   end
+
   resources :agenda
 
   resources :syllabuses do

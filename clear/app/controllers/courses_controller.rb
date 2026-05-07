@@ -4,7 +4,7 @@ class CoursesController < ApplicationController
   layout "app_shell"
 
   before_action :authenticate_user!
-  before_action :set_course, only: %i[show edit update destroy update_grade_weights grades convert]
+  before_action :set_course, only: %i[show edit update destroy update_grade_weights update_grade_calculation grades convert]
 
   def index
     @q = params[:q].to_s.strip
@@ -175,6 +175,13 @@ class CoursesController < ApplicationController
   def destroy_all
     current_user.courses.destroy_all
     redirect_to courses_path, notice: "All courses deleted."
+  end
+
+  def destroy_multiple
+    ids = Array(params[:ids]).map(&:to_i)
+    current_user.courses.where(id: ids).destroy_all
+    n = ids.size
+    redirect_to courses_path, notice: "#{n} course#{n == 1 ? '' : 's'} deleted."
   end
 
   def destroy

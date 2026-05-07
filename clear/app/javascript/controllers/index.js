@@ -37,6 +37,9 @@ application.register("auto-schedule-toggle", AutoScheduleToggleController)
 import AvatarCropController from "./avatar_crop_controller"
 application.register("avatar-crop", AvatarCropController)
 
+import BulkSelectController from "./bulk_select_controller"
+application.register("bulk-select", BulkSelectController)
+
 import CalendarViewController from "./calendar_view_controller"
 application.register("calendar-view", CalendarViewController)
 
