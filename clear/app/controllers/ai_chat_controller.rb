@@ -101,9 +101,7 @@ class AiChatController < ApplicationController
     end
 
     assistant_text = result[:text]
-    if assistant_text.blank? && iterations >= MAX_TOOL_ITERATIONS
-      assistant_text = "I made several changes but stopped to avoid an infinite loop. Let me know if you want me to continue."
-    end
+    assistant_text = "Done." if assistant_text.blank?
 
     history << { "role" => "assistant", "content" => assistant_text }
     updated_rate = GeminiRateTracker.usage
@@ -214,23 +212,6 @@ class AiChatController < ApplicationController
               draft_id: { type: "INTEGER", description: "Optional draft ID to select" }
             },
             required: []
-          }
-        },
-        {
-          name: "create_event",
-          description: "Create a new event on the user's calendar. Use this when the user asks to add, schedule, or create an event.",
-          parameters: {
-            type: "OBJECT",
-            properties: {
-              title: { type: "STRING", description: "Title of the event" },
-              description: { type: "STRING", description: "Optional description or notes" },
-              starts_at: { type: "STRING", description: "Start date/time in ISO 8601 format (e.g. 2026-03-20T14:00:00)" },
-              ends_at: { type: "STRING", description: "Optional end date/time in ISO 8601 format" },
-              duration_minutes: { type: "INTEGER", description: "Optional duration in minutes (used if ends_at is not provided)" },
-              location: { type: "STRING", description: "Optional location" },
-              color: { type: "STRING", description: "Optional hex color like #34D399" }
-            },
-            required: [ "title", "starts_at" ]
           }
         },
         {
@@ -951,19 +932,15 @@ class AiChatController < ApplicationController
     parts << "\nUse this context to give personalized advice, reminders, and insights. " \
              "You can suggest study strategies, flag busy days, warn about upcoming deadlines, " \
              "and help with time management. Keep responses concise and friendly."
-    parts << "\nYou can create events using create_event and edit existing events using edit_event. " \
-             "When the user asks to schedule or add something, use create_event. " \
-             "When the user asks to change, move, reschedule, or update an event, use edit_event with the event's ID. " \
-             "Each event listed above has an [ID:...] you can use. Always confirm what was created or changed."
+    parts << "\nTo create a new event, ALWAYS call show_create_form — pass every detail the user gave you " \
+             "(title, starts_at, ends_at, location, color, etc.) so the form is pre-filled. Never ask for more " \
+             "text before showing the form; show it immediately with whatever details you have. " \
+             "To edit an existing event use edit_event with the event's ID. " \
+             "Each event listed above has an [ID:...] you can use. Always confirm what was changed."
     parts << "\nWhen a single user request requires MULTIPLE changes (e.g. \"create three events\", \"add a shift " \
              "and an event\", \"reschedule these two\"), call the tools as many times as needed in the same turn — " \
              "you may emit multiple function calls. Do not stop after one tool call if more are needed to fulfill " \
              "the request. Only produce a final text reply after all required tool calls have been made."
-    parts << "\nCreating events — decision rule: " \
-             "If the user's request gives you BOTH a title AND a start time, call create_event directly. " \
-             "If either is missing or ambiguous, call show_create_form instead, passing every detail you DO have " \
-             "(title, starts_at, location, color, etc.) so the form is pre-filled for the user to complete. " \
-             "Never ask the user to provide more text before showing the form — show it immediately with whatever you have."
     parts << "\nGroup events (project_id present) are read-only: NEVER create, edit, delete, or reschedule any event that has a project_id. " \
              "If the user asks to change a group event, tell them you can only assist with personal calendar events."
     parts << "\nOther inline UI tools: use show_schedule to display the user's calendar visually " \
@@ -977,7 +954,7 @@ class AiChatController < ApplicationController
     parts << "You are strictly an academic/calendar planning assistant for CLEAR. Your purpose is to help the user " \
              "manage their courses, events, work shifts, deadlines, drafts, and study planning."
     parts << "ALWAYS allowed: brief greetings and small talk (e.g. \"hi\", \"thanks\", \"how are you\") — keep these " \
-             "to one short sentence. Using any of the provided tools (create_event, edit_event, delete_event, " \
+             "to one short sentence. Using any of the provided tools (show_create_form, edit_event, delete_event, " \
              "create_work_shift, edit_work_shift, delete_work_shift, select_draft) to help the user plan. " \
              "Answering questions about their schedule, courses, drafts, deadlines, study strategy, and time management."
     parts << "REFUSE (politely, in one or two sentences) any request that is not related to academic planning or " \
