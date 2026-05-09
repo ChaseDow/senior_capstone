@@ -101,7 +101,12 @@ class AiChatController < ApplicationController
     end
 
     assistant_text = result[:text]
-    assistant_text = "Done." if assistant_text.blank?
+    if assistant_text.blank?
+      if iterations >= MAX_TOOL_ITERATIONS
+      assistant_text = "I made several changes but stopped to avoid an infinite loop. Let me know if you want me to continue."
+      end
+      assistant_text = "Done."
+    end
 
     history << { "role" => "assistant", "content" => assistant_text }
     updated_rate = GeminiRateTracker.usage
@@ -1030,11 +1035,15 @@ class AiChatController < ApplicationController
              "You can suggest study strategies, flag busy days, warn about upcoming deadlines, " \
              "and help with time management. Keep responses concise and friendly."
     parts << "\nTo create a new event, ALWAYS call show_create_form — this applies regardless of draft mode. " \
-             "Trigger words: \"schedule\", \"plan\", \"add\", \"create\", \"set up\", \"make\", \"book\". " \
-             "Pass every detail you have (title, starts_at, ends_at, location, color, etc.) so the form is pre-filled. " \
-             "Never ask for more text before showing the form; show it immediately with whatever details you have. " \
-             "To edit an existing event use edit_event with the event's ID. " \
-             "Each event listed above has an [ID:...] you can use. Always confirm what was changed."
+             "Only do this when the user is explicitly asking to ADD something to their calendar (e.g. \"add\", " \
+             "\"create\", \"set up\", \"book\", \"schedule me\", \"put on my calendar\"). " \
+             "IMPORTANT: Do NOT call show_create_form for hypothetical/impact questions, even if the user uses the word " \
+             "\"schedule\" (e.g. \"how will this affect my schedule\", \"what if I...\", \"would this conflict\"). " \
+             "For those, reply with text only. " \
+             "When you DO call show_create_form, pass every detail you have (title, starts_at, ends_at, location, color, etc.) " \
+             "so the form is pre-filled. Never ask for more text before showing the form; show it immediately with whatever " \
+             "details you have. To edit an existing event use edit_event with the event's ID. Each event listed above has an " \
+             "[ID:...] you can use. Always confirm what was changed."
     parts << "\nFor requests involving MULTIPLE new events (e.g. \"plan me 3 study sessions\", \"schedule events " \
              "on Monday, Wednesday, Friday\"), call show_create_form once per event in the same turn — emit all " \
              "function calls together. Do not stop after one form if more are needed. " \
@@ -1046,6 +1055,13 @@ class AiChatController < ApplicationController
              "hypothetical or impact questions (e.g. \"what if I...\", \"how will X affect my schedule\", " \
              "\"if I do Y tonight...\") — answer those conversationally in text. " \
              "Use show_draft_picker only when the user explicitly asks to switch or pick a draft."
+    parts << "\nFor hypothetical/impact questions, compute the impact using the schedule context above. " \
+             "Infer the most likely time window from the user's wording AND from existing event titles on the " \
+             "relevant day (e.g. if the user asks about \"dinner\" and there is already an event with a dinner-like " \
+             "title tonight, use that event's exact start/end time as the assumed window). If there is no clear " \
+             "matching event title, fall back to the common-sense defaults below. Then: (1) say whether that window " \
+             "conflicts with any occupied slot, (2) name the conflicting item(s), and (3) suggest the nearest free " \
+             "alternative window that can fit the activity."
     parts << "\nYou can also manage work shifts: create with create_work_shift, edit with edit_work_shift, " \
              "or delete with delete_work_shift. Each work shift listed above has an [ID:...] you can use. " \
              "For recurring shifts, repeat_days uses weekday numbers (0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat)."
