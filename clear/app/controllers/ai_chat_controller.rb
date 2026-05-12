@@ -714,12 +714,12 @@ class AiChatController < ApplicationController
     current_user.events
       .where("starts_at >= ? AND starts_at < ? AND ends_at IS NOT NULL",
              date.beginning_of_day, date.end_of_day)
-      .each { |e| blocked << [to_min.(e.starts_at), to_min.(e.ends_at)] }
+      .each { |e| blocked << [ to_min.(e.starts_at), to_min.(e.ends_at) ] }
 
     current_user.courses.each do |c|
       next unless c.start_time && c.end_time
       next unless Array(c.repeat_days).map(&:to_i).include?(date.wday)
-      blocked << [to_min.(c.start_time), to_min.(c.end_time)]
+      blocked << [ to_min.(c.start_time), to_min.(c.end_time) ]
     end
 
     current_user.work_shifts.active.each do |s|
@@ -731,7 +731,7 @@ class AiChatController < ApplicationController
       else
         next unless date == s.start_date
       end
-      blocked << [to_min.(s.start_time), to_min.(s.end_time)]
+      blocked << [ to_min.(s.start_time), to_min.(s.end_time) ]
     end
 
     blocked.sort!
@@ -891,7 +891,7 @@ class AiChatController < ApplicationController
 
     upcoming_events.each do |e|
       next unless e.starts_at && e.ends_at
-      blocked_ivs[e.starts_at.to_date] << [to_min.(e.starts_at), to_min.(e.ends_at), e.title]
+      blocked_ivs[e.starts_at.to_date] << [ to_min.(e.starts_at), to_min.(e.ends_at), e.title ]
     end
 
     courses.each do |c|
@@ -901,7 +901,7 @@ class AiChatController < ApplicationController
         next unless days.include?(d.wday)
         next if c.respond_to?(:start_date) && c.start_date.present? && d < c.start_date
         next if c.respond_to?(:end_date)   && c.end_date.present?   && d > c.end_date
-        blocked_ivs[d] << [to_min.(c.start_time), to_min.(c.end_time), "#{c.title} course"]
+        blocked_ivs[d] << [ to_min.(c.start_time), to_min.(c.end_time), "#{c.title} course" ]
       end
     end
 
@@ -915,7 +915,7 @@ class AiChatController < ApplicationController
         else
           next unless d == s.start_date
         end
-        blocked_ivs[d] << [to_min.(s.start_time), to_min.(s.end_time), "#{s.title} shift"]
+        blocked_ivs[d] << [ to_min.(s.start_time), to_min.(s.end_time), "#{s.title} shift" ]
       end
     end
 
@@ -930,9 +930,9 @@ class AiChatController < ApplicationController
         merged = []
         ivs.sort.each do |s, e, _|
           if merged.empty? || s > merged.last[1]
-            merged << [s, e]
+            merged << [ s, e ]
           else
-            merged[-1][1] = [merged[-1][1], e].max
+            merged[-1][1] = [ merged[-1][1], e ].max
           end
         end
         windows = []
