@@ -101,8 +101,11 @@ class AiChatController < ApplicationController
     end
 
     assistant_text = result[:text]
-    if assistant_text.blank? && iterations >= MAX_TOOL_ITERATIONS
+    if assistant_text.blank?
+      if iterations >= MAX_TOOL_ITERATIONS
       assistant_text = "I made several changes but stopped to avoid an infinite loop. Let me know if you want me to continue."
+      end
+      assistant_text = "Done."
     end
 
     history << { "role" => "assistant", "content" => assistant_text }
@@ -214,23 +217,6 @@ class AiChatController < ApplicationController
               draft_id: { type: "INTEGER", description: "Optional draft ID to select" }
             },
             required: []
-          }
-        },
-        {
-          name: "create_event",
-          description: "Create a new event on the user's calendar. Use this when the user asks to add, schedule, or create an event.",
-          parameters: {
-            type: "OBJECT",
-            properties: {
-              title: { type: "STRING", description: "Title of the event" },
-              description: { type: "STRING", description: "Optional description or notes" },
-              starts_at: { type: "STRING", description: "Start date/time in ISO 8601 format (e.g. 2026-03-20T14:00:00)" },
-              ends_at: { type: "STRING", description: "Optional end date/time in ISO 8601 format" },
-              duration_minutes: { type: "INTEGER", description: "Optional duration in minutes (used if ends_at is not provided)" },
-              location: { type: "STRING", description: "Optional location" },
-              color: { type: "STRING", description: "Optional hex color like #34D399" }
-            },
-            required: [ "title", "starts_at" ]
           }
         },
         {
@@ -701,11 +687,64 @@ class AiChatController < ApplicationController
     attrs[:title]            = args["title"]            if args["title"].present?
     attrs[:description]      = args["description"]      if args["description"].present?
     attrs[:location]         = args["location"]         if args["location"].present?
-    attrs[:duration_minutes] = args["duration_minutes"] if args["duration_minutes"].present?
-    attrs[:starts_at]        = Time.zone.parse(args["starts_at"]) rescue nil if args["starts_at"].present?
-    attrs[:ends_at]          = Time.zone.parse(args["ends_at"])   rescue nil if args["ends_at"].present?
+    attrs[:duration_minutes] = args["duration_minutes"].to_i if args["duration_minutes"].present?
+    attrs[:starts_at]        = (Time.zone.parse(args["starts_at"]) rescue nil) if args["starts_at"].present?
+    attrs[:ends_at]          = (Time.zone.parse(args["ends_at"])   rescue nil) if args["ends_at"].present?
+
+    if attrs[:starts_at]
+      duration = attrs[:duration_minutes] ||
+                 (attrs[:ends_at] ? ((attrs[:ends_at] - attrs[:starts_at]) / 60).to_i : 60)
+      adjusted = find_conflict_free_start(attrs[:starts_at], duration)
+      if adjusted != attrs[:starts_at]
+        attrs[:ends_at]   = adjusted + duration.minutes if attrs[:ends_at]
+        attrs[:starts_at] = adjusted
+      end
+    end
+
     event = current_user.events.new(attrs)
-    { success: true, partial: { name: "ai_chat/ai_create_form", locals: { event: event } } }
+    { success: true, starts_at: attrs[:starts_at]&.iso8601,
+      partial: { name: "ai_chat/ai_create_form", locals: { event: event } } }
+  end
+
+  def find_conflict_free_start(proposed_start, duration_minutes)
+    to_min  = ->(t) { t.hour * 60 + t.min }
+    date    = proposed_start.to_date
+    blocked = []
+
+    current_user.events
+      .where("starts_at >= ? AND starts_at < ? AND ends_at IS NOT NULL",
+             date.beginning_of_day, date.end_of_day)
+      .each { |e| blocked << [ to_min.(e.starts_at), to_min.(e.ends_at) ] }
+
+    current_user.courses.each do |c|
+      next unless c.start_time && c.end_time
+      next unless Array(c.repeat_days).map(&:to_i).include?(date.wday)
+      blocked << [ to_min.(c.start_time), to_min.(c.end_time) ]
+    end
+
+    current_user.work_shifts.active.each do |s|
+      next unless s.start_time && s.end_time
+      if s.recurring?
+        next unless Array(s.repeat_days).map(&:to_i).include?(date.wday)
+        next if date < s.start_date
+        next if s.repeat_until.present? && date > s.repeat_until
+      else
+        next unless date == s.start_date
+      end
+      blocked << [ to_min.(s.start_time), to_min.(s.end_time) ]
+    end
+
+    blocked.sort!
+    start_min = to_min.(proposed_start)
+
+    10.times do
+      end_min  = start_min + duration_minutes
+      conflict = blocked.find { |s, e| start_min < e && end_min > s }
+      return proposed_start.change(hour: start_min / 60, min: start_min % 60) unless conflict
+      start_min = conflict[1]
+    end
+
+    proposed_start
   end
 
   def show_draft_picker_from_ai
@@ -838,13 +877,21 @@ class AiChatController < ApplicationController
       parts << "\nUser's work shifts:\n#{shift_lines.join("\n")}"
     end
 
-    # Pre-compute blocked slots per day for the next 14 days
-    blocked = Hash.new { |h, k| h[k] = [] }
+    # Pre-compute blocked intervals per day (as [start_min, end_min, label] tuples)
+    to_min  = ->(t) { t.hour * 60 + t.min }
+    min_str = lambda { |m|
+      h, mn = m.divmod(60)
+      ampm = h < 12 ? "am" : "pm"
+      h12  = h % 12; h12 = 12 if h12 == 0
+      mn == 0 ? "#{h12}#{ampm}" : "#{h12}:#{mn.to_s.rjust(2, '0')}#{ampm}"
+    }
+
+    blocked_ivs = Hash.new { |h, k| h[k] = [] }
     range = (Date.current..14.days.from_now.to_date)
 
     upcoming_events.each do |e|
       next unless e.starts_at && e.ends_at
-      blocked[e.starts_at.to_date] << "#{e.starts_at.strftime("%-I:%M%P")}–#{e.ends_at.strftime("%-I:%M%P")} (#{e.title})"
+      blocked_ivs[e.starts_at.to_date] << [ to_min.(e.starts_at), to_min.(e.ends_at), e.title ]
     end
 
     courses.each do |c|
@@ -854,7 +901,7 @@ class AiChatController < ApplicationController
         next unless days.include?(d.wday)
         next if c.respond_to?(:start_date) && c.start_date.present? && d < c.start_date
         next if c.respond_to?(:end_date)   && c.end_date.present?   && d > c.end_date
-        blocked[d] << "#{c.start_time.strftime("%-I:%M%P")}–#{c.end_time.strftime("%-I:%M%P")} (#{c.title} course)"
+        blocked_ivs[d] << [ to_min.(c.start_time), to_min.(c.end_time), "#{c.title} course" ]
       end
     end
 
@@ -868,13 +915,45 @@ class AiChatController < ApplicationController
         else
           next unless d == s.start_date
         end
-        blocked[d] << "#{s.start_time.strftime("%-I:%M%P")}–#{s.end_time.strftime("%-I:%M%P")} (#{s.title} shift)"
+        blocked_ivs[d] << [ to_min.(s.start_time), to_min.(s.end_time), "#{s.title} shift" ]
       end
     end
 
-    if blocked.any?
-      blocked_lines = blocked.sort.map { |day, slots| "  #{day.strftime("%a %b %-d")}: #{slots.sort.join(", ")}" }
-      parts << "\nOccupied time slots — do NOT schedule anything overlapping these:\n#{blocked_lines.join("\n")}"
+    if blocked_ivs.any?
+      blocked_lines = blocked_ivs.sort.map do |day, ivs|
+        slots = ivs.sort.map { |s, e, l| "#{min_str.(s)}–#{min_str.(e)} (#{l})" }
+        "  #{day.strftime("%a %b %-d")}: #{slots.join(", ")}"
+      end
+      parts << "\nOccupied time slots (never schedule inside these windows):\n#{blocked_lines.join("\n")}"
+
+      free_lines = blocked_ivs.sort.filter_map do |day, ivs|
+        merged = []
+        ivs.sort.each do |s, e, _|
+          if merged.empty? || s > merged.last[1]
+            merged << [ s, e ]
+          else
+            merged[-1][1] = [ merged[-1][1], e ].max
+          end
+        end
+        windows = []
+        prev = 0
+        merged.each do |s, e|
+          windows << "#{min_str.(prev)}–#{min_str.(s)}" if s - prev >= 30
+          prev = e
+        end
+        windows << "after #{min_str.(prev)}" if prev < 22 * 60
+        next if windows.empty?
+        "  #{day.strftime("%a %b %-d")}: #{windows.join(", ")}"
+      end
+
+      if free_lines.any?
+        parts << "\nFree windows — ONLY use these times when suggesting or calling show_create_form:\n#{free_lines.join("\n")}"
+      end
+      parts << "CRITICAL: When calling show_create_form, verify that BOTH the start AND end time of the event " \
+               "fall within the same free window above — not just the start. " \
+               "A 1-hour event starting at 12:30pm ends at 1:30pm; if the next blocked slot starts at 1:00pm, " \
+               "that window is only 30 minutes and cannot fit a 1-hour event. Choose a free window large enough " \
+               "for the full duration. If no single window fits, pick the best available slot and trim the duration."
     end
 
     if current_user_draft.present?
@@ -942,7 +1021,11 @@ class AiChatController < ApplicationController
                  "removals are gone, and edits reflect the new values. Give advice, flag conflicts, and answer " \
                  "questions as if this is simply their calendar. Do NOT volunteer that something is a draft or mention " \
                  "the draft/main distinction unless the user explicitly asks to compare the draft against the main " \
-                 "calendar or asks what will change when the draft is applied."
+                 "calendar or asks what will change when the draft is applied. " \
+                 "When the user DOES ask to compare (e.g. \"how does my schedule compare to my main schedule\", " \
+                 "\"what changed\", \"what's different\"), answer conversationally using the pending changes listed " \
+                 "above — do NOT call any tools (not show_schedule, not show_draft_picker, not any other tool) " \
+                 "for comparison questions. Just reply with text."
       else
         parts << "\nThis draft (\"#{current_user_draft.name}\") has no pending changes yet — it currently mirrors the main calendar."
       end
@@ -951,33 +1034,48 @@ class AiChatController < ApplicationController
     parts << "\nUse this context to give personalized advice, reminders, and insights. " \
              "You can suggest study strategies, flag busy days, warn about upcoming deadlines, " \
              "and help with time management. Keep responses concise and friendly."
-    parts << "\nYou can create events using create_event and edit existing events using edit_event. " \
-             "When the user asks to schedule or add something, use create_event. " \
-             "When the user asks to change, move, reschedule, or update an event, use edit_event with the event's ID. " \
-             "Each event listed above has an [ID:...] you can use. Always confirm what was created or changed."
-    parts << "\nWhen a single user request requires MULTIPLE changes (e.g. \"create three events\", \"add a shift " \
-             "and an event\", \"reschedule these two\"), call the tools as many times as needed in the same turn — " \
-             "you may emit multiple function calls. Do not stop after one tool call if more are needed to fulfill " \
-             "the request. Only produce a final text reply after all required tool calls have been made."
-    parts << "\nCreating events — decision rule: " \
-             "If the user's request gives you BOTH a title AND a start time, call create_event directly. " \
-             "If either is missing or ambiguous, call show_create_form instead, passing every detail you DO have " \
-             "(title, starts_at, location, color, etc.) so the form is pre-filled for the user to complete. " \
-             "Never ask the user to provide more text before showing the form — show it immediately with whatever you have."
+    parts << "\nTo create a new event, ALWAYS call show_create_form — this applies regardless of draft mode. " \
+             "Only do this when the user is explicitly asking to ADD something to their calendar (e.g. \"add\", " \
+             "\"create\", \"set up\", \"book\", \"schedule me\", \"put on my calendar\"). " \
+             "IMPORTANT: Do NOT call show_create_form for hypothetical/impact questions, even if the user uses the word " \
+             "\"schedule\" (e.g. \"how will this affect my schedule\", \"what if I...\", \"would this conflict\"). " \
+             "For those, reply with text only. " \
+             "When you DO call show_create_form, pass every detail you have (title, starts_at, ends_at, location, color, etc.) " \
+             "so the form is pre-filled. Never ask for more text before showing the form; show it immediately with whatever " \
+             "details you have. To edit an existing event use edit_event with the event's ID. Each event listed above has an " \
+             "[ID:...] you can use. Always confirm what was changed."
+    parts << "\nFor requests involving MULTIPLE new events (e.g. \"plan me 3 study sessions\", \"schedule events " \
+             "on Monday, Wednesday, Friday\"), call show_create_form once per event in the same turn — emit all " \
+             "function calls together. Do not stop after one form if more are needed. " \
+             "Only produce a final text reply after all show_create_form calls have been made."
     parts << "\nGroup events (project_id present) are read-only: NEVER create, edit, delete, or reschedule any event that has a project_id. " \
              "If the user asks to change a group event, tell them you can only assist with personal calendar events."
-    parts << "\nOther inline UI tools: use show_schedule to display the user's calendar visually " \
-             "(prefer calling it after any calendar change so the user can see the result), " \
-             "and show_draft_picker to let the user interactively pick or create a draft."
+    parts << "\nOther inline UI tools: use show_schedule ONLY when the user explicitly asks to see their schedule " \
+             "visually (e.g. \"show me my schedule\", \"display my calendar\"). Do NOT call show_schedule for " \
+             "hypothetical or impact questions (e.g. \"what if I...\", \"how will X affect my schedule\", " \
+             "\"if I do Y tonight...\") — answer those conversationally in text. " \
+             "Use show_draft_picker only when the user explicitly asks to switch or pick a draft."
+    parts << "\nFor hypothetical/impact questions, compute the impact using the schedule context above. " \
+             "Infer the most likely time window from the user's wording AND from existing event titles on the " \
+             "relevant day (e.g. if the user asks about \"dinner\" and there is already an event with a dinner-like " \
+             "title tonight, use that event's exact start/end time as the assumed window). If there is no clear " \
+             "matching event title, fall back to the common-sense defaults below. Then: (1) say whether that window " \
+             "conflicts with any occupied slot, (2) name the conflicting item(s), and (3) suggest the nearest free " \
+             "alternative window that can fit the activity."
     parts << "\nYou can also manage work shifts: create with create_work_shift, edit with edit_work_shift, " \
              "or delete with delete_work_shift. Each work shift listed above has an [ID:...] you can use. " \
              "For recurring shifts, repeat_days uses weekday numbers (0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat)."
 
+    parts << "\nCommon-sense time assumptions — when the user mentions an activity without a specific time, " \
+             "use these defaults rather than asking for clarification: " \
+             "breakfast ~7–9 AM, lunch ~12–1 PM, dinner ~6–8 PM, evening ~5 PM onwards, morning ~6–9 AM, " \
+             "afternoon ~12–5 PM, night ~9 PM onwards. " \
+             "Apply these defaults, check the schedule for conflicts in that window, and answer directly."
     parts << "\n--- SCOPE & GUARDRAILS ---"
     parts << "You are strictly an academic/calendar planning assistant for CLEAR. Your purpose is to help the user " \
              "manage their courses, events, work shifts, deadlines, drafts, and study planning."
     parts << "ALWAYS allowed: brief greetings and small talk (e.g. \"hi\", \"thanks\", \"how are you\") — keep these " \
-             "to one short sentence. Using any of the provided tools (create_event, edit_event, delete_event, " \
+             "to one short sentence. Using any of the provided tools (show_create_form, edit_event, delete_event, " \
              "create_work_shift, edit_work_shift, delete_work_shift, select_draft) to help the user plan. " \
              "Answering questions about their schedule, courses, drafts, deadlines, study strategy, and time management."
     parts << "REFUSE (politely, in one or two sentences) any request that is not related to academic planning or " \
